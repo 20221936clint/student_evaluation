@@ -88,6 +88,16 @@
                             <i class="fas fa-chevron-down dropdown-arrow" id="dropdownArrow"></i>
                         </div>
                         <div class="dropdown-menu" id="dropdownMenu">
+                            <div class="dropdown-item" data-value="admin">
+                                <div class="dropdown-item-icon">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div class="dropdown-item-info">
+                                    <span class="dropdown-item-title">Administrator</span>
+                                    <span class="dropdown-item-desc">Full system access</span>
+                                </div>
+                                <i class="fas fa-check check-icon"></i>
+                            </div>
                             <div class="dropdown-item" data-value="program_head">
                                 <div class="dropdown-item-icon">
                                     <i class="fas fa-user-tie"></i>
@@ -163,7 +173,12 @@
                 </div>
 
                 <div class="login-footer">
-                    <p>Need help? <a href="#">Contact Administrator</a></p>
+                    <p>Demo Credentials:</p>
+                    <div style="margin-top: 8px; font-size: 11px; color: #6b7280;">
+                        <div style="margin-bottom: 4px;"><strong>Admin:</strong> admin@cjcm.edu / admin123</div>
+                        <div style="margin-bottom: 4px;"><strong>Program Head:</strong> head@test.com / password123</div>
+                        <div><strong>Instructor:</strong> teacher@test.com / password123</div>
+                    </div>
                 </div>
             </div>
         </div>

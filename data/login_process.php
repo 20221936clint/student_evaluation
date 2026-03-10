@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $allowed_roles = ['program_head', 'instructor'];
+    $allowed_roles = ['admin', 'program_head', 'instructor'];
     if (!in_array($role, $allowed_roles)) {
         echo json_encode([
             'success' => false,
@@ -44,7 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    try {   $table = $role === 'program_head' ? 'program_heads' : 'instructors';
+    try {   $table = match($role) {
+        'admin' => 'admins',
+        'program_head' => 'program_heads',
+        'instructor' => 'instructors',
+        default => 'program_heads'
+    };
         
         $stmt = $pdo->prepare("SELECT * FROM $table WHERE email = ?");
         $stmt->execute([$email]);
@@ -54,9 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_role'] = $role;
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
-      $redirect = $role === 'program_head' 
-                ? '../Door/program_head/dashboard.php' 
-                : '../Door/instructor/dashboard.php';
+      $redirect = match($role) {
+            'admin' => '../Door/admin/dashboard.php',
+            'program_head' => '../Door/program_head/dashboard.php',
+            'instructor' => '../Door/instructor/dashboard.php',
+            default => '../Door/program_head/dashboard.php'
+        };
 
             echo json_encode([
                 'success' => true,
@@ -75,6 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 function demoLogin($role, $email, $password) {    $demo_credentials = [
+        'admin' => [
+            'email' => 'admin@cjcm.edu',
+            'password' => 'admin123'
+        ],
         'program_head' => [
             'email' => 'head@test.com',
             'password' => 'password123'
@@ -93,12 +105,20 @@ function demoLogin($role, $email, $password) {    $demo_credentials = [
         $_SESSION['user_id'] = 1;
         $_SESSION['user_email'] = $email;
         $_SESSION['user_role'] = $role;
-        $_SESSION['user_name'] = $role === 'program_head' ? 'John Head' : 'Jane Teacher';
+        $_SESSION['user_name'] = match($role) {
+            'admin' => 'Administrator',
+            'program_head' => 'John Head',
+            'instructor' => 'Jane Teacher',
+            default => 'User'
+        };
 
         // Redirect based on role
-        $redirect = $role === 'program_head' 
-            ? '../Door/program_head/dashboard.php' 
-            : '../Door/instructor/dashboard.php';
+        $redirect = match($role) {
+            'admin' => '../Door/admin/dashboard.php',
+            'program_head' => '../Door/program_head/dashboard.php',
+            'instructor' => '../Door/instructor/dashboard.php',
+            default => '../Door/program_head/dashboard.php'
+        };
 
         echo json_encode([
             'success' => true,
@@ -108,7 +128,7 @@ function demoLogin($role, $email, $password) {    $demo_credentials = [
     } else {
         echo json_encode([
             'success' => false,
-            'message' => 'Invalid email or password. Try: ' . $demo_email . ' / ' . $demo_password
+            'message' => 'Invalid email or password. Try: ' . $demo_email . ' / ' . $demo_password . ' (or admin@cjcm.edu / admin123 for admin)'
         ]);
     }
 }

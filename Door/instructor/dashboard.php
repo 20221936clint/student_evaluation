@@ -5,141 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
     <title>Instructor Dashboard - Faculty Evaluation System</title>
-    <link rel="stylesheet" href="../../css/common.css">
-    <link rel="stylesheet" href="./style/dashboard.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-page">
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo">
-            <span class="sidebar-title">IBM</span>
+            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 64px; height: 64px; border-radius: 12px; object-fit: cover;">
+            <div class="sidebar-brand">
+                <span class="sidebar-brand-name">IBM</span>
+                <span class="sidebar-brand-sub">Evaluation System</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="sidebar-user-info">
+                <span class="sidebar-user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?></span>
+                <span class="sidebar-user-role">Instructor</span>
+            </div>
         </div>
         
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active" data-section="overview">
+            <div class="sidebar-nav-label">Menu</div>
+            <a href="dashboard.php" class="sidebar-nav-item active">
                 <i class="fas fa-chart-pie"></i>
                 <span>Overview</span>
             </a>
-            <a href="#" class="nav-item" data-section="my-evaluations">
+            <a href="pages/evaluations.php" class="sidebar-nav-item">
                 <i class="fas fa-clipboard-check"></i>
                 <span>My Evaluations</span>
             </a>
-            <a href="#" class="nav-item" data-section="my-courses">
+            <a href="pages/courses.php" class="sidebar-nav-item">
                 <i class="fas fa-book"></i>
                 <span>My Courses</span>
             </a>
-            <a href="#" class="nav-item" data-section="students">
+            <a href="pages/students.php" class="sidebar-nav-item">
                 <i class="fas fa-user-graduate"></i>
                 <span>Students</span>
             </a>
-            <a href="#" class="nav-item" data-section="feedback">
+            <a href="pages/feedback.php" class="sidebar-nav-item">
                 <i class="fas fa-comment-dots"></i>
                 <span>Feedback</span>
             </a>
-            <a href="#" class="nav-item" data-section="reports">
+            <a href="pages/reports.php" class="sidebar-nav-item">
                 <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
-            <a href="#" class="nav-item" data-section="profile">
+            <a href="pages/profile.php" class="sidebar-nav-item">
                 <i class="fas fa-user"></i>
                 <span>Profile</span>
             </a>
         </nav>
-        
-        <div class="sidebar-footer">
-            <a href="../../data/logout.php" class="nav-item logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
-        </div>
     </aside>
 
+    <!-- Main Content -->
     <div class="main-content">
+        <!-- Topbar -->
         <header class="topbar">
-            <button class="menu-toggle" id="menuToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search...">
+            <div class="topbar-left">
+                <button class="topbar-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <div class="topbar-title">Dashboard</div>
+                    <div class="topbar-subtitle">Instructor Panel</div>
+                </div>
             </div>
             
-            <div class="topbar-actions">
-                <button class="notification-btn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">2</span>
-                </button>
-                
-                <div class="user-dropdown" id="userDropdown">
-                    <div class="user-info">
-                        <span class="user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?></span>
-                        <span class="user-role">Instructor</span>
-                    </div>
-                    <img src="https://ui-avatars.com/api/?name=Jane+Teacher&background=D4A843&color=fff" alt="User" class="user-avatar">
+            <div class="topbar-right">
+                <div class="topbar-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span><?php echo date('F j, Y'); ?></span>
                 </div>
+                <a href="../../data/logout.php" class="topbar-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
             </div>
         </header>
 
-        <main class="dashboard-main">
-            <div class="page-header">
-                <h1>Dashboard Overview</h1>
-                <p>Welcome back, <?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?>!</p>
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-banner-role">Instructor</div>
+                <h1>Welcome back, <?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?>!</h1>
+                <p>Track your course performance, view student evaluations, and improve your teaching methods.</p>
             </div>
 
-            <div class="stats-grid">
+            <!-- Stats Row -->
+            <div class="stats-row">
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(212, 168, 67, 0.1);">
-                        <i class="fas fa-book" style="color: var(--gold-primary);"></i>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon gold">
+                            <i class="fas fa-book"></i>
+                        </div>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-number">6</span>
-                        <span class="stat-label">My Courses</span>
-                    </div>
+                    <div class="stat-card-value">6</div>
+                    <div class="stat-card-label">My Courses</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(76, 175, 80, 0.1);">
-                        <i class="fas fa-user-graduate" style="color: #4CAF50;"></i>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon blue">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-number">180</span>
-                        <span class="stat-label">Total Students</span>
-                    </div>
+                    <div class="stat-card-value">180</div>
+                    <div class="stat-card-label">Total Students</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(33, 150, 243, 0.1);">
-                        <i class="fas fa-star" style="color: #2196F3;"></i>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon purple">
+                            <i class="fas fa-star"></i>
+                        </div>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-number">4.7</span>
-                        <span class="stat-label">My Rating</span>
-                    </div>
+                    <div class="stat-card-value">4.7</div>
+                    <div class="stat-card-label">My Rating</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(255, 152, 0, 0.1);">
-                        <i class="fas fa-comment-dots" style="color: #FF9800;"></i>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon green">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-number">12</span>
-                        <span class="stat-label">New Feedback</span>
-                    </div>
+                    <div class="stat-card-value">12</div>
+                    <div class="stat-card-label">New Feedback</div>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>My Recent Evaluations</h3>
-                        <a href="#" class="view-all">View All</a>
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Recent Evaluations Card -->
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3><i class="fas fa-clipboard-list"></i> My Recent Evaluations</h3>
+                        <a href="pages/evaluations.php" class="view-all">View All</a>
                     </div>
-                    <div class="card-body">
-                        <table class="data-table">
+                    <div class="content-card-body">
+                        <table class="eval-table">
                             <thead>
                                 <tr>
                                     <th>Course</th>
@@ -152,19 +165,19 @@
                                 <tr>
                                     <td>Business Management 101</td>
                                     <td>30</td>
-                                    <td><span class="rating">4.8</span></td>
+                                    <td><span class="rating-badge excellent">4.8</span></td>
                                     <td>Mar 8, 2026</td>
                                 </tr>
                                 <tr>
                                     <td>Marketing Principles</td>
                                     <td>28</td>
-                                    <td><span class="rating">4.6</span></td>
+                                    <td><span class="rating-badge good">4.6</span></td>
                                     <td>Mar 7, 2026</td>
                                 </tr>
                                 <tr>
                                     <td>Strategic Management</td>
                                     <td>25</td>
-                                    <td><span class="rating">4.7</span></td>
+                                    <td><span class="rating-badge excellent">4.7</span></td>
                                     <td>Mar 6, 2026</td>
                                 </tr>
                             </tbody>
@@ -172,11 +185,13 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Recent Feedback</h3>
+                <!-- Recent Feedback Card -->
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3><i class="fas fa-comment-alt"></i> Recent Feedback</h3>
+                        <a href="pages/feedback.php" class="view-all">View All</a>
                     </div>
-                    <div class="card-body">
+                    <div class="content-card-body">
                         <div class="feedback-list">
                             <div class="feedback-item">
                                 <div class="feedback-header">

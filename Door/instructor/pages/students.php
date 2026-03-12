@@ -1,3 +1,31 @@
+<?php
+session_start();
+require_once '../../../data/config.php';
+
+$instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
+
+// Fetch summary stats
+$total_students = 0;
+$avg_attendance = 0;
+$late_submissions = 0;
+
+$sql = "SELECT COUNT(*) as cnt, COALESCE(AVG(s.attendance_rate),0) as avg_att FROM students s JOIN instructor_courses ic ON s.course_code = (SELECT c.course_code FROM courses c WHERE c.id = ic.course_id) WHERE ic.instructor_id = ?";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $total_students = $row['cnt']; $avg_attendance = round($row['avg_att']); $stmt->close(); }
+
+// Fetch course list for filter
+$course_list = [];
+$sql = "SELECT c.course_code, c.course_name FROM instructor_courses ic JOIN courses c ON ic.course_id = c.id WHERE ic.instructor_id = ?";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $course_list[] = $row; } $stmt->close(); }
+
+// Fetch students
+$students = [];
+$sql = "SELECT s.first_name, s.last_name, s.email, s.course_code, s.year_level, s.attendance_rate, s.avatar_initials, s.avatar_gradient_from, s.avatar_gradient_to FROM students s JOIN instructor_courses ic ON s.course_code = (SELECT c.course_code FROM courses c WHERE c.id = ic.course_id) WHERE ic.instructor_id = ? ORDER BY s.last_name";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $students[] = $row; } $stmt->close(); }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +33,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
     <title>Students - Faculty Evaluation System</title>
-    <link rel="stylesheet" href="../../css/common.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,7 +43,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo">
+            <img src="../../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 70px; height: 70px; border-radius: 16px; object-fit: cover; border: 3px solid white; background: white; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
             <div class="sidebar-brand">
                 <span class="sidebar-brand-name">IBM</span>
                 <span class="sidebar-brand-sub">Evaluation System</span>
@@ -27,7 +55,7 @@
                 <i class="fas fa-user"></i>
             </div>
             <div class="sidebar-user-info">
-                <span class="sidebar-user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?></span>
+                <span class="sidebar-user-name"><?php echo htmlspecialchars($user_name); ?></span>
                 <span class="sidebar-user-role">Instructor</span>
             </div>
         </div>
@@ -66,7 +94,8 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" style="position: relative;">
+        <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle">
@@ -83,7 +112,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span><?php echo date('F j, Y'); ?></span>
                 </div>
-                <a href="../../data/logout.php" class="topbar-logout">
+                <a href="../../../data/logout.php" class="topbar-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -96,9 +125,9 @@
                 <div class="mentees-header-right">
                     <select class="eval-filter-select">
                         <option>All Courses</option>
-                        <option>BM101 - Business Management 101</option>
-                        <option>MKT201 - Marketing Principles</option>
-                        <option>SM301 - Strategic Management</option>
+                        <?php foreach ($course_list as $cl): ?>
+                        <option><?php echo htmlspecialchars($cl['course_code'] . ' - ' . $cl['course_name']); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
@@ -109,7 +138,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>180</h4>
+                        <h4><?php echo $total_students; ?></h4>
                         <p>Total Students</p>
                     </div>
                 </div>
@@ -118,7 +147,7 @@
                         <i class="fas fa-calendar-check"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>92%</h4>
+                        <h4><?php echo $avg_attendance; ?>%</h4>
                         <p>Avg Attendance</p>
                     </div>
                 </div>
@@ -127,7 +156,7 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>15</h4>
+                        <h4>0</h4>
                         <p>Late Submissions</p>
                     </div>
                 </div>
@@ -151,81 +180,23 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <?php foreach ($students as $student): ?>
                             <tr>
                                 <td>
                                     <div class="student-item-inline">
-                                        <div class="student-avatar-sm" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">JD</div>
-                                        <span>John Doe</span>
+                                        <div class="student-avatar-sm" style="background: linear-gradient(135deg, <?php echo htmlspecialchars($student['avatar_gradient_from']); ?>, <?php echo htmlspecialchars($student['avatar_gradient_to']); ?>);"><?php echo htmlspecialchars($student['avatar_initials']); ?></div>
+                                        <span><?php echo htmlspecialchars($student['first_name'] . ' ' . $student['last_name']); ?></span>
                                     </div>
                                 </td>
-                                <td>john.doe@student.edu</td>
-                                <td><span class="course-code">BM101</span></td>
-                                <td>3rd Year</td>
-                                <td><span class="status-badge completed">95%</span></td>
+                                <td><?php echo htmlspecialchars($student['email']); ?></td>
+                                <td><span class="course-code"><?php echo htmlspecialchars($student['course_code']); ?></span></td>
+                                <td><?php echo htmlspecialchars($student['year_level']); ?></td>
+                                <td><span class="status-badge <?php echo $student['attendance_rate'] >= 90 ? 'completed' : 'pending'; ?>"><?php echo round($student['attendance_rate']); ?>%</span></td>
                                 <td>
                                     <button class="action-btn action-btn-edit"><i class="fas fa-eye"></i></button>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>
-                                    <div class="student-item-inline">
-                                        <div class="student-avatar-sm" style="background: linear-gradient(135deg, #10b981, #34d399);">JW</div>
-                                        <span>Jane Wilson</span>
-                                    </div>
-                                </td>
-                                <td>jane.wilson@student.edu</td>
-                                <td><span class="course-code">BM101</span></td>
-                                <td>2nd Year</td>
-                                <td><span class="status-badge completed">92%</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-edit"><i class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="student-item-inline">
-                                        <div class="student-avatar-sm" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">MJ</div>
-                                        <span>Mike Johnson</span>
-                                    </div>
-                                </td>
-                                <td>mike.j@student.edu</td>
-                                <td><span class="course-code">MKT201</span></td>
-                                <td>3rd Year</td>
-                                <td><span class="status-badge pending">88%</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-edit"><i class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="student-item-inline">
-                                        <div class="student-avatar-sm" style="background: linear-gradient(135deg, #f43f5e, #fb7185);">SW</div>
-                                        <span>Sarah Williams</span>
-                                    </div>
-                                </td>
-                                <td>sarah.w@student.edu</td>
-                                <td><span class="course-code">SM301</span></td>
-                                <td>4th Year</td>
-                                <td><span class="status-badge completed">98%</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-edit"><i class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="student-item-inline">
-                                        <div class="student-avatar-sm" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">TB</div>
-                                        <span>Tom Brown</span>
-                                    </div>
-                                </td>
-                                <td>tom.b@student.edu</td>
-                                <td><span class="course-code">BM101</span></td>
-                                <td>2nd Year</td>
-                                <td><span class="status-badge completed">90%</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-edit"><i class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -233,6 +204,6 @@
         </main>
     </div>
 
-    <script src="../../function/dashboard.js"></script>
+    <script src="../../../function/dashboard.js"></script>
 </body>
 </html>

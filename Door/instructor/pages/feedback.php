@@ -1,3 +1,35 @@
+<?php
+session_start();
+require_once '../../../data/config.php';
+
+$instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
+
+// Fetch summary stats
+$total_feedback = 0;
+$new_this_month = 0;
+$avg_rating = 0;
+
+$sql = "SELECT COUNT(*) as cnt, COALESCE(AVG(rating),0) as avg_r FROM evaluation_feedback WHERE instructor_id = ?";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $total_feedback = $row['cnt']; $avg_rating = round($row['avg_r'], 1); $stmt->close(); }
+
+$sql = "SELECT COUNT(*) as cnt FROM evaluation_feedback WHERE instructor_id = ? AND feedback_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $new_this_month = $row['cnt']; $stmt->close(); }
+
+// Fetch course list for filter
+$course_list = [];
+$sql = "SELECT DISTINCT c.course_code, c.course_name FROM evaluation_feedback ef JOIN courses c ON ef.course_id = c.id WHERE ef.instructor_id = ?";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $course_list[] = $row; } $stmt->close(); }
+
+// Fetch all feedback
+$feedbacks = [];
+$sql = "SELECT course_name, feedback_text, rating, feedback_date FROM evaluation_feedback WHERE instructor_id = ? ORDER BY feedback_date DESC";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $feedbacks[] = $row; } $stmt->close(); }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +37,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
     <title>Feedback - Faculty Evaluation System</title>
-    <link rel="stylesheet" href="../../css/common.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,7 +47,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo">
+            <img src="../../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 70px; height: 70px; border-radius: 16px; object-fit: cover; border: 3px solid white; background: white; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
             <div class="sidebar-brand">
                 <span class="sidebar-brand-name">IBM</span>
                 <span class="sidebar-brand-sub">Evaluation System</span>
@@ -27,7 +59,7 @@
                 <i class="fas fa-user"></i>
             </div>
             <div class="sidebar-user-info">
-                <span class="sidebar-user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?></span>
+                <span class="sidebar-user-name"><?php echo htmlspecialchars($user_name); ?></span>
                 <span class="sidebar-user-role">Instructor</span>
             </div>
         </div>
@@ -66,7 +98,8 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" style="position: relative;">
+        <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle">
@@ -83,7 +116,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span><?php echo date('F j, Y'); ?></span>
                 </div>
-                <a href="../../data/logout.php" class="topbar-logout">
+                <a href="../../../data/logout.php" class="topbar-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -96,9 +129,9 @@
                 <div class="mentees-header-right">
                     <select class="eval-filter-select">
                         <option>All Courses</option>
-                        <option>BM101 - Business Management 101</option>
-                        <option>MKT201 - Marketing Principles</option>
-                        <option>SM301 - Strategic Management</option>
+                        <?php foreach ($course_list as $cl): ?>
+                        <option><?php echo htmlspecialchars($cl['course_code'] . ' - ' . $cl['course_name']); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
@@ -109,7 +142,7 @@
                         <i class="fas fa-comment-dots"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>48</h4>
+                        <h4><?php echo $total_feedback; ?></h4>
                         <p>Total Feedback</p>
                     </div>
                 </div>
@@ -118,7 +151,7 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>12</h4>
+                        <h4><?php echo $new_this_month; ?></h4>
                         <p>New This Month</p>
                     </div>
                 </div>
@@ -127,7 +160,7 @@
                         <i class="fas fa-star"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>4.7</h4>
+                        <h4><?php echo $avg_rating; ?></h4>
                         <p>Average Rating</p>
                     </div>
                 </div>
@@ -140,80 +173,24 @@
                     </div>
                     <div class="content-card-body">
                         <div class="feedback-list">
+                            <?php foreach ($feedbacks as $fb): ?>
                             <div class="feedback-item">
                                 <div class="feedback-header">
-                                    <span class="feedback-course">Business Management 101</span>
-                                    <span class="feedback-date">Mar 8, 2026</span>
+                                    <span class="feedback-course"><?php echo htmlspecialchars($fb['course_name']); ?></span>
+                                    <span class="feedback-date"><?php echo date('M j, Y', strtotime($fb['feedback_date'])); ?></span>
                                 </div>
-                                <p class="feedback-text">"Excellent teaching methodology. Very engaging and practical examples that really help understand the concepts."</p>
+                                <p class="feedback-text">"<?php echo htmlspecialchars($fb['feedback_text']); ?>"</p>
                                 <div class="feedback-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
+                                    <?php
+                                    $full_stars = floor($fb['rating']);
+                                    $half_star = ($fb['rating'] - $full_stars) >= 0.25;
+                                    for ($i = 0; $i < $full_stars; $i++) echo '<i class="fas fa-star"></i>';
+                                    if ($half_star) echo '<i class="fas fa-star-half-alt"></i>';
+                                    for ($i = $full_stars + ($half_star ? 1 : 0); $i < 5; $i++) echo '<i class="far fa-star"></i>';
+                                    ?>
                                 </div>
                             </div>
-                            
-                            <div class="feedback-item">
-                                <div class="feedback-header">
-                                    <span class="feedback-course">Marketing Principles</span>
-                                    <span class="feedback-date">Mar 5, 2026</span>
-                                </div>
-                                <p class="feedback-text">"Great examples and case studies. Would love more interactive sessions in class."</p>
-                                <div class="feedback-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="feedback-item">
-                                <div class="feedback-header">
-                                    <span class="feedback-course">Strategic Management</span>
-                                    <span class="feedback-date">Mar 3, 2026</span>
-                                </div>
-                                <p class="feedback-text">"Very knowledgeable and explains complex concepts clearly. The group projects are very helpful."</p>
-                                <div class="feedback-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="feedback-item">
-                                <div class="feedback-header">
-                                    <span class="feedback-course">Business Management 101</span>
-                                    <span class="feedback-date">Feb 28, 2026</span>
-                                </div>
-                                <p class="feedback-text">"Good overall. Could use more real-world applications and guest speakers."</p>
-                                <div class="feedback-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="feedback-item">
-                                <div class="feedback-header">
-                                    <span class="feedback-course">Marketing Principles</span>
-                                    <span class="feedback-date">Feb 25, 2026</span>
-                                </div>
-                                <p class="feedback-text">"Love the interactive activities! Would appreciate more time for discussions."</p>
-                                <div class="feedback-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -221,6 +198,6 @@
         </main>
     </div>
 
-    <script src="../../function/dashboard.js"></script>
+    <script src="../../../function/dashboard.js"></script>
 </body>
 </html>

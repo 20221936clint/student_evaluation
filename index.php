@@ -67,27 +67,6 @@
         </div>
     </footer>
 
-    <script>    function addRefreshButton() {
-            var navLinks = document.getElementById('navLinks');
-            if (navLinks) {
-                var refreshLi = document.createElement('li');
-                var refreshLink = document.createElement('a');
-                refreshLink.href = 'javascript:void(0)';
-                refreshLink.className = 'nav-refresh-btn';
-                refreshLink.title = 'Refresh';
-                refreshLink.onclick = function() { location.reload(); };
-                refreshLink.innerHTML = '<i class="fas fa-sync-alt"></i>';
-                refreshLi.appendChild(refreshLink);
-                navLinks.insertBefore(refreshLi, navLinks.firstChild);
-            }
-        }
-           if (!sessionStorage.getItem('siteVisited')) {
-            sessionStorage.setItem('siteVisited', 'true');   setTimeout(function() {
-                window.location.reload();
-            }, 500);
-        }
-        
-        document.addEventListener('DOMContentLoaded', addRefreshButton);
     </script>
     <script type="module" src="./js/landing.js"></script>
 </body>

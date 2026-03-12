@@ -815,7 +815,7 @@ if (!file_exists($page_file)) {
                         <div class="user-role">Administrator</div>
                     </div>
                 </div>
-                <a href="../../data/logout.php" class="logout-btn">
+                <a href="../../../data/logout.php" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>

@@ -1,3 +1,23 @@
+<?php
+session_start();
+require_once '../../../data/config.php';
+
+$instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
+
+// Fetch instructor's courses
+$courses = [];
+$sql = "SELECT c.course_code, c.course_name, c.student_count, c.schedule, c.room, ic.bg_class,
+        COALESCE(AVG(e.rating), 0) as avg_rating
+        FROM instructor_courses ic
+        JOIN courses c ON ic.course_id = c.id
+        LEFT JOIN evaluations e ON e.course_id = c.id AND e.instructor_id = ic.instructor_id
+        WHERE ic.instructor_id = ?
+        GROUP BY c.id, ic.bg_class
+        ORDER BY c.course_code";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $courses[] = $row; } $stmt->close(); }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +25,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
     <title>My Courses - Faculty Evaluation System</title>
-    <link rel="stylesheet" href="../../css/common.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,7 +35,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo">
+            <img src="../../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 70px; height: 70px; border-radius: 16px; object-fit: cover; border: 3px solid white; background: white; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
             <div class="sidebar-brand">
                 <span class="sidebar-brand-name">IBM</span>
                 <span class="sidebar-brand-sub">Evaluation System</span>
@@ -27,7 +47,7 @@
                 <i class="fas fa-user"></i>
             </div>
             <div class="sidebar-user-info">
-                <span class="sidebar-user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?></span>
+                <span class="sidebar-user-name"><?php echo htmlspecialchars($user_name); ?></span>
                 <span class="sidebar-user-role">Instructor</span>
             </div>
         </div>
@@ -66,7 +86,8 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" style="position: relative;">
+        <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle">
@@ -83,7 +104,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span><?php echo date('F j, Y'); ?></span>
                 </div>
-                <a href="../../data/logout.php" class="topbar-logout">
+                <a href="../../../data/logout.php" class="topbar-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -96,30 +117,31 @@
             </div>
             
             <div class="mentees-grid">
+                <?php foreach ($courses as $index => $course): ?>
                 <div class="mentee-card">
                     <div class="mentee-card-top">
-                        <div class="mentee-avatar bg-1"><i class="fas fa-book-open"></i></div>
+                        <div class="mentee-avatar <?php echo htmlspecialchars($course['bg_class']); ?>"><i class="fas fa-book-open"></i></div>
                         <div class="mentee-info">
-                            <h4>BM101</h4>
-                            <p>Business Management 101</p>
+                            <h4><?php echo htmlspecialchars($course['course_code']); ?></h4>
+                            <p><?php echo htmlspecialchars($course['course_name']); ?></p>
                         </div>
                     </div>
                     <div class="mentee-details">
                         <div class="mentee-detail-row">
                             <span class="mentee-detail-label">Students</span>
-                            <span class="mentee-detail-value">30</span>
+                            <span class="mentee-detail-value"><?php echo $course['student_count']; ?></span>
                         </div>
                         <div class="mentee-detail-row">
                             <span class="mentee-detail-label">Rating</span>
-                            <span class="mentee-detail-value gpa-high">4.8</span>
+                            <span class="mentee-detail-value <?php echo $course['avg_rating'] >= 4.7 ? 'gpa-high' : 'gpa-mid'; ?>"><?php echo number_format($course['avg_rating'], 1); ?></span>
                         </div>
                         <div class="mentee-detail-row">
                             <span class="mentee-detail-label">Schedule</span>
-                            <span class="mentee-detail-value">Mon/Wed 9AM</span>
+                            <span class="mentee-detail-value"><?php echo htmlspecialchars($course['schedule']); ?></span>
                         </div>
                         <div class="mentee-detail-row">
                             <span class="mentee-detail-label">Room</span>
-                            <span class="mentee-detail-value">Room 101</span>
+                            <span class="mentee-detail-value"><?php echo htmlspecialchars($course['room']); ?></span>
                         </div>
                     </div>
                     <div class="mentee-card-actions">
@@ -131,118 +153,11 @@
                         </button>
                     </div>
                 </div>
-                
-                <div class="mentee-card">
-                    <div class="mentee-card-top">
-                        <div class="mentee-avatar bg-2"><i class="fas fa-book-open"></i></div>
-                        <div class="mentee-info">
-                            <h4>MKT201</h4>
-                            <p>Marketing Principles</p>
-                        </div>
-                    </div>
-                    <div class="mentee-details">
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Students</span>
-                            <span class="mentee-detail-value">28</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Rating</span>
-                            <span class="mentee-detail-value gpa-mid">4.6</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Schedule</span>
-                            <span class="mentee-detail-value">Tue/Thu 11AM</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Room</span>
-                            <span class="mentee-detail-value">Room 203</span>
-                        </div>
-                    </div>
-                    <div class="mentee-card-actions">
-                        <button class="action-btn action-btn-edit">
-                            <i class="fas fa-edit"></i> View
-                        </button>
-                        <button class="action-btn action-btn-delete">
-                            <i class="fas fa-eye"></i> Students
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="mentee-card">
-                    <div class="mentee-card-top">
-                        <div class="mentee-avatar bg-3"><i class="fas fa-book-open"></i></div>
-                        <div class="mentee-info">
-                            <h4>SM301</h4>
-                            <p>Strategic Management</p>
-                        </div>
-                    </div>
-                    <div class="mentee-details">
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Students</span>
-                            <span class="mentee-detail-value">25</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Rating</span>
-                            <span class="mentee-detail-value gpa-high">4.7</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Schedule</span>
-                            <span class="mentee-detail-value">Fri 2PM</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Room</span>
-                            <span class="mentee-detail-value">Room 305</span>
-                        </div>
-                    </div>
-                    <div class="mentee-card-actions">
-                        <button class="action-btn action-btn-edit">
-                            <i class="fas fa-edit"></i> View
-                        </button>
-                        <button class="action-btn action-btn-delete">
-                            <i class="fas fa-eye"></i> Students
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="mentee-card">
-                    <div class="mentee-card-top">
-                        <div class="mentee-avatar bg-4"><i class="fas fa-book-open"></i></div>
-                        <div class="mentee-info">
-                            <h4>BE201</h4>
-                            <p>Business Ethics</p>
-                        </div>
-                    </div>
-                    <div class="mentee-details">
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Students</span>
-                            <span class="mentee-detail-value">32</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Rating</span>
-                            <span class="mentee-detail-value gpa-mid">4.5</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Schedule</span>
-                            <span class="mentee-detail-value">Wed 4PM</span>
-                        </div>
-                        <div class="mentee-detail-row">
-                            <span class="mentee-detail-label">Room</span>
-                            <span class="mentee-detail-value">Room 102</span>
-                        </div>
-                    </div>
-                    <div class="mentee-card-actions">
-                        <button class="action-btn action-btn-edit">
-                            <i class="fas fa-edit"></i> View
-                        </button>
-                        <button class="action-btn action-btn-delete">
-                            <i class="fas fa-eye"></i> Students
-                        </button>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </main>
     </div>
 
-    <script src="../../function/dashboard.js"></script>
+    <script src="../../../function/dashboard.js"></script>
 </body>
 </html>

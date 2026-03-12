@@ -1,3 +1,31 @@
+<?php
+session_start();
+require_once '../../../data/config.php';
+
+$instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
+
+// Fetch report stats
+$pdf_count = 0;
+$excel_count = 0;
+$total_downloads = 0;
+
+$sql = "SELECT report_type, COUNT(*) as cnt, SUM(download_count) as downloads FROM reports WHERE generated_by = 'instructor' GROUP BY report_type";
+$result = $conn->query($sql);
+if ($result) { while ($row = $result->fetch_assoc()) { if ($row['report_type'] == 'pdf') { $pdf_count = $row['cnt']; } else { $excel_count = $row['cnt']; } $total_downloads += $row['downloads']; } }
+
+// Fetch reports
+$reports = [];
+$sql = "SELECT report_name, report_description, report_type, icon_class FROM reports WHERE generated_by = 'instructor' ORDER BY created_at DESC";
+$result = $conn->query($sql);
+if ($result) { while ($row = $result->fetch_assoc()) { $reports[] = $row; } }
+
+// Fetch quick stats (course ratings for this instructor)
+$quick_stats = [];
+$sql = "SELECT c.course_code, c.course_name, COALESCE(AVG(e.rating),0) as avg_rating FROM instructor_courses ic JOIN courses c ON ic.course_id = c.id LEFT JOIN evaluations e ON e.course_id = c.id AND e.instructor_id = ic.instructor_id WHERE ic.instructor_id = ? GROUP BY c.id ORDER BY avg_rating DESC LIMIT 3";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $quick_stats[] = $row; } $stmt->close(); }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +33,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
     <title>Reports - Faculty Evaluation System</title>
-    <link rel="stylesheet" href="../../css/common.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,7 +43,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo">
+            <img src="../../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 70px; height: 70px; border-radius: 16px; object-fit: cover; border: 3px solid white; background: white; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
             <div class="sidebar-brand">
                 <span class="sidebar-brand-name">IBM</span>
                 <span class="sidebar-brand-sub">Evaluation System</span>
@@ -27,7 +55,7 @@
                 <i class="fas fa-user"></i>
             </div>
             <div class="sidebar-user-info">
-                <span class="sidebar-user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?></span>
+                <span class="sidebar-user-name"><?php echo htmlspecialchars($user_name); ?></span>
                 <span class="sidebar-user-role">Instructor</span>
             </div>
         </div>
@@ -58,15 +86,16 @@
                 <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
-            <a href="profile.php" class="                <i classsidebar-nav-item">
-="fas fa-user"></i>
+            <a href="profile.php" class="sidebar-nav-item">
+                <i class="fas fa-user"></i>
                 <span>Profile</span>
             </a>
         </nav>
     </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" style="position: relative;">
+        <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle">
@@ -83,7 +112,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span><?php echo date('F j, Y'); ?></span>
                 </div>
-                <a href="../../data/logout.php" class="topbar-logout">
+                <a href="../../../data/logout.php" class="topbar-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -101,7 +130,7 @@
                         <i class="fas fa-file-pdf"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>5</h4>
+                        <h4><?php echo $pdf_count; ?></h4>
                         <p>PDF Reports</p>
                     </div>
                 </div>
@@ -110,7 +139,7 @@
                         <i class="fas fa-file-excel"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>3</h4>
+                        <h4><?php echo $excel_count; ?></h4>
                         <p>Excel Reports</p>
                     </div>
                 </div>
@@ -119,7 +148,7 @@
                         <i class="fas fa-download"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>23</h4>
+                        <h4><?php echo $total_downloads; ?></h4>
                         <p>Downloads</p>
                     </div>
                 </div>
@@ -132,57 +161,20 @@
                     </div>
                     <div class="content-card-body">
                         <div class="report-list">
+                            <?php foreach ($reports as $report): ?>
                             <div class="report-item">
                                 <div class="report-icon">
-                                    <i class="fas fa-file-pdf"></i>
+                                    <i class="<?php echo htmlspecialchars($report['icon_class']); ?>"></i>
                                 </div>
                                 <div class="report-info">
-                                    <h4>Evaluation Summary Report</h4>
-                                    <p>Spring 2026 Semester</p>
+                                    <h4><?php echo htmlspecialchars($report['report_name']); ?></h4>
+                                    <p><?php echo htmlspecialchars($report['report_description']); ?></p>
                                 </div>
                                 <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">
                                     <i class="fas fa-download"></i> Download
                                 </button>
                             </div>
-                            
-                            <div class="report-item">
-                                <div class="report-icon">
-                                    <i class="fas fa-file-pdf"></i>
-                                </div>
-                                <div class="report-info">
-                                    <h4>Course Performance Report</h4>
-                                    <p>All Courses - Academic Year 2025-2026</p>
-                                </div>
-                                <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                            </div>
-                            
-                            <div class="report-item">
-                                <div class="report-icon">
-                                    <i class="fas fa-file-excel"></i>
-                                </div>
-                                <div class="report-info">
-                                    <h4>Student Grades Export</h4>
-                                    <p>Current Semester</p>
-                                </div>
-                                <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                            </div>
-                            
-                            <div class="report-item">
-                                <div class="report-icon">
-                                    <i class="fas fa-file-pdf"></i>
-                                </div>
-                                <div class="report-info">
-                                    <h4>Feedback Analysis</h4>
-                                    <p>All Courses - Comprehensive</p>
-                                </div>
-                                <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -193,33 +185,17 @@
                     </div>
                     <div class="content-card-body">
                         <div class="performance-list">
+                            <?php foreach ($quick_stats as $stat): ?>
                             <div class="performance-item">
                                 <div class="performance-info">
-                                    <span class="performance-name">BM101 - Business Management</span>
-                                    <span class="performance-value">4.8</span>
+                                    <span class="performance-name"><?php echo htmlspecialchars($stat['course_code'] . ' - ' . $stat['course_name']); ?></span>
+                                    <span class="performance-value"><?php echo number_format($stat['avg_rating'], 1); ?></span>
                                 </div>
                                 <div class="progress-bar">
-                                    <div class="progress" style="width: 96%;"></div>
+                                    <div class="progress" style="width: <?php echo round($stat['avg_rating'] * 20); ?>%;"></div>
                                 </div>
                             </div>
-                            <div class="performance-item">
-                                <div class="performance-info">
-                                    <span class="performance-name">MKT201 - Marketing</span>
-                                    <span class="performance-value">4.6</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: 92%;"></div>
-                                </div>
-                            </div>
-                            <div class="performance-item">
-                                <div class="performance-info">
-                                    <span class="performance-name">SM301 - Strategic</span>
-                                    <span class="performance-value">4.7</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: 94%;"></div>
-                                </div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -227,6 +203,6 @@
         </main>
     </div>
 
-    <script src="../../function/dashboard.js"></script>
+    <script src="../../../function/dashboard.js"></script>
 </body>
 </html>

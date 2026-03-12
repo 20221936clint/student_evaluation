@@ -6,6 +6,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropdownItems = document.querySelectorAll('.dropdown-item');
     const roleInput = document.getElementById('roleInput');
 
+    // Check for saved credentials on page load
+    const savedCredentials = localStorage.getItem('rememberMeCredentials');
+    if (savedCredentials) {
+        try {
+            const credentials = JSON.parse(savedCredentials);
+            document.getElementById('username').value = credentials.email || '';
+            document.getElementById('password').value = credentials.password || '';
+            document.getElementById('rememberMe').checked = true;
+        } catch (e) {
+            console.error('Error parsing saved credentials:', e);
+        }
+    }
+
     // Toggle dropdown
     dropdownTrigger.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -106,6 +119,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
 
                 if (result.success) {
+                    // Handle Remember Me functionality
+                    const rememberMe = document.getElementById('rememberMe').checked;
+                    if (rememberMe) {
+                        localStorage.setItem('rememberMeCredentials', JSON.stringify({
+                            email: email,
+                            password: password
+                        }));
+                    } else {
+                        localStorage.removeItem('rememberMeCredentials');
+                    }
+                    
                     showToast('Login Successful! Redirecting...');
                     setTimeout(() => {
                         window.location.href = result.redirect;

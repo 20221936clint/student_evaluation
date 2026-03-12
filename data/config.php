@@ -1,20 +1,21 @@
 <?php
-// Database configuration
+// Database Configuration
 $db_host = 'localhost';
-$db_name = 'checkmate';
 $db_user = 'root';
 $db_pass = '';
+$db_name = 'checkmate';
 
-try {
-    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    error_log("Database connection failed: " . $e->getMessage());
-    $pdo = null;
+// Create connection
+$conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
+
+// Check connection
+if ($conn->connect_error) {
+    // If database connection fails, set conn to null so pages can handle gracefully
+    $conn = null;
 }
 
-// Session configuration
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// Set charset
+if ($conn) {
+    $conn->set_charset("utf8mb4");
 }
+?>

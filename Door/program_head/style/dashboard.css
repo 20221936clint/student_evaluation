@@ -329,7 +329,6 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-decoration: none;
 }
 
 .topbar-logout:hover {
@@ -1001,20 +1000,6 @@
     }
 }
 
-/* View All Link */
-.view-all {
-    color: var(--gold-dark);
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.view-all:hover {
-    color: var(--gold-primary);
-    text-decoration: underline;
-}
-
 /* Page Hidden */
 .page-hidden {
     display: none;
@@ -1142,9 +1127,9 @@
     color: #059669;
 }
 
-.status-badge.overdue {
-    background: rgba(239, 68, 68, 0.12);
-    color: #dc2626;
+.status-badge.inactive {
+    background: rgba(107, 114, 128, 0.12);
+    color: #6b7280;
 }
 
 /* Mentees Grid */
@@ -1477,46 +1462,7 @@
     margin: 0;
 }
 
-/* Filter Select */
-.eval-filter-select {
-    padding: 8px 16px;
-    border: 2px solid var(--border-light);
-    border-radius: 10px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--dark-text);
-    background: var(--white);
-    outline: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.eval-filter-select:focus {
-    border-color: var(--gold-primary);
-    box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.15);
-}
-
-/* Search Input */
-.eval-search-input {
-    padding: 8px 16px;
-    border: 2px solid var(--border-light);
-    border-radius: 10px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--dark-text);
-    background: var(--white);
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.eval-search-input:focus {
-    border-color: var(--gold-primary);
-    box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.15);
-}
-
-/* Responsive for new components */
+/* Responsive */
 @media (max-width: 1200px) {
     .eval-summary-row {
         grid-template-columns: repeat(2, 1fr);
@@ -1531,4 +1477,26 @@
     .mentees-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Background Blur Effect */
+.bg-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.dashboard-content.bg-blur::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../media/Ibm logo.jpg');
+    background-size: 50%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.3;
+    z-index: -1;
+    pointer-events: none;
 }

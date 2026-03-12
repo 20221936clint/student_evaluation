@@ -1,10 +1,22 @@
+<?php
+session_start();
+require_once '../../../data/config.php';
+
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'John Head';
+
+// Fetch departments
+$departments = [];
+$sql = "SELECT department_name, icon_class, gradient_from, gradient_to, instructor_count, course_count FROM departments ORDER BY department_name";
+$result = $conn->query($sql);
+if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row; } }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Departments - Program Head Dashboard</title>
-    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../../css/common.css">
     <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -30,13 +42,13 @@
 <body>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 64px; height: 64px; border-radius: 12px; object-fit: cover;">
+            <img src="../../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 70px; height: 70px; border-radius: 16px; object-fit: cover; border: 3px solid white; background: white; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
             <div class="sidebar-brand"><span class="sidebar-brand-name">IBM</span><span class="sidebar-brand-sub">Evaluation System</span></div>
         </div>
         <div class="sidebar-user">
             <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
             <div class="sidebar-user-info">
-                <span class="sidebar-user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'John Head'; ?></span>
+                <span class="sidebar-user-name"><?php echo htmlspecialchars($user_name); ?></span>
                 <span class="sidebar-user-role">Program Head</span>
             </div>
         </div>
@@ -51,7 +63,8 @@
             <a href="settings.php" class="sidebar-nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
         </nav>
     </aside>
-    <div class="main-content">
+    <div class="main-content" style="position: relative;">
+        <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
@@ -59,7 +72,7 @@
             </div>
             <div class="topbar-right">
                 <div class="topbar-date"><i class="fas fa-calendar-alt"></i><span><?php echo date('F j, Y'); ?></span></div>
-                <a href="../../data/logout.php" class="topbar-logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+                <a href="../../../data/logout.php" class="topbar-logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
             </div>
         </header>
         <main class="dashboard-content">
@@ -69,22 +82,16 @@
                     <p class="page-subtitle">View all departments in the institution</p>
                 </div>
                 <div class="dept-grid">
+                    <?php foreach ($departments as $dept): ?>
                     <div class="dept-card">
-                        <div class="dept-icon" style="background: linear-gradient(135deg, #d4a843, #e8c768);"><i class="fas fa-cogs"></i></div>
-                        <div class="dept-info"><div class="dept-name">Operational Management</div><div class="dept-meta">8 Instructors | 12 Courses</div></div>
+                        <div class="dept-icon" style="background: linear-gradient(135deg, <?php echo htmlspecialchars($dept['gradient_from']); ?>, <?php echo htmlspecialchars($dept['gradient_to']); ?>);"><i class="<?php echo htmlspecialchars($dept['icon_class']); ?>"></i></div>
+                        <div class="dept-info"><div class="dept-name"><?php echo htmlspecialchars($dept['department_name']); ?></div><div class="dept-meta"><?php echo $dept['instructor_count']; ?> Instructors | <?php echo $dept['course_count']; ?> Courses</div></div>
                     </div>
-                    <div class="dept-card">
-                        <div class="dept-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);"><i class="fas fa-dollar-sign"></i></div>
-                        <div class="dept-info"><div class="dept-name">Financial Management</div><div class="dept-meta">5 Instructors | 8 Courses</div></div>
-                    </div>
-                    <div class="dept-card">
-                        <div class="dept-icon" style="background: linear-gradient(135deg, #ec4899, #f472b6);"><i class="fas fa-chart-line"></i></div>
-                        <div class="dept-info"><div class="dept-name">Marketing Management</div><div class="dept-meta">3 Instructors | 5 Courses</div></div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </main>
     </div>
-    <script src="../../function/dashboard.js"></script>
+    <script src="../../../function/dashboard.js"></script>
 </body>
 </html>

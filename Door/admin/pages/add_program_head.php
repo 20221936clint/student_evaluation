@@ -9,7 +9,6 @@
     </a>
 </div>
 
-<!-- Success Message -->
 <?php if (isset($_GET['success'])): ?>
 <div class="alert alert-success">
     <i class="fas fa-check-circle"></i>
@@ -17,7 +16,6 @@
 </div>
 <?php endif; ?>
 
-<!-- Add Form -->
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">
@@ -32,8 +30,24 @@
                 <input type="text" class="form-input" name="first_name" placeholder="Enter first name" required>
             </div>
             <div class="form-group">
+                <label class="form-label">Middle Name</label>
+                <input type="text" class="form-input" name="middle_name" placeholder="Enter middle name">
+            </div>
+            <div class="form-group">
                 <label class="form-label">Last Name</label>
                 <input type="text" class="form-input" name="last_name" placeholder="Enter last name" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Suffix</label>
+                <select class="form-select" name="suffix">
+                    <option value="">None</option>
+                    <option value="Jr.">Jr.</option>
+                    <option value="Sr.">Sr.</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="IV">IV</option>
+                    <option value="V">V</option>
+                </select>
             </div>
             <div class="form-group">
                 <label class="form-label">Email Address</label>
@@ -76,27 +90,4 @@
             </button>
         </div>
     </form>
-</div>
-
-<!-- Quick Add Options -->
-<div class="card" style="margin-top: 24px;">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fas fa-bolt"></i>
-            Quick Add
-        </h3>
-    </div>
-    <div class="card-body" style="padding: 24px;">
-        <p style="color: var(--light-text); margin-bottom: 16px;">Quickly add demo program heads for testing:</p>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <a href="../../data/admin_process.php?action=quick_add&type=demo" class="btn btn-success">
-                <i class="fas fa-magic"></i>
-                Add Demo Instructors
-            </a>
-            <a href="../../data/admin_process.php?action=quick_add&type=sample" class="btn" style="background: var(--cream); color: var(--dark-text);">
-                <i class="fas fa-file-import"></i>
-                Import Sample Data
-            </a>
-        </div>
-    </div>
 </div>

@@ -1,3 +1,25 @@
+<?php
+session_start();
+require_once '../../../data/config.php';
+
+$instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
+
+// Fetch summary stats
+$total_evaluations = 0;
+$avg_rating = 0;
+$semester_change = 0;
+
+$sql = "SELECT COUNT(*) as cnt, COALESCE(AVG(rating),0) as avg_r FROM evaluations WHERE instructor_id = ?";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $total_evaluations = $row['cnt']; $avg_rating = round($row['avg_r'], 1); $stmt->close(); }
+
+// Fetch all evaluations
+$evaluations = [];
+$sql = "SELECT c.course_name, c.student_count, e.rating, e.semester, e.evaluation_date FROM evaluations e JOIN courses c ON e.course_id = c.id WHERE e.instructor_id = ? ORDER BY e.evaluation_date DESC";
+$stmt = $conn->prepare($sql);
+if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $evaluations[] = $row; } $stmt->close(); }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +27,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon_atoms.ico" type="image/x-icon">
     <title>My Evaluations - Faculty Evaluation System</title>
-    <link rel="stylesheet" href="../../css/common.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -15,7 +37,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../../media/LOGO.jpg" alt="Logo" class="sidebar-logo">
+            <img src="../../../media/LOGO.jpg" alt="Logo" class="sidebar-logo" style="width: 70px; height: 70px; border-radius: 16px; object-fit: cover; border: 3px solid white; background: white; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
             <div class="sidebar-brand">
                 <span class="sidebar-brand-name">IBM</span>
                 <span class="sidebar-brand-sub">Evaluation System</span>
@@ -27,7 +49,7 @@
                 <i class="fas fa-user"></i>
             </div>
             <div class="sidebar-user-info">
-                <span class="sidebar-user-name"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher'; ?></span>
+                <span class="sidebar-user-name"><?php echo htmlspecialchars($user_name); ?></span>
                 <span class="sidebar-user-role">Instructor</span>
             </div>
         </div>
@@ -66,7 +88,8 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" style="position: relative;">
+        <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle">
@@ -83,7 +106,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span><?php echo date('F j, Y'); ?></span>
                 </div>
-                <a href="../../data/logout.php" class="topbar-logout">
+                <a href="../../../data/logout.php" class="topbar-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -101,7 +124,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>45</h4>
+                        <h4><?php echo $total_evaluations; ?></h4>
                         <p>Total Evaluations</p>
                     </div>
                 </div>
@@ -110,7 +133,7 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="eval-summary-info">
-                        <h4>4.7</h4>
+                        <h4><?php echo $avg_rating; ?></h4>
                         <p>Average Rating</p>
                     </div>
                 </div>
@@ -141,41 +164,15 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <?php foreach ($evaluations as $eval): ?>
                             <tr>
-                                <td>Business Management 101</td>
-                                <td>30</td>
-                                <td><span class="rating-badge excellent">4.8</span></td>
-                                <td>Spring 2026</td>
-                                <td>Mar 8, 2026</td>
+                                <td><?php echo htmlspecialchars($eval['course_name']); ?></td>
+                                <td><?php echo $eval['student_count']; ?></td>
+                                <td><span class="rating-badge <?php echo $eval['rating'] >= 4.7 ? 'excellent' : ($eval['rating'] >= 4.4 ? 'good' : 'average'); ?>"><?php echo number_format($eval['rating'], 1); ?></span></td>
+                                <td><?php echo htmlspecialchars($eval['semester']); ?></td>
+                                <td><?php echo date('M j, Y', strtotime($eval['evaluation_date'])); ?></td>
                             </tr>
-                            <tr>
-                                <td>Marketing Principles</td>
-                                <td>28</td>
-                                <td><span class="rating-badge good">4.6</span></td>
-                                <td>Spring 2026</td>
-                                <td>Mar 7, 2026</td>
-                            </tr>
-                            <tr>
-                                <td>Strategic Management</td>
-                                <td>25</td>
-                                <td><span class="rating-badge excellent">4.7</span></td>
-                                <td>Spring 2026</td>
-                                <td>Mar 6, 2026</td>
-                            </tr>
-                            <tr>
-                                <td>Business Ethics</td>
-                                <td>32</td>
-                                <td><span class="rating-badge good">4.5</span></td>
-                                <td>Fall 2025</td>
-                                <td>Dec 15, 2025</td>
-                            </tr>
-                            <tr>
-                                <td>Entrepreneurship</td>
-                                <td>22</td>
-                                <td><span class="rating-badge average">4.3</span></td>
-                                <td>Fall 2025</td>
-                                <td>Dec 12, 2025</td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -183,6 +180,6 @@
         </main>
     </div>
 
-    <script src="../../function/dashboard.js"></script>
+    <script src="../../../function/dashboard.js"></script>
 </body>
 </html>

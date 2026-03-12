@@ -90,12 +90,16 @@ try {
             <tbody id="instructorsTableBody">
                 <?php foreach ($instructors as $instructor): ?>
                 <?php 
-                    $initials = strtoupper(substr($instructor['first_name'], 0, 1) . substr($instructor['last_name'], 0, 1));
+                    $initials = strtoupper(substr($instructor['first_name'], 0, 1) . (isset($instructor['middle_name']) && $instructor['middle_name'] ? substr($instructor['middle_name'], 0, 1) : '') . substr($instructor['last_name'], 0, 1));
+                    $full_name = $instructor['first_name'] . ' ' . ($instructor['middle_name'] ?? '') . ' ' . $instructor['last_name'] . ($instructor['suffix'] ? ', ' . $instructor['suffix'] : '');
+                    $full_name = preg_replace('/\s+/', ' ', trim($full_name));
                     $created_date = isset($instructor['created_at']) ? date('M j, Y', strtotime($instructor['created_at'])) : date('M j, Y');
                 ?>
                 <tr data-id="<?php echo $instructor['id']; ?>" 
                     data-first-name="<?php echo htmlspecialchars($instructor['first_name']); ?>"
+                    data-middle-name="<?php echo htmlspecialchars($instructor['middle_name'] ?? ''); ?>"
                     data-last-name="<?php echo htmlspecialchars($instructor['last_name']); ?>"
+                    data-suffix="<?php echo htmlspecialchars($instructor['suffix'] ?? ''); ?>"
                     data-email="<?php echo htmlspecialchars($instructor['email']); ?>"
                     data-employee-id="<?php echo htmlspecialchars($instructor['employee_id'] ?? ''); ?>"
                     data-department="<?php echo htmlspecialchars($instructor['department']); ?>"
@@ -104,7 +108,7 @@ try {
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #d4a843, #e8c768); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;"><?php echo $initials; ?></div>
                             <div>
-                                <div style="font-weight: 600;"><?php echo htmlspecialchars($instructor['first_name'] . ' ' . $instructor['last_name']); ?></div>
+                                <div style="font-weight: 600;"><?php echo htmlspecialchars($full_name); ?></div>
                                 <div style="font-size: 12px; color: #6b7280;"><?php echo htmlspecialchars($instructor['position'] ?? 'Instructor'); ?></div>
                             </div>
                         </div>
@@ -146,8 +150,24 @@ try {
                 <input type="text" class="form-input" name="first_name" id="editFirstName" required>
             </div>
             <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Middle Name</label>
+                <input type="text" class="form-input" name="middle_name" id="editMiddleName">
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
                 <label class="form-label">Last Name</label>
                 <input type="text" class="form-input" name="last_name" id="editLastName" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Suffix</label>
+                <select class="form-select" name="suffix" id="editSuffix">
+                    <option value="">None</option>
+                    <option value="Jr.">Jr.</option>
+                    <option value="Sr.">Sr.</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="IV">IV</option>
+                    <option value="V">V</option>
+                </select>
             </div>
             <div class="form-group" style="margin-bottom: 16px;">
                 <label class="form-label">Email</label>
@@ -206,7 +226,9 @@ function editInstructor(id) {
     if (row) {
         document.getElementById('editId').value = row.dataset.id;
         document.getElementById('editFirstName').value = row.dataset.firstName;
+        document.getElementById('editMiddleName').value = row.dataset.middleName || '';
         document.getElementById('editLastName').value = row.dataset.lastName;
+        document.getElementById('editSuffix').value = row.dataset.suffix || '';
         document.getElementById('editEmail').value = row.dataset.email;
         document.getElementById('editDepartment').value = row.dataset.department;
         document.getElementById('editPosition').value = row.dataset.position;

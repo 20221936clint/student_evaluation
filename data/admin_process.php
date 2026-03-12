@@ -26,7 +26,9 @@ try {
 if ($action === 'add_instructor') {
     // Handle add instructor form submission
     $first_name = trim($_POST['first_name'] ?? '');
+    $middle_name = trim($_POST['middle_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
+    $suffix = trim($_POST['suffix'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $department = $_POST['department'] ?? '';
@@ -58,8 +60,8 @@ if ($action === 'add_instructor') {
 
     if ($pdo) {
         try {
-            $stmt = $pdo->prepare("INSERT INTO instructors (first_name, last_name, email, password, department, employee_id) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$first_name, $last_name, $email, $hashed_password, $department, $employee_id]);
+            $stmt = $pdo->prepare("INSERT INTO instructors (first_name, middle_name, last_name, suffix, email, password, department, employee_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$first_name, $middle_name, $last_name, $suffix, $email, $hashed_password, $department, $employee_id]);
             header('Location: ../Door/admin/dashboard.php?page=manage_program_heads&success=' . urlencode('Instructor added successfully!'));
         } catch (PDOException $e) {
             header('Location: ../Door/admin/dashboard.php?page=add_program_head&error=' . urlencode('Email already exists'));
@@ -190,7 +192,9 @@ if ($action === 'add_instructor') {
 } elseif ($action === 'edit_instructor') {
     $id = $_POST['id'] ?? 0;
     $first_name = trim($_POST['first_name'] ?? '');
+    $middle_name = trim($_POST['middle_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
+    $suffix = trim($_POST['suffix'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $department = $_POST['department'] ?? '';
     $position = $_POST['position'] ?? 'Instructor';
@@ -202,8 +206,8 @@ if ($action === 'add_instructor') {
 
     if ($pdo) {
         try {
-            $stmt = $pdo->prepare("UPDATE instructors SET first_name = ?, last_name = ?, email = ?, department = ?, position = ? WHERE id = ?");
-            $stmt->execute([$first_name, $last_name, $email, $department, $position, $id]);
+            $stmt = $pdo->prepare("UPDATE instructors SET first_name = ?, middle_name = ?, last_name = ?, suffix = ?, email = ?, department = ?, position = ? WHERE id = ?");
+            $stmt->execute([$first_name, $middle_name, $last_name, $suffix, $email, $department, $position, $id]);
             header('Location: ../Door/admin/dashboard.php?page=manage_program_heads&success=' . urlencode('Instructor updated successfully!'));
         } catch (PDOException $e) {
             header('Location: ../Door/admin/dashboard.php?page=manage_program_heads&error=' . urlencode('Failed to update instructor'));
@@ -218,13 +222,30 @@ if ($action === 'add_instructor') {
 
     header('Content-Type: application/json');
 
-    if ($pdo && !empty($id)) {
-        $stmt = $pdo->prepare("SELECT * FROM instructors WHERE id = ?");
-        $stmt->execute([$id]);
-        $instructor = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo json_encode($instructor);
+    // Validate that id is a positive integer
+    if (empty($id) || !is_numeric($id) || intval($id) <= 0) {
+        echo json_encode(['error' => 'Invalid instructor ID']);
+        exit;
+    }
+
+    if ($pdo) {
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM instructors WHERE id = ?");
+            $stmt->execute([$id]);
+            $instructor = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($instructor === false) {
+                echo json_encode(['error' => 'Instructor not found']);
+            } else {
+                // Remove password from response for security
+                unset($instructor['password']);
+                echo json_encode($instructor);
+            }
+        } catch (PDOException $e) {
+            echo json_encode(['error' => 'Database error occurred']);
+        }
     } else {
-        echo json_encode(['error' => 'Invalid request']);
+        echo json_encode(['error' => 'Database connection not available']);
     }
     exit;
 

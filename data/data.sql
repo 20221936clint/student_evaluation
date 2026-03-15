@@ -160,11 +160,36 @@ CREATE TABLE IF NOT EXISTS instructor_courses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Pending Instructor Registrations (self-registration)
+CREATE TABLE IF NOT EXISTS pending_instructors (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    employee_id VARCHAR(50) NOT NULL UNIQUE,
+    department VARCHAR(100),
+    password VARCHAR(255) NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Admin Promotions (promote instructor to program_head)
+CREATE TABLE IF NOT EXISTS admin_promotions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    instructor_id INT NOT NULL,
+    promoted_to VARCHAR(50) NOT NULL COMMENT 'program_head or admin',
+    promoted_by INT NOT NULL COMMENT 'admin user_id',
+    promotion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('active', 'revoked') DEFAULT 'active',
+    FOREIGN KEY (instructor_id) REFERENCES instructors(id)
+);
+
 -- =====================================================
 -- SAMPLE DATA INSERTS
 -- =====================================================
 
--- Sample Users (Password: password123)
+-- Sample Users
+-- Note: All passwords are 'password123' (hashed with bcrypt)
 -- Admin
 INSERT INTO admins (first_name, last_name, email, password, role) VALUES
 ('System', 'Administrator', 'admin@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
@@ -183,7 +208,7 @@ INSERT INTO program_heads (first_name, last_name, email, password, department, p
 
 -- Instructors
 INSERT INTO instructors (first_name, last_name, email, password, department, employee_id, position, phone, office_location, avatar_gradient_from, avatar_gradient_to, status) VALUES
-('Jane', 'Smith', 'jane.smith@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Operational Management', 'EMP0001', 'Instructor', '+1 234 567 8900', 'Room 305, Building A', '#667eea', '#764ba2', 'active'),
+('Jane', 'Teacher', 'teacher@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Operational Management', 'EMP0001', 'Instructor', '+1 234 567 8900', 'Room 305, Building A', '#667eea', '#764ba2', 'active'),
 ('Michael', 'Brown', 'michael.brown@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Financial Management', 'EMP0002', 'Instructor', '+1 234 567 8910', 'Room 306, Building A', '#11998e', '#38ef7d', 'active'),
 ('Sarah', 'Johnson', 'sarah.johnson@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Marketing Management', 'EMP0003', 'Instructor', '+1 234 567 8920', 'Room 307, Building A', '#f093fb', '#f5576c', 'active'),
 ('David', 'Lee', 'david.lee@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Operational Management', 'EMP0004', 'Instructor', '+1 234 567 8930', 'Room 308, Building A', '#4facfe', '#00f2fe', 'active'),

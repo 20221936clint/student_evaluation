@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const credentials = JSON.parse(savedCredentials);
             document.getElementById('username').value = credentials.email || '';
             document.getElementById('password').value = credentials.password || '';
-            document.getElementById('rememberMe').checked = true;
         } catch (e) {
             console.error('Error parsing saved credentials:', e);
         }
@@ -116,20 +115,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: formData
                 });
 
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Invalid response content type');
+                }
+
                 const result = await response.json();
 
                 if (result.success) {
-                    // Handle Remember Me functionality
-                    const rememberMe = document.getElementById('rememberMe').checked;
-                    if (rememberMe) {
-                        localStorage.setItem('rememberMeCredentials', JSON.stringify({
-                            email: email,
-                            password: password
-                        }));
-                    } else {
-                        localStorage.removeItem('rememberMeCredentials');
-                    }
-                    
                     // Clear the logged_out flag since user is logging in
                     sessionStorage.removeItem('logged_out');
                     sessionStorage.setItem('on_protected_page', 'true');

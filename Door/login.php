@@ -168,15 +168,6 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
                         </div>
                     </div>
 
-                    <div class="form-options">
-                        <label class="remember-me">
-                            <input type="checkbox" id="rememberMe">
-                            <span class="checkmark"></span>
-                            <span>Remember me</span>
-                        </label>
-                        <a href="./forgot_password.html" class="forgot-link">Forgot Password?</a>
-                    </div>
-
                     <button type="submit" class="login-btn" id="loginBtn">
                         <span class="btn-text">Sign In</span>
                         <span class="btn-loader" id="btnLoader">
@@ -184,22 +175,22 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
                         </span>
                         <i class="fas fa-arrow-right btn-arrow"></i>
                     </button>
-                </form>
 
-                <div class="create-account-section" id="createAccountSection" style="display: none;">
-                    <div class="create-account-divider">
-                        <span>or</span>
+                    <div class="create-account-section" id="createAccountSection" style="display: none;">
+                        <div class="create-account-divider">
+                            <span>or</span>
+                        </div>
+                        <a href="./register_instructor.php" class="create-account-btn">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Sign Up as Instructor</span>
+                        </a>
                     </div>
-                    <a href="./register_instructor.html" class="create-account-btn">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Create Instructor Account</span>
-                    </a>
-                </div>
+                </form>
 
                 <div class="login-footer">
                     <p>Demo Credentials:</p>
                     <div style="margin-top: 8px; font-size: 11px; color: #6b7280;">
-                        <div style="margin-bottom: 4px;"><strong>Admin:</strong> admin@cjcm.edu / admin123</div>
+                        <div style="margin-bottom: 4px;"><strong>Admin:</strong> admin@cjcm.edu / password123</div>
                         <div style="margin-bottom: 4px;"><strong>Program Head:</strong> head@test.com / password123</div>
                         <div><strong>Instructor:</strong> teacher@test.com / password123</div>
                     </div>
@@ -248,6 +239,21 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
             if (window.history && window.history.replaceState) {
                 window.history.replaceState(null, '', window.location.href);
             }
+
+            // Show/hide Sign Up section based on role selection
+            const createAccountSection = document.getElementById('createAccountSection');
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const role = this.getAttribute('data-value');
+                    if (role === 'instructor') {
+                        createAccountSection.style.display = 'block';
+                    } else {
+                        createAccountSection.style.display = 'none';
+                    }
+                });
+            });
         })();
     </script>
     <script type="module" src="../function/login.js"></script>

@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function demoLogin($role, $email, $password) {    $demo_credentials = [
         'admin' => [
             'email' => 'admin@cjcm.edu',
-            'password' => 'admin123'
+            'password' => 'password123'
         ],
         'program_head' => [
             'email' => 'head@test.com',
@@ -116,7 +116,7 @@ function demoLogin($role, $email, $password) {    $demo_credentials = [
     } else {
         echo json_encode([
             'success' => false,
-            'message' => 'Invalid email or password. Try: ' . $demo_email . ' / ' . $demo_password . ' (or admin@cjcm.edu / admin123 for admin)'
+            'message' => 'Invalid email or password. Try: ' . $demo_email . ' / ' . $demo_password
         ]);
     }
 }

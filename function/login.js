@@ -130,9 +130,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         localStorage.removeItem('rememberMeCredentials');
                     }
                     
+                    // Clear the logged_out flag since user is logging in
+                    sessionStorage.removeItem('logged_out');
+                    sessionStorage.setItem('on_protected_page', 'true');
+                    // Set just_logged_in flag so session_guard.js skips the initial logout check
+                    sessionStorage.setItem('just_logged_in', 'true');
+                    
                     showToast('Login Successful! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = result.redirect;
+                        // Use replace so the login page is removed from history
+                        // This prevents back button from going to login page after login
+                        window.location.replace(result.redirect);
                     }, 1000);
                 } else {
                     showToast(result.message || 'Login failed. Please try again.');

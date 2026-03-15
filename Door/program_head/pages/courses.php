@@ -1,8 +1,15 @@
 <?php
-session_start();
+require_once '../../../data/session_security.php';
 require_once '../../../data/config.php';
 
-$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'John Head';
+// Check role access - returns array with access status
+$role_access = check_role_access('program_head');
+$show_role_modal = !$role_access['allowed'];
+
+$user_name = $_SESSION['user_name'] ?? 'John Head';
+
+// Only fetch data if access is allowed
+if (!$show_role_modal) {
 
 // Fetch stats
 $total_courses = 0;
@@ -39,6 +46,7 @@ $sql = "SELECT c.course_code, c.course_name, c.description, c.student_count, c.e
         ORDER BY c.course_code";
 $result = $conn->query($sql);
 if ($result) { while ($row = $result->fetch_assoc()) { $courses[] = $row; } }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -223,6 +231,35 @@ if ($result) { while ($row = $result->fetch_assoc()) { $courses[] = $row; } }
             </div>
         </main>
     </div>
+    
+    <!-- Role Mismatch Modal -->
+    <div class="modal-overlay" id="roleMismatchModal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-icon" style="background: rgba(220, 38, 38, 0.1); color: #dc2626;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">Access Restricted</h3>
+            <p id="roleModalMessage" style="font-size: 14px; color: #6b7280; margin-bottom: 20px;"></p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <a href="../../../data/logout.php" style="background: #dc2626; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 500;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                <a href="../../../Door/login.php" style="background: linear-gradient(135deg, #d4a843, #b8922f); color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 500;">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+        </div>
+    </div>
+    
     <script src="../../../function/dashboard.js"></script>
+    <?php if ($show_role_modal): ?>
+    <script>
+        // Show role mismatch modal on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('roleModalMessage').textContent = <?php echo json_encode($role_access['message']); ?>;
+            document.getElementById('roleMismatchModal').classList.add('show');
+        });
+    </script>
+    <?php endif; ?>
 </body>
 </html>

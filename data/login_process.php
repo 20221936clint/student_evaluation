@@ -1,21 +1,9 @@
 <?php
 header('Content-Type: application/json');
-session_start();
+require_once 'config.php';
 
-$db_host = 'localhost';
-$db_name = 'checkmate';
-$db_user = 'root';
-$db_pass = '';
-
-$pdo = null;
-$db_connected = false;
-
-try {
-    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $db_connected = true;
-} catch (PDOException $e) {
-    $db_connected = false;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -39,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         exit;
     }
-   if (!$db_connected) {
+   if (!$pdo) {
         demoLogin($role, $email, $password);
         exit;
     }

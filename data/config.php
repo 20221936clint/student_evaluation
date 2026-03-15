@@ -5,17 +5,26 @@ $db_user = 'root';
 $db_pass = '';
 $db_name = 'checkmate';
 
-// Create connection
+// ========================================
+// MySQLi Connection (for legacy code)
+// ========================================
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
-// Check connection
+// Check mysqli connection
 if ($conn->connect_error) {
-    // If database connection fails, set conn to null so pages can handle gracefully
     $conn = null;
+} else {
+    $conn->set_charset("utf8mb4");
 }
 
-// Set charset
-if ($conn) {
-    $conn->set_charset("utf8mb4");
+// ========================================
+// PDO Connection (recommended)
+// ========================================
+try {
+    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $pdo = null;
 }
 ?>

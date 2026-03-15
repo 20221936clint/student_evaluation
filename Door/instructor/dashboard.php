@@ -1,9 +1,10 @@
 <?php
-session_start();
+require_once '../../data/session_security.php';
+check_auth('instructor', '../login.php');
 require_once '../../data/config.php';
 
-$instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
-$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
+$instructor_id = $_SESSION['user_id'] ?? 1;
+$user_name = $_SESSION['user_name'] ?? 'Jane Teacher';
 
 // Fetch stats
 $course_count = 0;
@@ -126,7 +127,7 @@ if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result =
                     <i class="fas fa-calendar-alt"></i>
                     <span><?php echo date('F j, Y'); ?></span>
                 </div>
-                <a href="../../../data/logout.php" class="topbar-logout">
+                <a href="../../data/logout.php" class="topbar-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -251,5 +252,6 @@ if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result =
     </div>
 
     <script src="../../function/dashboard.js"></script>
+    <script src="../../function/session_guard.js"></script>
 </body>
 </html>

@@ -1,3 +1,32 @@
+<?php
+// Start session to check login status
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is already logged in
+$is_logged_in = isset($_SESSION['user_role']) && !empty($_SESSION['user_role']);
+$user_role = $_SESSION['user_role'] ?? '';
+$user_name = $_SESSION['user_name'] ?? 'User';
+
+// Determine dashboard URL based on role
+$dashboard_url = '';
+$role_label = '';
+if ($is_logged_in) {
+    $dashboard_url = match($user_role) {
+        'admin' => './Door/admin/dashboard.php',
+        'program_head' => './Door/program_head/dashboard.php',
+        'instructor' => './Door/instructor/dashboard.php',
+        default => './Door/login.php'
+    };
+    $role_label = match($user_role) {
+        'admin' => 'Administrator',
+        'program_head' => 'Program Head',
+        'instructor' => 'Instructor',
+        default => 'User'
+    };
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,7 +50,20 @@
                 <span class="nav-title">Institute For Business Management</span>
             </a>
             <ul class="nav-links" id="navLinks">
-                <li><a href="./Door/login.php" class="nav-login-btn">Login</a></li>
+                <?php if ($is_logged_in): ?>
+                    <li style="display: flex; align-items: center; gap: 8px; margin-right: 12px;">
+                        <span style="color: #d4a843; font-weight: 600; font-size: 13px;">
+                            <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($user_name); ?>
+                        </span>
+                        <span style="background: rgba(212, 168, 67, 0.2); color: #b8922f; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+                            <?php echo htmlspecialchars($role_label); ?>
+                        </span>
+                    </li>
+                    <li><a href="<?php echo htmlspecialchars($dashboard_url); ?>" class="nav-login-btn" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fas fa-home"></i> Return</a></li>
+                    <li><a href="./data/logout.php" class="nav-login-btn" style="background: linear-gradient(135deg, #dc2626, #b91c1c);"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <?php else: ?>
+                    <li><a href="./Door/login.php" class="nav-login-btn">Login</a></li>
+                <?php endif; ?>
             </ul>
             <div class="nav-toggle" id="navToggle">
                 <span></span>

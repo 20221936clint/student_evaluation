@@ -1,29 +1,26 @@
 <?php
-// Database connection
-$host = 'localhost';
-$dbname = 'checkmate';
-$db_user = 'root';
-$db_pass = '';
+require_once '../../data/config.php';
 
 $instructor_count = 0;
 $department_count = 3;
 $recent_instructors = [];
 $error_message = '';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // Get instructor count
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM instructors");
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $instructor_count = $result['count'] ?? 0;
-    
-    // Get recent instructors (last 5)
-    $stmt = $pdo->query("SELECT * FROM instructors ORDER BY created_at DESC LIMIT 5");
-    $recent_instructors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-} catch (PDOException $e) {
+if ($pdo) {
+    try {
+        // Get instructor count
+        $stmt = $pdo->query("SELECT COUNT(*) as count FROM instructors");
+        $result = $stmt->fetch();
+        $instructor_count = $result['count'] ?? 0;
+        
+        // Get recent instructors (last 5)
+        $stmt = $pdo->query("SELECT * FROM instructors ORDER BY created_at DESC LIMIT 5");
+        $recent_instructors = $stmt->fetchAll();
+        
+    } catch (PDOException $e) {
+        $error_message = "Database connection failed. Please set up the database using data.sql";
+    }
+} else {
     $error_message = "Database connection failed. Please set up the database using data.sql";
 }
 ?>
@@ -33,10 +30,6 @@ try {
         <h1 class="page-title">Dashboard Overview</h1>
         <p class="page-subtitle">Welcome back, Administrator!</p>
     </div>
-    <a href="dashboard.php?page=add_program_head" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Add Instructor
-    </a>
 </div>
 
 <?php if ($error_message): ?>

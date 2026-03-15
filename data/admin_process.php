@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'config.php';
 
 // Check if user is admin
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
@@ -8,20 +8,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
 }
 
 $action = $_GET['action'] ?? '';
-
-// Database connection
-$host = 'localhost';
-$dbname = 'checkmate';
-$db_user = 'root';
-$db_pass = '';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    // For demo purposes, continue without database
-    $pdo = null;
-}
 
 if ($action === 'add_instructor') {
     // Handle add instructor form submission

@@ -3,29 +3,22 @@
         <h1 class="page-title">Manage Instructors</h1>
         <p class="page-subtitle">View and manage all instructor accounts</p>
     </div>
-    <a href="dashboard.php?page=add_program_head" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Add Instructor
-    </a>
 </div>
 
 <?php
-// Database connection to fetch instructors
-$host = 'localhost';
-$dbname = 'checkmate';
-$db_user = 'root';
-$db_pass = '';
+require_once '../../data/config.php';
 
 $instructors = [];
 $error_message = '';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    $stmt = $pdo->query("SELECT * FROM instructors ORDER BY id DESC");
-    $instructors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
+if ($pdo) {
+    try {
+        $stmt = $pdo->query("SELECT * FROM instructors ORDER BY id DESC");
+        $instructors = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        $error_message = "Database connection failed. Please set up the database using data.sql";
+    }
+} else {
     $error_message = "Database connection failed. Please set up the database using data.sql";
 }
 ?>
@@ -72,7 +65,7 @@ try {
         <div class="empty-state">
             <i class="fas fa-user-plus"></i>
             <h3>No Instructors Found</h3>
-            <p>Click \"Add Instructor\" or \"Add Demo Data\" to get started.</p>
+            <p>No instructors found in the system.</p>
         </div>
         <?php else: ?>
         <table class="data-table" id="instructorsTable">

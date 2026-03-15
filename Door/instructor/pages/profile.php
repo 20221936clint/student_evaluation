@@ -1,9 +1,15 @@
 <?php
-session_start();
-require_once '../../../data/config.php';
+require_once '../../../data/session_security.php';
+
+// Check role access
+$role_access = check_role_access('instructor');
+$show_role_modal = !$role_access['allowed'];
 
 $instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
 $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
+
+// Only fetch data if access is allowed
+if (!$show_role_modal) {
 
 // Fetch instructor profile
 $profile = [
@@ -29,6 +35,8 @@ if ($stmt) {
 }
 
 $full_name = $profile['first_name'] . ' ' . $profile['last_name'];
+
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -184,5 +192,30 @@ $full_name = $profile['first_name'] . ' ' . $profile['last_name'];
     </div>
 
     <script src="../../../function/dashboard.js"></script>
+<?php if ($show_role_modal): ?>
+<div class="modal-overlay" id="roleMismatchModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+    <div style="background: white; border-radius: 16px; padding: 32px; max-width: 450px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(220, 38, 38, 0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: #dc2626;"></i>
+        </div>
+        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">Access Restricted</h3>
+        <p id="roleModalMessage" style="font-size: 14px; color: #6b7280; margin-bottom: 20px;"></p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <a href="../../../data/logout.php" style="background: #dc2626; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 500;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <a href="../../../Door/login.php" style="background: linear-gradient(135deg, #d4a843, #b8922f); color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 500;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+        </div>
+    </div>
+</div>
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('roleModalMessage').textContent = <?php echo json_encode($role_access['message']); ?>;
+        document.getElementById('roleMismatchModal').style.display = 'flex';
+    });
+</script>
+<?php endif; ?>
 </body>
 </html>

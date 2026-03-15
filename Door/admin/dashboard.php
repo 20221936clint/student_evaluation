@@ -1,11 +1,6 @@
 <?php
-session_start();
-
-// Check if user is logged in and is admin
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header('Location: ../login.php');
-    exit;
-}
+require_once '../../data/session_security.php';
+check_auth('admin', '../login.php');
 
 $user_name = $_SESSION['user_name'] ?? 'Administrator';
 $current_page = $_GET['page'] ?? 'dashboard';
@@ -815,7 +810,7 @@ if (!file_exists($page_file)) {
                         <div class="user-role">Administrator</div>
                     </div>
                 </div>
-                <a href="../../../data/logout.php" class="logout-btn">
+                <a href="../../data/logout.php" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -902,5 +897,6 @@ if (!file_exists($page_file)) {
             showModal(decodeURIComponent(urlParams.get('error')), 'error');
         }
     </script>
+    <script src="../../function/session_guard.js"></script>
 </body>
 </html>

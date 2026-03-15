@@ -1,3 +1,27 @@
+<?php
+// Start session to check login status
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// If user is already logged in, redirect to their dashboard
+if (isset($_SESSION['user_role']) && !empty($_SESSION['user_role'])) {
+    $redirect = match($_SESSION['user_role']) {
+        'admin' => 'admin/dashboard.php',
+        'program_head' => 'program_head/dashboard.php',
+        'instructor' => 'instructor/dashboard.php',
+        default => 'login.php'
+    };
+    header('Location: ' . $redirect);
+    exit;
+}
+
+// Prevent caching of login page too
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -197,6 +221,35 @@
          data-auto_prompt="false">
     </div>
 
+    <script>
+        // Security: When on login page, mark as logged out
+        // This prevents forward-button navigation back to cached dashboard pages
+        // BUT: Don't set the flag if user just logged in (to avoid race condition)
+        (function() {
+            // Only set logged_out if user did NOT just log in
+            // The 'just_logged_in' flag is set by login.js on successful login
+            // and cleared by session_guard.js on the dashboard page
+            if (sessionStorage.getItem('just_logged_in') !== 'true') {
+                sessionStorage.setItem('logged_out', 'true');
+                sessionStorage.removeItem('on_protected_page');
+            }
+            
+            // Also handle pageshow event (when page loads from bfcache via back/forward)
+            window.addEventListener('pageshow', function(event) {
+                // Only re-set the flag if not in the middle of a login redirect
+                if (sessionStorage.getItem('just_logged_in') !== 'true') {
+                    sessionStorage.setItem('logged_out', 'true');
+                    sessionStorage.removeItem('on_protected_page');
+                }
+            });
+            
+            // Clear all forward history entries by replacing current state
+            // This ensures forward button has nowhere to go
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, '', window.location.href);
+            }
+        })();
+    </script>
     <script type="module" src="../function/login.js"></script>
 </body>
 

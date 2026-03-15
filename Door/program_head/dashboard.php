@@ -1,8 +1,9 @@
 <?php
-session_start();
+require_once '../../data/session_security.php';
+check_auth('program_head', '../login.php');
 require_once '../../data/config.php';
 
-$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'John Head';
+$user_name = $_SESSION['user_name'] ?? 'John Head';
 
 // Fetch stats
 $total_instructors = 0;
@@ -126,7 +127,7 @@ if ($result) { while ($row = $result->fetch_assoc()) { $dept_performance[] = $ro
                     <i class="fas fa-calendar-alt"></i>
                     <span><?php echo date('F j, Y'); ?></span>
                 </div>
-                <a href="../../../data/logout.php" class="topbar-logout">
+                <a href="../../data/logout.php" class="topbar-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -243,5 +244,6 @@ if ($result) { while ($row = $result->fetch_assoc()) { $dept_performance[] = $ro
     </div>
 
     <script src="../../function/dashboard.js"></script>
+    <script src="../../function/session_guard.js"></script>
 </body>
 </html>

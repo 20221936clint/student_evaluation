@@ -54,22 +54,20 @@ if ($is_logged_in) {
                 <img src="./media/LOGO.jpg" alt="Logo" class="nav-logo">
                 <span class="nav-title">Institute For Business Management</span>
             </a>
-            <ul class="nav-links" id="navLinks">
-                <?php if ($is_logged_in): ?>
-                    <li style="display: flex; align-items: center; gap: 8px; margin-right: 12px;">
-                        <span style="color: #d4a843; font-weight: 600; font-size: 13px;">
-                            <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($user_name); ?>
-                        </span>
-                        <span style="background: rgba(212, 168, 67, 0.2); color: #b8922f; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">
-                            <?php echo htmlspecialchars($role_label); ?>
-                        </span>
-                    </li>
-                    <li><a href="<?php echo htmlspecialchars($dashboard_url); ?>" class="nav-login-btn" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fas fa-home"></i> Return</a></li>
-                    <li><a href="./data/logout.php" class="nav-login-btn" style="background: linear-gradient(135deg, #dc2626, #b91c1c);"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                <?php else: ?>
-                    <li><a href="#" id="openLoginPanel" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                <?php endif; ?>
-            </ul>
+             <ul class="nav-links" id="navLinks">
+                 <?php if ($is_logged_in): ?>
+                     <li class="user-info">
+                         <span class="user-name">
+                             <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($user_name); ?>
+                         </span>
+                         <span class="user-role"><?php echo htmlspecialchars($role_label); ?></span>
+                     </li>
+                     <li><a href="<?php echo htmlspecialchars($dashboard_url); ?>" class="nav-login-btn nav-return"><i class="fas fa-home"></i> Return</a></li>
+                     <li><a href="./data/logout.php" class="nav-login-btn nav-logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                 <?php else: ?>
+                     <li><a href="#" id="openLoginPanel" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                 <?php endif; ?>
+             </ul>
             <div class="nav-toggle" id="navToggle">
                 <span></span>
                 <span></span>
@@ -126,6 +124,9 @@ if ($is_logged_in) {
             </ul>
         </div>
      </footer>
+
+     <!-- Backdrop for panel -->
+     <div class="panel-backdrop" id="panelBackdrop"></div>
 
      <!-- Sliding Login/Register Panel -->
      <div class="login-panel-slide" id="loginPanel">

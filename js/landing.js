@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeRegisterBtn = document.getElementById('closeRegisterPanel');
     const switchToRegisterBtn = document.getElementById('switchToRegister');
     const switchToLoginBtn = document.getElementById('switchToLogin');
+    const panelBackdrop = document.getElementById('panelBackdrop');
 
     // Role dropdown elements
     const dropdownTrigger = document.getElementById('dropdownTrigger');
@@ -45,14 +46,26 @@ document.addEventListener('DOMContentLoaded', function() {
     function openPanel() {
         loginPanel.classList.add('active');
         heroContent.classList.add('shifted');
+        if (panelBackdrop) panelBackdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 
     function closePanel() {
+        // Ensure dropdown is closed and margin removed
+        if (dropdownTrigger && dropdownMenu && dropdownArrow) {
+            dropdownTrigger.classList.remove('active');
+            dropdownMenu.classList.remove('open');
+            dropdownArrow.classList.remove('rotated');
+            const roleSelector = dropdownTrigger.closest('.role-selector');
+            if (roleSelector) roleSelector.classList.remove('dropdown-open');
+        }
         loginPanel.classList.remove('active');
         heroContent.classList.remove('shifted');
+        if (panelBackdrop) panelBackdrop.classList.remove('active');
+        document.body.style.overflow = '';
         // Reset to login view after a short delay if in register mode
         setTimeout(() => {
-            if (registerView.style.display === 'block') {
+            if (registerView && registerView.style.display === 'block') {
                 switchToLogin();
             }
         }, 300);
@@ -64,33 +77,57 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     if (closeLoginBtn) closeLoginBtn.addEventListener('click', closePanel);
     if (closeRegisterBtn) closeRegisterBtn.addEventListener('click', closePanel);
+    if (panelBackdrop) panelBackdrop.addEventListener('click', closePanel);
 
     // ===========================
     // Dropdown Role Selection
     // ===========================
     if (dropdownTrigger && dropdownMenu && dropdownArrow && selectedRole) {
+        // Helper to close dropdown and remove margin
+        function closeDropdown() {
+            dropdownTrigger.classList.remove('active');
+            dropdownMenu.classList.remove('open');
+            dropdownArrow.classList.remove('rotated');
+            const roleSelector = dropdownTrigger.closest('.role-selector');
+            if (roleSelector) roleSelector.classList.remove('dropdown-open');
+        }
+
         dropdownTrigger.addEventListener('click', function(e) {
             e.stopPropagation();
-            this.classList.toggle('active');
+            const isOpen = this.classList.toggle('active');
             dropdownMenu.classList.toggle('open');
             dropdownArrow.classList.toggle('rotated');
+            const roleSelector = this.closest('.role-selector');
+            if (roleSelector) {
+                if (isOpen) {
+                    roleSelector.classList.add('dropdown-open');
+                } else {
+                    roleSelector.classList.remove('dropdown-open');
+                }
+            }
         });
 
         dropdownItems.forEach(item => {
             item.addEventListener('click', function() {
                 const value = this.getAttribute('data-value');
                 const title = this.querySelector('.dropdown-item-title').textContent;
-
+                
+                // Remove selected class from all items
                 dropdownItems.forEach(i => i.classList.remove('selected'));
+                
+                // Add selected class to clicked item
                 this.classList.add('selected');
+                
+                // Update displayed text
                 selectedRole.textContent = title;
                 selectedRole.classList.remove('placeholder');
+                
+                // Store selected value
                 dropdownTrigger.setAttribute('data-selected', value);
-
-                dropdownTrigger.classList.remove('active');
-                dropdownMenu.classList.remove('open');
-                dropdownArrow.classList.remove('rotated');
-
+                
+                // Close dropdown
+                closeDropdown();
+                
                 // Show sign-up button only if instructor selected
                 if (value === 'instructor' && loginFooter) {
                     loginFooter.style.display = 'block';
@@ -103,9 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownTrigger.classList.remove('active');
-                dropdownMenu.classList.remove('open');
-                dropdownArrow.classList.remove('rotated');
+                closeDropdown();
             }
         });
     }

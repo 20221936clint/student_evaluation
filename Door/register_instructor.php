@@ -247,12 +247,8 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
         </div>
     </div>
 
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle"></i>
-        <span class="toast-message" id="toastMessage">Success!</span>
-    </div>
 
-    <script>
+     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             

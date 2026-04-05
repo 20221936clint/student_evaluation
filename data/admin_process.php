@@ -60,14 +60,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    if ($pdo) {
-        try {
-            $stmt = $pdo->prepare("SELECT id FROM instructors WHERE email = ?");
-            $stmt->execute([$email]);
-            if ($stmt->fetch()) {
-                echo json_encode(['success' => false, 'message' => 'Email already registered']);
-                exit;
-            }
+     if ($pdo) {
+         try {
+             $stmt = $pdo->prepare("SELECT id, status FROM instructors WHERE email = ?");
+             $stmt->execute([$email]);
+             $existing = $stmt->fetch();
+             if ($existing) {
+                 if ($existing['status'] === 'pending') {
+                     echo json_encode(['success' => false, 'message' => 'Your account is pending approval. Please wait for administrator approval.']);
+                 } else {
+                     echo json_encode(['success' => false, 'message' => 'Email already registered']);
+                 }
+                 exit;
+             }
 
             $stmt = $pdo->prepare("SELECT id FROM instructors WHERE employee_id = ?");
             $stmt->execute([$employee_id]);

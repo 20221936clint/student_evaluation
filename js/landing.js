@@ -134,9 +134,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (loginFooter) {
                     loginFooter.style.display = 'none';
                 }
-            });
-        });
+    });
 
+    // ===========================
+    // Toast Notification
+    // ===========================
+    window.showToast = function(message, type = 'info') {
+        // Find the active login panel to append toast to
+        const loginPanel = document.getElementById('loginPanel');
+        if (!loginPanel) return;
+        
+        let toast = loginPanel.querySelector('.toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <button class="toast-close" aria-label="Close">&times;</button>
+                <i class="fas fa-info-circle toast-icon"></i>
+                <span class="toast-message"></span>
+            `;
+            loginPanel.appendChild(toast);
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.classList.remove('show');
+            });
+        }
+        const toastMessage = toast.querySelector('.toast-message');
+        const icon = toast.querySelector('.toast-icon');
+        
+        toastMessage.textContent = message;
+        toast.className = 'toast';
+        
+        // Set border color and icon based on type
+        const colors = {
+            'error': '#dc2626',
+            'warning': '#f59e0b',
+            'success': '#10b981',
+            'info': '#3b82f6'
+        };
+        const icons = {
+            'error': 'fa-exclamation-circle',
+            'warning': 'fa-exclamation-triangle',
+            'success': 'fa-check-circle',
+            'info': 'fa-info-circle'
+        };
+        
+        const color = colors[type] || colors.info;
+        const iconClass = icons[type] || icons.info;
+        
+        toast.style.borderLeftColor = color;
+        icon.className = 'fas ' + iconClass + ' toast-icon';
+        icon.style.color = color;
+        
+        toast.classList.add('show');
+        
+        // Auto hide after 4 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    };
+});
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
@@ -216,11 +272,16 @@ document.addEventListener('DOMContentLoaded', function() {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const role = dropdownTrigger ? dropdownTrigger.getAttribute('data-selected') : '';
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
             if (!role) {
-                showToast('Please select a role', 'error');
+                showToast('Please select a role', 'warning');
+                return;
+            }
+
+            if (!email || !password) {
+                showToast('Please enter email and password', 'warning');
                 return;
             }
 
@@ -251,15 +312,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     sessionStorage.removeItem('logged_out');
                     sessionStorage.setItem('on_protected_page', 'true');
                     sessionStorage.setItem('just_logged_in', 'true');
-                    showToast('Login Successful! Redirecting...', 'success');
                     setTimeout(() => {
                         window.location.replace(result.redirect);
-                    }, 1000);
+                    }, 500);
                 } else {
-                    showToast(result.message || 'Login failed. Please try again.', 'error');
+                    // Show error message from server
+                    const errorMsg = result.message || 'Login failed. Please try again.';
+                    showToast(errorMsg, 'error');
                 }
             } catch (error) {
-                showToast('An error occurred. Please try again.', 'error');
                 console.error('Login error:', error);
             } finally {
                 loginBtn.classList.remove('loading');
@@ -288,17 +349,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const confirmPassword = document.getElementById('regConfirmPassword').value;
 
             if (password !== confirmPassword) {
-                showToast('Passwords do not match!', 'error');
+                showToast('Passwords do not match', 'error');
                 return;
             }
 
             if (password.length < 6) {
-                showToast('Password must be at least 6 characters!', 'error');
+                showToast('Password must be at least 6 characters', 'warning');
                 return;
             }
 
             if (!department) {
-                showToast('Please select a department.', 'error');
+                showToast('Please select a department', 'warning');
+                return;
+            }
+
+            if (!firstName || !lastName || !email || !employeeId) {
+                showToast('Please fill in all required fields', 'warning');
                 return;
             }
 
@@ -331,10 +397,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         switchToLogin();
                     }, 1500);
                 } else {
-                    showToast(result.message || 'Registration failed!', 'error');
+                    // Show error message from server
+                    const errorMsg = result.message || 'Registration failed. Please try again.';
+                    showToast(errorMsg, 'error');
                 }
             } catch (error) {
-                showToast('An error occurred. Please try again.', 'error');
                 console.error('Registration error:', error);
             } finally {
                 registerBtn.classList.remove('loading');
@@ -343,30 +410,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ===========================
-    // Toast Notification
-    // ===========================
-    window.showToast = function(message, type = 'success') {
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.className = 'toast';
-            toast.innerHTML = '<i class="fas fa-check-circle"></i><span class="toast-message"></span>';
-            document.body.appendChild(toast);
-        }
-        const toastMessage = toast.querySelector('.toast-message');
-        const icon = toast.querySelector('i');
-        toastMessage.textContent = message;
-        toast.className = 'toast ' + type;
-        if (type === 'success') {
-            icon.className = 'fas fa-check-circle';
-        } else {
-            icon.className = 'fas fa-exclamation-circle';
-        }
-        toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    };
 });

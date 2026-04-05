@@ -1006,6 +1006,11 @@ html, body {
     pointer-events: auto;
 }
 
+.login-panel-slide.active {
+    right: 0;
+    pointer-events: auto;
+}
+
 .login-slide-card {
     width: 100%;
     max-width: 420px;

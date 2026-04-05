@@ -37,36 +37,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    try {   $table = match($role) {
-        'admin' => 'admins',
-        'program_head' => 'program_heads',
-        'instructor' => 'instructors',
-        default => 'program_heads'
-    };
+    try {
+        $table = match($role) {
+            'admin' => 'admins',
+            'program_head' => 'program_heads',
+            'instructor' => 'instructors',
+            default => 'program_heads'
+        };
         
         $stmt = $pdo->prepare("SELECT * FROM $table WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
-        if ($user && password_verify($password, $user['password'])) {       $_SESSION['user_id'] = $user['id'];
+        if ($user && password_verify($password, $user['password'])) {
+            // Check if account is active (for instructors) or exists (for program heads/admins)
+            if ($role === 'instructor') {
+                // Check if instructor is promoted/approved to have an account
+                // instructors table has status column (active, pending, etc.)
+                if (isset($user['status']) && $user['status'] !== 'active') {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Your account is not yet approved. Please contact your administrator.'
+                    ]);
+                    exit;
+                }
+            }
+            
+            $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_role'] = $role;
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
-      $redirect = match($role) {
-            'admin' => '../Door/admin/dashboard.php',
-            'program_head' => '../Door/program_head/dashboard.php',
-            'instructor' => '../Door/instructor/dashboard.php',
-            default => '../Door/program_head/dashboard.php'
-        };
+            
+            $redirect = match($role) {
+                'admin' => 'Door/admin/dashboard.php',
+                'program_head' => 'Door/program_head/dashboard.php',
+                'instructor' => 'Door/instructor/dashboard.php',
+                default => 'Door/program_head/dashboard.php'
+            };
 
             echo json_encode([
                 'success' => true,
                 'message' => 'Login successful',
                 'redirect' => $redirect
             ]);
-        } else {          demoLogin($role, $email, $password);
+        } else {
+            // User exists but wrong password
+            if ($user) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid password. Please try again.'
+                ]);
+            } else {
+                // Email not found in this role's table
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'No account found with this email for the selected role. Please check your email or register first.'
+                ]);
+            }
         }
-    } catch (Exception $e) {      demoLogin($role, $email, $password);
+    } catch (Exception $e) {
+        error_log('Login error: ' . $e->getMessage());
+        echo json_encode([
+            'success' => false,
+            'message' => 'An error occurred during login. Please try again.'
+        ]);
     }
 } else {
     echo json_encode([

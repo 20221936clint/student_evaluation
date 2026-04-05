@@ -203,12 +203,8 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
         </div>
     </div>
 
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle toast-icon"></i>
-        <span class="toast-message" id="toastMessage">Login Successful!</span>
-    </div>
 
-    <div id="g_id_onload"
+     <div id="g_id_onload"
          data-client_id="51350034331-htkdt3n26sjrqti6vdrpf0giklsjuvnp.apps.googleusercontent.com"
          data-context="signin"
          data-ux_mode="popup"

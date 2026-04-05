@@ -105,13 +105,13 @@ function demoLogin($role, $email, $password) {    $demo_credentials = [
             default => 'User'
         };
 
-        // Redirect based on role
-        $redirect = match($role) {
-            'admin' => '../Door/admin/dashboard.php',
-            'program_head' => '../Door/program_head/dashboard.php',
-            'instructor' => '../Door/instructor/dashboard.php',
-            default => '../Door/program_head/dashboard.php'
-        };
+         // Redirect based on role
+         $redirect = match($role) {
+             'admin' => 'Door/admin/dashboard.php',
+             'program_head' => 'Door/program_head/dashboard.php',
+             'instructor' => 'Door/instructor/dashboard.php',
+             default => 'Door/program_head/dashboard.php'
+         };
 
         echo json_encode([
             'success' => true,

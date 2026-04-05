@@ -218,9 +218,12 @@ if ($is_logged_in) {
              </div>
 
              <div class="login-footer" id="loginFooter" style="display:none;">
-                 <p>Don't have an instructor account?</p>
+                 <p style="color: var(--medium-text); font-size: 0.85rem; margin-bottom: 12px;">
+                     <i class="fas fa-info-circle" style="color: var(--gold-primary); margin-right: 6px;"></i>
+                     Don't have an instructor account?
+                 </p>
                  <button type="button" class="create-account-btn" id="switchToRegister">
-                     <i class="fas fa-user-plus"></i> Sign Up as Instructor
+                     <i class="fas fa-user-plus"></i> Create Instructor Account
                  </button>
              </div>
          </div>

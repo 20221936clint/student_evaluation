@@ -1,0 +1,337 @@
+// landing.js - Handles sliding panels, particles, and form submissions
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ===========================
+    // Particle Effect
+    // ===========================
+    const particlesContainer = document.getElementById('particles');
+    if (particlesContainer) {
+        const particleCount = 30;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 4 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.background = `rgba(212, 168, 67, ${Math.random() * 0.5 + 0.2})`;
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particlesContainer.appendChild(particle);
+        }
+    }
+
+    // ===========================
+    // DOM Elements
+    // ===========================
+    const openLoginBtn = document.getElementById('openLoginPanel');
+    const loginPanel = document.getElementById('loginPanel');
+    const heroContent = document.getElementById('heroContent');
+    const closeLoginBtn = document.getElementById('closeLoginPanel');
+    const closeRegisterBtn = document.getElementById('closeRegisterPanel');
+    const switchToRegisterBtn = document.getElementById('switchToRegister');
+    const switchToLoginBtn = document.getElementById('switchToLogin');
+
+    // Role dropdown elements
+    const dropdownTrigger = document.getElementById('dropdownTrigger');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const dropdownArrow = document.getElementById('dropdownArrow');
+    const selectedRole = document.getElementById('selectedRole');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    const loginFooter = document.getElementById('loginFooter');
+
+    // Toggle Panel
+    function openPanel() {
+        loginPanel.classList.add('active');
+        heroContent.classList.add('shifted');
+    }
+
+    function closePanel() {
+        loginPanel.classList.remove('active');
+        heroContent.classList.remove('shifted');
+        // Reset to login view after a short delay if in register mode
+        setTimeout(() => {
+            if (registerView.style.display === 'block') {
+                switchToLogin();
+            }
+        }, 300);
+    }
+
+    if (openLoginBtn) openLoginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        openPanel();
+    });
+    if (closeLoginBtn) closeLoginBtn.addEventListener('click', closePanel);
+    if (closeRegisterBtn) closeRegisterBtn.addEventListener('click', closePanel);
+
+    // ===========================
+    // Dropdown Role Selection
+    // ===========================
+    if (dropdownTrigger && dropdownMenu && dropdownArrow && selectedRole) {
+        dropdownTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+            dropdownMenu.classList.toggle('open');
+            dropdownArrow.classList.toggle('rotated');
+        });
+
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const title = this.querySelector('.dropdown-item-title').textContent;
+
+                dropdownItems.forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedRole.textContent = title;
+                selectedRole.classList.remove('placeholder');
+                dropdownTrigger.setAttribute('data-selected', value);
+
+                dropdownTrigger.classList.remove('active');
+                dropdownMenu.classList.remove('open');
+                dropdownArrow.classList.remove('rotated');
+
+                // Show sign-up button only if instructor selected
+                if (value === 'instructor' && loginFooter) {
+                    loginFooter.style.display = 'block';
+                } else if (loginFooter) {
+                    loginFooter.style.display = 'none';
+                }
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownTrigger.classList.remove('active');
+                dropdownMenu.classList.remove('open');
+                dropdownArrow.classList.remove('rotated');
+            }
+        });
+    }
+
+    // ===========================
+    // Toggle Password Visibility
+    // ===========================
+    const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+    const loginPassword = document.getElementById('loginPassword');
+    if (toggleLoginPassword && loginPassword) {
+        toggleLoginPassword.addEventListener('click', function() {
+            const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPassword.setAttribute('type', type);
+            const icon = this.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    const toggleRegPassword = document.getElementById('toggleRegPassword');
+    const regPassword = document.getElementById('regPassword');
+    if (toggleRegPassword && regPassword) {
+        toggleRegPassword.addEventListener('click', function() {
+            const type = regPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            regPassword.setAttribute('type', type);
+            const icon = this.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    // ===========================
+    // View Switching
+    // ===========================
+    const loginView = document.getElementById('loginView');
+    const registerView = document.getElementById('registerView');
+
+    if (switchToRegisterBtn) {
+        switchToRegisterBtn.addEventListener('click', function() {
+            loginView.style.display = 'none';
+            registerView.style.display = 'block';
+            loginPanel.classList.add('register-mode');
+        });
+    }
+
+    function switchToLogin() {
+        registerView.style.display = 'none';
+        loginView.style.display = 'block';
+        loginPanel.classList.remove('register-mode');
+    }
+
+    if (switchToLoginBtn) {
+        switchToLoginBtn.addEventListener('click', switchToLogin);
+    }
+
+    // ===========================
+    // Login Form Submission
+    // ===========================
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const role = dropdownTrigger ? dropdownTrigger.getAttribute('data-selected') : '';
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!role) {
+                showToast('Please select a role', 'error');
+                return;
+            }
+
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('role', role);
+                formData.append('email', email);
+                formData.append('password', password);
+
+                const response = await fetch('./data/login_process.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Invalid response content type');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    sessionStorage.removeItem('logged_out');
+                    sessionStorage.setItem('on_protected_page', 'true');
+                    sessionStorage.setItem('just_logged_in', 'true');
+                    showToast('Login Successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.replace(result.redirect);
+                    }, 1000);
+                } else {
+                    showToast(result.message || 'Login failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                showToast('An error occurred. Please try again.', 'error');
+                console.error('Login error:', error);
+            } finally {
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+            }
+        });
+    }
+
+    // ===========================
+    // Register Form Submission
+    // ===========================
+    const registerForm = document.getElementById('registerForm');
+    const registerBtn = document.getElementById('registerBtn');
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const firstName = document.getElementById('regFirstName').value.trim();
+            const lastName = document.getElementById('regLastName').value.trim();
+            const middleName = document.getElementById('regMiddleName').value.trim();
+            const suffix = document.getElementById('regSuffix').value;
+            const email = document.getElementById('regEmail').value.trim();
+            const employeeId = document.getElementById('regEmployeeId').value.trim();
+            const department = document.getElementById('regDepartment').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match!', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters!', 'error');
+                return;
+            }
+
+            if (!department) {
+                showToast('Please select a department.', 'error');
+                return;
+            }
+
+            registerBtn.classList.add('loading');
+            registerBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'register_instructor');
+                formData.append('first_name', firstName);
+                formData.append('last_name', lastName);
+                formData.append('middle_name', middleName);
+                formData.append('suffix', suffix);
+                formData.append('email', email);
+                formData.append('employee_id', employeeId);
+                formData.append('department', department);
+                formData.append('password', password);
+
+                const response = await fetch('./data/admin_process.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message || 'Registration successful!', 'success');
+                    registerForm.reset();
+                    setTimeout(() => {
+                        switchToLogin();
+                    }, 1500);
+                } else {
+                    showToast(result.message || 'Registration failed!', 'error');
+                }
+            } catch (error) {
+                showToast('An error occurred. Please try again.', 'error');
+                console.error('Registration error:', error);
+            } finally {
+                registerBtn.classList.remove('loading');
+                registerBtn.disabled = false;
+            }
+        });
+    }
+
+    // ===========================
+    // Toast Notification
+    // ===========================
+    window.showToast = function(message, type = 'success') {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            toast.innerHTML = '<i class="fas fa-check-circle"></i><span class="toast-message"></span>';
+            document.body.appendChild(toast);
+        }
+        const toastMessage = toast.querySelector('.toast-message');
+        const icon = toast.querySelector('i');
+        toastMessage.textContent = message;
+        toast.className = 'toast ' + type;
+        if (type === 'success') {
+            icon.className = 'fas fa-check-circle';
+        } else {
+            icon.className = 'fas fa-exclamation-circle';
+        }
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    };
+});

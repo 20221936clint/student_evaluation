@@ -705,7 +705,6 @@ body.login-page {
 .login-btn:hover {
     background: linear-gradient(135deg, #D4A843, #FFD700, #F0D68A);
     color: var(--dark-text);
-    box-shadow: var(--shadow-gold);
     transform: translateY(-2px);
 }
 

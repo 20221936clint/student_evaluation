@@ -67,7 +67,7 @@ if ($is_logged_in) {
                     <li><a href="<?php echo htmlspecialchars($dashboard_url); ?>" class="nav-login-btn" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fas fa-home"></i> Return</a></li>
                     <li><a href="./data/logout.php" class="nav-login-btn" style="background: linear-gradient(135deg, #dc2626, #b91c1c);"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 <?php else: ?>
-                    <li><a href="./Door/login.php" class="nav-login-btn">Login</a></li>
+                    <li><a href="#" id="openLoginPanel" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                 <?php endif; ?>
             </ul>
             <div class="nav-toggle" id="navToggle">
@@ -99,7 +99,7 @@ if ($is_logged_in) {
 
         <div class="particles" id="particles"></div>
 
-        <div class="hero-content">
+        <div class="hero-content" id="heroContent">
             <span class="hero-badge">Welcome IBM</span>
             <h1 class="hero-title">
                 Institute For Business Management<br>
@@ -125,10 +125,229 @@ if ($is_logged_in) {
                 <li><a href="#">Contact</a></li>
             </ul>
         </div>
-    </footer>
+     </footer>
 
-    </script>
-    <script type="module" src="./js/landing.js"></script>
-</body>
+     <!-- Sliding Login/Register Panel -->
+     <div class="login-panel-slide" id="loginPanel">
+         <!-- Login View -->
+         <div class="login-slide-card" id="loginView">
+             <button type="button" class="close-login" id="closeLoginPanel">&times;</button>
+             <div class="login-header">
+                 <div class="avatar-circle">
+                     <i class="fas fa-user-shield"></i>
+                 </div>
+                 <h2>Welcome Back</h2>
+                 <p class="login-subtitle">Sign in to your account</p>
+             </div>
+
+             <div class="role-selector">
+                 <label class="field-label">Login As</label>
+                 <div class="dropdown-wrapper" id="roleDropdown">
+                     <div class="dropdown-trigger" id="dropdownTrigger">
+                         <div class="dropdown-trigger-content">
+                             <i class="fas fa-user-tag dropdown-icon"></i>
+                             <span id="selectedRole">Select Role</span>
+                         </div>
+                         <i class="fas fa-chevron-down dropdown-arrow" id="dropdownArrow"></i>
+                     </div>
+                     <div class="dropdown-menu" id="dropdownMenu">
+                         <div class="dropdown-item" data-value="admin">
+                             <div class="dropdown-item-icon"><i class="fas fa-crown"></i></div>
+                             <div class="dropdown-item-info">
+                                 <span class="dropdown-item-title">Administrator</span>
+                                 <span class="dropdown-item-desc">Full system access</span>
+                             </div>
+                             <i class="fas fa-check check-icon"></i>
+                         </div>
+                         <div class="dropdown-item" data-value="program_head">
+                             <div class="dropdown-item-icon"><i class="fas fa-user-tie"></i></div>
+                             <div class="dropdown-item-info">
+                                 <span class="dropdown-item-title">Program Head</span>
+                                 <span class="dropdown-item-desc">Department management access</span>
+                             </div>
+                             <i class="fas fa-check check-icon"></i>
+                         </div>
+                         <div class="dropdown-item" data-value="instructor">
+                             <div class="dropdown-item-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                             <div class="dropdown-item-info">
+                                 <span class="dropdown-item-title">Instructor</span>
+                                 <span class="dropdown-item-desc">Faculty evaluation access</span>
+                             </div>
+                             <i class="fas fa-check check-icon"></i>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <form class="login-form" id="loginForm">
+                 <div class="input-group">
+                     <label class="field-label">Email</label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-envelope input-icon"></i>
+                         <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                         <div class="input-focus-line"></div>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label">Password</label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-lock input-icon"></i>
+                         <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                         <button type="button" class="toggle-password" id="toggleLoginPassword">
+                             <i class="fas fa-eye"></i>
+                         </button>
+                         <div class="input-focus-line"></div>
+                     </div>
+                 </div>
+
+                 <button type="submit" class="login-btn" id="loginBtn">
+                     <span class="btn-text">Sign In</span>
+                     <span class="btn-loader"><i class="fas fa-spinner fa-spin"></i></span>
+                     <i class="fas fa-arrow-right btn-arrow"></i>
+                 </button>
+             </form>
+
+             <div class="demo-credentials" style="font-size: 0.75rem; color: var(--light-text); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                 <p style="margin-bottom: 6px; font-weight: 600; color: var(--gold-dark);">Demo Credentials:</p>
+                 <div style="font-size: 0.7rem; line-height: 1.5; margin-left: 8px;">
+                     <div><strong>Admin:</strong> admin@cjcm.edu / password123</div>
+                     <div><strong>Instructor:</strong> teacher@test.com / password123</div>
+                 </div>
+             </div>
+
+             <div class="login-footer" id="loginFooter" style="display:none;">
+                 <p>Don't have an instructor account?</p>
+                 <button type="button" class="create-account-btn" id="switchToRegister">
+                     <i class="fas fa-user-plus"></i> Sign Up as Instructor
+                 </button>
+             </div>
+         </div>
+
+         <!-- Register View -->
+         <div class="login-slide-card" id="registerView" style="display:none;">
+             <button type="button" class="close-login" id="closeRegisterPanel">&times;</button>
+             <div class="login-header">
+                 <div class="avatar-circle">
+                     <i class="fas fa-chalkboard-teacher"></i>
+                 </div>
+                 <h2>Register as Instructor</h2>
+                 <p class="login-subtitle">Create your instructor account</p>
+             </div>
+
+             <form id="registerForm" class="register-form">
+                 <div class="form-row">
+                     <div class="input-group">
+                         <label class="field-label" for="regFirstName">First Name</label>
+                         <div class="input-wrapper">
+                             <i class="fas fa-user input-icon"></i>
+                             <input type="text" id="regFirstName" name="first_name" placeholder="Enter first name" required>
+                             <div class="input-focus-line"></div>
+                         </div>
+                     </div>
+                     <div class="input-group">
+                         <label class="field-label" for="regLastName">Last Name</label>
+                         <div class="input-wrapper">
+                             <i class="fas fa-user input-icon"></i>
+                             <input type="text" id="regLastName" name="last_name" placeholder="Enter last name" required>
+                             <div class="input-focus-line"></div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label" for="regMiddleName">Middle Name <span class="optional">(optional)</span></label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-user input-icon"></i>
+                         <input type="text" id="regMiddleName" name="middle_name" placeholder="Enter middle name">
+                         <div class="input-focus-line"></div>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label" for="regSuffix">Suffix <span class="optional">(optional)</span></label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-id-card input-icon"></i>
+                         <select id="regSuffix" name="suffix">
+                             <option value="">None</option>
+                             <option value="Jr.">Jr.</option>
+                             <option value="Sr.">Sr.</option>
+                             <option value="II">II</option>
+                             <option value="III">III</option>
+                             <option value="IV">IV</option>
+                             <option value="V">V</option>
+                         </select>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label" for="regEmail">Email Address</label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-envelope input-icon"></i>
+                         <input type="email" id="regEmail" name="email" placeholder="e.g. name@school.edu" required>
+                         <div class="input-focus-line"></div>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label" for="regEmployeeId">Employee ID</label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-id-badge input-icon"></i>
+                         <input type="text" id="regEmployeeId" name="employee_id" placeholder="e.g. EMP0001" required>
+                         <div class="input-focus-line"></div>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label" for="regDepartment">Department</label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-building input-icon"></i>
+                         <select id="regDepartment" name="department" required>
+                             <option value="">Select department</option>
+                             <option value="Operational Management">Operational Management (OM)</option>
+                             <option value="Financial Management">Financial Management (FM)</option>
+                             <option value="Marketing Management">Marketing Management (MM)</option>
+                         </select>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label" for="regPassword">Password</label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-lock input-icon"></i>
+                         <input type="password" id="regPassword" name="password" placeholder="At least 6 characters" required minlength="6">
+                         <button type="button" class="toggle-password" id="toggleRegPassword">
+                             <i class="fas fa-eye"></i>
+                         </button>
+                         <div class="input-focus-line"></div>
+                     </div>
+                 </div>
+
+                 <div class="input-group">
+                     <label class="field-label" for="regConfirmPassword">Confirm Password</label>
+                     <div class="input-wrapper">
+                         <i class="fas fa-lock input-icon"></i>
+                         <input type="password" id="regConfirmPassword" name="confirm_password" placeholder="Re-enter password" required>
+                         <div class="input-focus-line"></div>
+                     </div>
+                 </div>
+
+                 <button type="submit" class="login-btn" id="registerBtn">
+                     <span class="btn-text"><i class="fas fa-user-plus"></i> Create Account</span>
+                     <span class="btn-loader"><i class="fas fa-spinner fa-spin"></i></span>
+                 </button>
+
+                 <div class="login-footer">
+                     <p>Already have an account?</p>
+                     <button type="button" class="create-account-btn" id="switchToLogin">
+                         <i class="fas fa-arrow-left"></i> Back to Login
+                     </button>
+                 </div>
+             </form>
+         </div>
+     </div>
+
+     <script type="module" src="./js/landing.js"></script>
+ </body>
 
 </html>

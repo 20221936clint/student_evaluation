@@ -999,6 +999,7 @@ html, body {
     transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 24px;
     pointer-events: none;
+    overflow: hidden;
 }
 
 .login-panel-slide.active {
@@ -1681,6 +1682,31 @@ html, body {
     transform: scale(1.1);
 }
 
+/* Toast positioning - center of screen, fixed position to prevent panel resize */
+.login-panel-slide .toast {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    opacity: 0 !important;
+    max-width: 400px !important;
+    min-width: 300px !important;
+    width: 90% !important;
+    z-index: 100000 !important;
+    pointer-events: auto !important;
+}
+
+.login-panel-slide .toast.show {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+/* Ensure panel doesn't resize when toast appears */
+.login-panel-slide {
+    overflow: hidden !important;
+}
 
 @media (max-width: 500px) {
     .login-panel-slide {

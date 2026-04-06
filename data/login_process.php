@@ -50,18 +50,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
          if ($user && password_verify($password, $user['password'])) {
-             // Check if account is active (for instructors) or exists (for program heads/admins)
-             if ($role === 'instructor') {
-                 // Check if instructor is promoted/approved to have an account
-                 // instructors table has status column (active, pending, etc.)
-                 if (isset($user['status']) && $user['status'] !== 'active') {
-                     echo json_encode([
-                         'success' => false,
-                         'message' => 'Your account is not yet approved. Please contact your administrator.'
-                     ]);
-                     exit;
-                 }
-             }
+            // Check if account is approved (for instructors)
+            if ($role === 'instructor') {
+                // Only block if status is 'pending' or 'rejected' (not approved)
+                if (isset($user['status']) && in_array($user['status'], ['pending', 'rejected'])) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Your account is not yet approved. Please contact your administrator.'
+                    ]);
+                    exit;
+                }
+            }
              
              // Check if admin is using demo account and requires setup
              if ($role === 'admin' && isset($user['is_demo']) && $user['is_demo']) {

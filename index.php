@@ -68,11 +68,20 @@ if (file_exists($config_path)) {
     <title>Faculty Management Evaluation System</title>
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/landing.css">
+    <link rel="stylesheet" href="./css/loading.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
+    <!-- Loading Modal Overlay (hidden by default) -->
+    <div class="loading-overlay" id="loginLoadingOverlay" style="display:none;">
+        <div class="loading-modal">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading your dashboard...</div>
+            <div class="loading-subtext">Please wait while we prepare your experience.</div>
+        </div>
+    </div>
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#" class="nav-brand">

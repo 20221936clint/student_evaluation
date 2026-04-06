@@ -30,7 +30,12 @@ try {
     // Promote selected instructor
     $stmt = $pdo->prepare("INSERT INTO admin_promotions (instructor_id, promoted_to, promoted_by, status) VALUES (?, 'program_head', ?, 'active')");
     $stmt->execute([$instructor_id, $admin_id]);
-    echo json_encode(['success' => true, 'message' => 'Instructor promoted to Program Head.']);
+
+    // Set instructor status to 'active' in instructors table
+    $stmt = $pdo->prepare("UPDATE instructors SET status = 'active' WHERE id = ?");
+    $stmt->execute([$instructor_id]);
+
+    echo json_encode(['success' => true, 'message' => 'Instructor promoted to Program Head and activated.']);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);

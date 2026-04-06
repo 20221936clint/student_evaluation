@@ -7,38 +7,7 @@ $instructor_id = $_SESSION['user_id'] ?? 1;
 $user_name = $_SESSION['user_name'] ?? 'Jane Teacher';
 
 // Fetch stats
-$course_count = 0;
-$student_count = 0;
-$avg_rating = 0;
-$new_feedback = 0;
-
-$sql = "SELECT COUNT(*) as cnt FROM instructor_courses WHERE instructor_id = ?";
-$stmt = $conn->prepare($sql);
-if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $course_count = $row['cnt']; $stmt->close(); }
-
-$sql = "SELECT COALESCE(SUM(c.student_count),0) as cnt FROM instructor_courses ic JOIN courses c ON ic.course_id = c.id WHERE ic.instructor_id = ?";
-$stmt = $conn->prepare($sql);
-if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $student_count = $row['cnt']; $stmt->close(); }
-
-$sql = "SELECT COALESCE(AVG(e.rating),0) as avg_r FROM evaluations e WHERE e.instructor_id = ?";
-$stmt = $conn->prepare($sql);
-if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $avg_rating = round($row['avg_r'], 1); $stmt->close(); }
-
-$sql = "SELECT COUNT(*) as cnt FROM evaluation_feedback WHERE instructor_id = ? AND feedback_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
-$stmt = $conn->prepare($sql);
-if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); $row = $result->fetch_assoc(); $new_feedback = $row['cnt']; $stmt->close(); }
-
-// Fetch recent evaluations
-$recent_evaluations = [];
-$sql = "SELECT c.course_name, c.student_count, e.rating, e.evaluation_date FROM evaluations e JOIN courses c ON e.course_id = c.id WHERE e.instructor_id = ? ORDER BY e.evaluation_date DESC LIMIT 3";
-$stmt = $conn->prepare($sql);
-if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $recent_evaluations[] = $row; } $stmt->close(); }
-
-// Fetch recent feedback
-$recent_feedback = [];
-$sql = "SELECT course_name, feedback_text, rating, feedback_date FROM evaluation_feedback WHERE instructor_id = ? ORDER BY feedback_date DESC LIMIT 2";
-$stmt = $conn->prepare($sql);
-if ($stmt) { $stmt->bind_param("i", $instructor_id); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $recent_feedback[] = $row; } $stmt->close(); }
+// ...existing code...
 ?>
 <!DOCTYPE html>
 <html lang="en">

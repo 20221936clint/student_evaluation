@@ -41,10 +41,10 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
         sessionStorage.setItem('logged_out', 'true');
         
          // Use replace to navigate to home page
-         window.location.replace('/bs/index.php');
+         window.location.replace('../index.php');
     </script>
 </head>
 <body>
-     <p>Logging out... If you are not redirected, <a href="/bs/index.php">click here</a>.</p>
+     <p>Logging out... If you are not redirected, <a href="../index.php">click here</a>.</p>
 </body>
 </html>

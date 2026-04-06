@@ -3,7 +3,7 @@
    Faculty Evaluation System
    ======================================== */
 
-/* CSS Variables - Gold/White Theme */
+/* CSS Variables - Gold Theme */
 :root {
     --sidebar-width: 260px;
     --sidebar-width-collapsed: 80px;
@@ -15,12 +15,12 @@
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
     --shadow-gold: 0 4px 20px rgba(212, 168, 67, 0.3);
     
-    /* Gold/White Color palette */
+    /* Gold Color palette */
     --gold-primary: #D4A843;
     --gold-dark: #B8860B;
     --gold-light: #F0D68A;
     --gold-yellow: #FFD700;
-    --gold-gradient: linear-gradient(135deg, #D4A843, #FFD700, #B8860B);
+    --gold-gradient: linear-gradient(135deg, #B8860B, #D4A843, #F0D68A);
     --gold-gradient-dark: linear-gradient(160deg, #B8860B 0%, #D4A843 40%, #F0D68A 100%);
     
     /* Background colors */
@@ -28,8 +28,6 @@
     --off-white: #F8F6F0;
     --cream: #FFFDF5;
     --bg-light: #FAFAF8;
-    --bg-dark: #2D2D2D;
-    --bg-dark-light: #3D3D3D;
     
     /* Text colors */
     --dark-text: #2D2D2D;
@@ -54,9 +52,10 @@
     padding: 0;
     min-height: 100vh;
     position: relative;
+    overflow-x: hidden;
 }
 
-/* Sidebar - Gold/White Theme */
+/* Sidebar - Gold Theme */
 .sidebar {
     position: fixed;
     top: 0;
@@ -68,6 +67,7 @@
     display: flex;
     flex-direction: column;
     transition: transform var(--transition-speed) ease;
+    overflow-x: hidden;
     overflow-y: auto;
     box-shadow: 4px 0 20px rgba(184, 134, 11, 0.2);
 }
@@ -346,7 +346,7 @@
     padding: 32px;
 }
 
-/* Welcome Banner - Gold/White Theme */
+/* Welcome Banner - Gold Theme */
 .welcome-banner {
     background: var(--gold-gradient-dark);
     border-radius: 20px;

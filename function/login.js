@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const role = dropdownTrigger.getAttribute('data-selected');
-            const email = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
             
             if (!role) {
                 showToast('Please select a role');
@@ -84,13 +84,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     sessionStorage.setItem('on_protected_page', 'true');
                     // Set just_logged_in flag so session_guard.js skips the initial logout check
                     sessionStorage.setItem('just_logged_in', 'true');
-                    
-                    showToast('Login Successful! Redirecting...');
+
+                    // Show loading modal overlay
+                    const overlay = document.getElementById('loginLoadingOverlay');
+                    if (overlay) {
+                        overlay.style.display = 'flex';
+                    }
                     setTimeout(() => {
-                        // Use replace so the login page is removed from history
-                        // This prevents back button from going to login page after login
                         window.location.replace(result.redirect);
-                    }, 1000);
+                    }, 5000);
                 } else {
                     showToast(result.message || 'Login failed. Please try again.');
                 }

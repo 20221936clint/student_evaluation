@@ -5,38 +5,30 @@ require_once '../../../data/session_security.php';
 $role_access = check_role_access('program_head');
 $show_role_modal = !$role_access['allowed'];
 
-$user_name = $_SESSION['user_name'] ?? 'John Head';
+$user_name = $_SESSION['user_name'] ?? 'Program Head';
 
 // Only fetch data if access is allowed
 if (!$show_role_modal) {
-
-// Fetch program head profile
-$profile = [
-    'first_name' => 'John',
-    'last_name' => 'Head',
-    'email' => 'head@test.com',
-    'department' => 'Operational Management'
-];
-
-$ph_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
-$sql = "SELECT first_name, last_name, email, department FROM program_heads WHERE id = ?";
-$stmt = $conn->prepare($sql);
-if ($stmt) {
-    $stmt->bind_param("i", $ph_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        $profile = $row;
+    require_once '../../../data/config.php';
+    
+    // Fetch program head profile
+    $profile = [
+        'first_name' => 'Program',
+        'last_name' => 'Head',
+        'email' => 'head@example.com'
+    ];
+    
+    $ph_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+    try {
+        $stmt = $pdo->prepare("SELECT first_name, last_name, email FROM program_heads WHERE id = ?");
+        $stmt->execute([$ph_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            $profile = $result;
+        }
+    } catch (PDOException $e) {
+        // Keep default profile if query fails
     }
-    $stmt->close();
-}
-
-// Fetch departments for dropdown
-$departments = [];
-$sql = "SELECT department_name FROM departments ORDER BY department_name";
-$result = $conn->query($sql);
-if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row['department_name']; } }
-
 }
 ?>
 <!DOCTYPE html>
@@ -50,28 +42,28 @@ if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row['de
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --gold: #d4a843; --gold-light: #e8c768; --gold-dark: #b8922f; --cream: #faf8f5; --cream-light: #f5f2eb; --white: #ffffff; --dark-text: #2d3748; --dark-text-2: #4a5568; --light-text: #718096; --light-text-2: #a0aec0; --border-light: #e2e8f0; --border-soft: #edf2f7; }
+        :root { --gold: #B8860B; --gold-light: #D4A843; --gold-dark: #8B6914; --cream: #f7f5ef; --cream-light: #f0ebe3; --white: #ffffff; --dark-text: #1f1f1f; --dark-text-2: #4a5568; --light-text: #666666; --border-light: #d4cfc5; --border-soft: #e8e4da; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; color: var(--dark-text); }
+        body { font-family: 'Poppins', sans-serif; color: var(--dark-text); overflow-x: hidden; }
         .page-container { padding: 32px; }
-        .welcome-banner { background: linear-gradient(160deg, #B8860B 0%, #D4A843 40%, #F0D68A 100%); border-radius: 20px; padding: 36px 44px; color: white; margin-bottom: 32px; box-shadow: 0 8px 32px rgba(184, 134, 11, 0.3); position: relative; overflow: hidden; }
-        .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.15); border-radius: 50%; }
+        .welcome-banner { background: linear-gradient(160deg, #6b5a00 0%, var(--gold-light) 40%, var(--gold-dark) 100%); border-radius: 20px; padding: 36px 44px; color: white; margin-bottom: 32px; box-shadow: 0 8px 32px rgba(139, 105, 20, 0.4); position: relative; overflow: hidden; }
+        .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; }
         .welcome-banner h1 { font-size: 28px; font-weight: 800; margin: 0 0 12px 0; position: relative; z-index: 1; }
         .welcome-banner p { font-size: 15px; opacity: 0.95; margin: 0; max-width: 600px; position: relative; z-index: 1; }
         .settings-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
-        .card { background: var(--white); border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border-soft); transition: all 0.3s ease; }
-        .card:hover { box-shadow: 0 4px 20px rgba(212, 168, 67, 0.15); border-color: var(--gold-light); }
+        .card { background: var(--white); border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid var(--border-soft); transition: all 0.3s ease; }
+        .card:hover { box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2); border-color: var(--gold-light); }
         .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--cream-light); }
         .card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
         .card-icon.gold { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); }
-        .card-icon.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-        .card-icon.green { background: linear-gradient(135deg, #10b981, #34d399); }
-        .card-icon.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+        .card-icon.blue { background: linear-gradient(135deg, #0284c7, #38bdf8); }
+        .card-icon.green { background: linear-gradient(135deg, #059669, #34d399); }
+        .card-icon.purple { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
         .card-title { font-size: 18px; font-weight: 700; color: var(--dark-text); }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--dark-text-2); margin-bottom: 8px; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid var(--border-light); border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: var(--dark-text); background: var(--white); transition: all 0.2s ease; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.15); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15); }
         .toggle-group { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
         .toggle-group:last-child { border-bottom: none; }
         .toggle-label { display: flex; flex-direction: column; }
@@ -83,13 +75,12 @@ if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row['de
         .toggle-slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .toggle-slider { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); }
         input:checked + .toggle-slider:before { transform: translateX(24px); }
-        .btn-save { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: white; padding: 14px 28px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-save { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: white; padding: 14px 28px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3); }
         .btn-reset { background: var(--white); color: var(--dark-text-2); padding: 14px 28px; border: 2px solid var(--border-light); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-left: 12px; }
         .button-group { margin-top: 24px; padding-top: 24px; border-top: 2px solid var(--cream-light); }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .card { animation: fadeInUp 0.5s ease forwards; }
         .welcome-banner { animation: fadeInUp 0.5s ease forwards; }
-    </style>
 </head>
 <body>
     <aside class="sidebar" id="sidebar">
@@ -107,9 +98,7 @@ if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row['de
         <nav class="sidebar-nav">
             <div class="sidebar-nav-label">Menu</div>
             <a href="../dashboard.php" class="sidebar-nav-item"><i class="fas fa-chart-pie"></i><span>Overview</span></a>
-            <a href="evaluations.php" class="sidebar-nav-item"><i class="fas fa-clipboard-check"></i><span>Evaluations</span></a>
             <a href="instructors.php" class="sidebar-nav-item"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a>
-            <a href="courses.php" class="sidebar-nav-item"><i class="fas fa-book"></i><span>Courses</span></a>
             <a href="departments.php" class="sidebar-nav-item"><i class="fas fa-building"></i><span>Departments</span></a>
             <a href="reports.php" class="sidebar-nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
             <a href="settings.php" class="sidebar-nav-item active"><i class="fas fa-cog"></i><span>Settings</span></a>
@@ -141,22 +130,14 @@ if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row['de
                             <div class="card-icon gold"><i class="fas fa-user-circle"></i></div>
                             <h3 class="card-title">Profile Settings</h3>
                         </div>
-                        <div class="form-group">
-                            <label>Full Name</label>
-                            <input type="text" value="<?php echo htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']); ?>" placeholder="Enter your full name">
-                        </div>
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" value="<?php echo htmlspecialchars($profile['email']); ?>" placeholder="Enter your email">
-                        </div>
-                        <div class="form-group">
-                            <label>Department</label>
-                            <select>
-                                <?php foreach ($departments as $dept): ?>
-                                <option <?php echo $dept == $profile['department'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($dept); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                         <div class="form-group">
+                             <label>Full Name</label>
+                             <input type="text" value="<?php echo htmlspecialchars(($profile['first_name'] ?? '') . ' ' . ($profile['last_name'] ?? '')); ?>" placeholder="Enter your full name">
+                         </div>
+                         <div class="form-group">
+                             <label>Email Address</label>
+                             <input type="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" placeholder="Enter your email">
+                         </div>
                     </div>
 
                     <!-- Notification Settings -->

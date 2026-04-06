@@ -5,17 +5,30 @@ require_once '../../../data/session_security.php';
 $role_access = check_role_access('program_head');
 $show_role_modal = !$role_access['allowed'];
 
-$user_name = $_SESSION['user_name'] ?? 'John Head';
+$user_name = $_SESSION['user_name'] ?? 'Program Head';
 
 // Only fetch data if access is allowed
 if (!$show_role_modal) {
-
-// Fetch departments
-$departments = [];
-$sql = "SELECT department_name, icon_class, gradient_from, gradient_to, instructor_count, course_count FROM departments ORDER BY department_name";
-$result = $conn->query($sql);
-if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row; } }
-
+    require_once '../../../data/config.php';
+    
+    // Fetch departments with table existence check
+    $departments = [];
+    try {
+        // Check if departments table exists
+        $stmt = $pdo->query("SHOW TABLES LIKE 'departments'");
+        if ($stmt->rowCount() > 0) {
+            $sql = "SELECT department_name, icon_class, gradient_from, gradient_to, instructor_count, course_count FROM departments ORDER BY department_name";
+            $stmt = $pdo->query($sql);
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $departments[] = $row;
+            }
+        } else {
+            // departments table doesn't exist, leave array empty
+            $departments = [];
+        }
+    } catch (PDOException $e) {
+        $departments = [];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -29,22 +42,131 @@ if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row; } 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --gold: #d4a843; --gold-light: #e8c768; --cream: #fef9f3; --white: #ffffff; --dark-text: #1a1a2e; --light-text: #6b7280; --border-light: #e5e7eb; }
+        :root { 
+            --gold: #B8860B; 
+            --gold-light: #D4A843; 
+            --gold-dark: #8B6914; 
+            --cream: #f7f5ef; 
+            --white: #ffffff; 
+            --dark-text: #1f1f1f; 
+            --light-text: #666666; 
+            --border-light: #d4cfc5; 
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--cream); }
-        .page-container { padding: 24px; }
-        .page-header { margin-bottom: 24px; }
-        .page-title { font-size: 24px; font-weight: 700; color: var(--dark-text); }
-        .page-subtitle { font-size: 13px; color: var(--light-text); margin-top: 4px; }
-        .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border-light); margin-bottom: 20px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 16px; font-weight: 700; color: var(--dark-text); }
-        .dept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .dept-card { background: var(--cream); border-radius: 12px; padding: 20px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 16px; }
-        .dept-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
-        .dept-info { flex: 1; }
-        .dept-name { font-size: 16px; font-weight: 700; color: var(--dark-text); }
-        .dept-meta { font-size: 13px; color: var(--light-text); margin-top: 4px; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--cream);
+            overflow-x: hidden;
+        }
+        .page-container { 
+            padding: 24px; 
+        }
+        .page-header { 
+            margin-bottom: 24px; 
+        }
+        .page-title { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: var(--dark-text); 
+        }
+        .page-subtitle { 
+            font-size: 13px; 
+            color: var(--light-text); 
+            margin-top: 4px; 
+        }
+        .card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 24px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            border: 1px solid var(--border-light); 
+            margin-bottom: 20px; 
+        }
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        .card-title { 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: var(--dark-text); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title i {
+            color: var(--gold-dark);
+        }
+        .dept-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        .dept-card { 
+            background: var(--cream); 
+            border-radius: 12px; 
+            padding: 20px; 
+            border: 1px solid var(--border-light); 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            transition: all 0.2s ease;
+        }
+        .dept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .dept-icon { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+            color: white; 
+            flex-shrink: 0;
+        }
+        .dept-info { 
+            flex: 1; 
+            min-width: 0;
+        }
+        .dept-name { 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: var(--dark-text); 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dept-meta { 
+            font-size: 13px; 
+            color: var(--light-text); 
+            margin-top: 4px; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .btn-add {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -63,9 +185,7 @@ if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row; } 
         <nav class="sidebar-nav">
             <div class="sidebar-nav-label">Menu</div>
             <a href="../dashboard.php" class="sidebar-nav-item"><i class="fas fa-chart-pie"></i><span>Overview</span></a>
-            <a href="evaluations.php" class="sidebar-nav-item"><i class="fas fa-clipboard-check"></i><span>Evaluations</span></a>
             <a href="instructors.php" class="sidebar-nav-item"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a>
-            <a href="courses.php" class="sidebar-nav-item"><i class="fas fa-book"></i><span>Courses</span></a>
             <a href="departments.php" class="sidebar-nav-item active"><i class="fas fa-building"></i><span>Departments</span></a>
             <a href="reports.php" class="sidebar-nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
             <a href="settings.php" class="sidebar-nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
@@ -88,15 +208,36 @@ if ($result) { while ($row = $result->fetch_assoc()) { $departments[] = $row; } 
                 <div class="page-header">
                     <h1 class="page-title">Departments</h1>
                     <p class="page-subtitle">View all departments in the institution</p>
-                </div>
-                <div class="dept-grid">
-                    <?php foreach ($departments as $dept): ?>
-                    <div class="dept-card">
-                        <div class="dept-icon" style="background: linear-gradient(135deg, <?php echo htmlspecialchars($dept['gradient_from']); ?>, <?php echo htmlspecialchars($dept['gradient_to']); ?>);"><i class="<?php echo htmlspecialchars($dept['icon_class']); ?>"></i></div>
-                        <div class="dept-info"><div class="dept-name"><?php echo htmlspecialchars($dept['department_name']); ?></div><div class="dept-meta"><?php echo $dept['instructor_count']; ?> Instructors | <?php echo $dept['course_count']; ?> Courses</div></div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
+                 </div>
+                 <div class="dept-grid">
+                     <?php if (empty($departments)): ?>
+                     <div class="dept-card" style="grid-column: 1 / -1; justify-content: center; padding: 40px;">
+                         <div style="text-align: center;">
+                             <i class="fas fa-building" style="font-size: 48px; color: var(--light-text); opacity: 0.3; margin-bottom: 16px;"></i>
+                             <h3 style="color: var(--dark-text); margin-bottom: 8px;">No Departments Configured</h3>
+                             <p style="color: var(--light-text); max-width: 600px; margin: 0 auto;">
+                                 The departments table is not yet set up in the database. Please configure your departments to view them here.
+                             </p>
+                         </div>
+                     </div>
+                     <?php else: ?>
+                     <?php foreach ($departments as $dept): ?>
+                     <div class="dept-card">
+                         <div class="dept-icon" style="background: linear-gradient(135deg, <?php echo htmlspecialchars($dept['gradient_from'] ?? '#B8860B'); ?>, <?php echo htmlspecialchars($dept['gradient_to'] ?? '#D4A843'); ?>);"><i class="<?php echo htmlspecialchars($dept['icon_class'] ?? 'fas fa-building'); ?>"></i></div>
+                         <div class="dept-info">
+                             <div class="dept-name"><?php echo htmlspecialchars($dept['department_name']); ?></div>
+                             <div class="dept-meta">
+                                 <?php 
+                                 $instructor_count = $dept['instructor_count'] ?? 0;
+                                 $course_count = $dept['course_count'] ?? 0;
+                                 echo $instructor_count . ' Instructor' . ($instructor_count != 1 ? 's' : '') . ' | ' . $course_count . ' Course' . ($course_count != 1 ? 's' : '');
+                                 ?>
+                             </div>
+                         </div>
+                     </div>
+                     <?php endforeach; ?>
+                     <?php endif; ?>
+                 </div>
             </div>
         </main>
     </div>

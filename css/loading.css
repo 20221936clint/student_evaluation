@@ -1,0 +1,57 @@
+/* Loading overlay for login redirect */
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 30, 30, 0.45);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px) brightness(0.8);
+  transition: opacity 0.3s;
+}
+.loading-modal {
+  background: rgba(255,255,255,0.98);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 48px 36px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+  max-width: 90vw;
+}
+.loading-spinner {
+  border: 7px solid #f3f3f3;
+  border-top: 7px solid #d4a843;
+  border-right: 7px solid #e8c768;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 12px rgba(212,168,67,0.12);
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.loading-text {
+  font-size: 1.35rem;
+  color: #d4a843;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.loading-subtext {
+  font-size: 1rem;
+  color: #444;
+  margin-top: 0;
+  text-align: center;
+  opacity: 0.7;
+}

@@ -138,17 +138,9 @@ try {
                 <i class="fas fa-chart-pie"></i>
                 <span>Overview</span>
             </a>
-            <a href="pages/evaluations.php" class="sidebar-nav-item">
-                <i class="fas fa-clipboard-check"></i>
-                <span>Evaluations</span>
-            </a>
             <a href="pages/instructors.php" class="sidebar-nav-item">
                 <i class="fas fa-chalkboard-teacher"></i>
                 <span>Instructors</span>
-            </a>
-            <a href="pages/courses.php" class="sidebar-nav-item">
-                <i class="fas fa-book"></i>
-                <span>Courses</span>
             </a>
             <a href="pages/departments.php" class="sidebar-nav-item">
                 <i class="fas fa-building"></i>

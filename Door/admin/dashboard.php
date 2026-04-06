@@ -821,6 +821,41 @@ if (!file_exists($page_file)) {
 
         <!-- Main Content -->
         <main class="main-content">
+            <?php
+            // Check if admin needs to complete setup (demo account)
+            $needs_setup = false;
+            if (isset($_SESSION['admin_requires_setup']) && $_SESSION['admin_requires_setup']) {
+                $needs_setup = true;
+            }
+            ?>
+            <?php if ($needs_setup): ?>
+                <div id="adminSetupSection" style="max-width: 600px; margin: 0 auto 24px; background: white; border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);">
+                    <h2 style="margin-bottom: 16px; font-size: 18px; color: var(--dark-text); display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-user-shield" style="color: var(--gold);"></i> Complete Your Account Setup
+                    </h2>
+                    <p style="color: var(--light-text); margin-bottom: 20px; font-size: 14px;">
+                        For security, please set up your permanent credentials. After saving, the demo account will be disabled.
+                    </p>
+                    <form id="adminSetupForm">
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label class="form-label">New Email Address</label>
+                            <input type="email" name="new_email" class="form-input" required placeholder="Enter new email">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label class="form-label">New Password</label>
+                            <input type="password" name="new_password" class="form-input" required minlength="6" placeholder="At least 6 characters">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" name="confirm_password" class="form-input" required placeholder="Re-enter password">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="min-width: 140px;">
+                            <i class="fas fa-save"></i> Save & Continue
+                        </button>
+                    </form>
+                    <div id="adminSetupMessage" style="margin-top: 16px; padding: 12px; border-radius: 10px; display: none;"></div>
+                </div>
+            <?php endif; ?>
             <?php include $page_file; ?>
         </main>
     </div>
@@ -899,6 +934,58 @@ if (!file_exists($page_file)) {
             showModal(decodeURIComponent(urlParams.get('error')), 'error');
         }
     </script>
-    <script src="../../function/session_guard.js"></script>
-</body>
+     <script src="../../function/session_guard.js"></script>
+     <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const setupForm = document.getElementById('adminSetupForm');
+    if (setupForm) {
+        setupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const messageDiv = document.getElementById('adminSetupMessage');
+            const submitBtn = setupForm.querySelector('button[type="submit"]');
+            const originalBtnContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            const formData = new FormData(setupForm);
+
+            fetch('../../data/complete_admin_setup.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnContent;
+                if (data.success) {
+                    messageDiv.textContent = data.message;
+                    messageDiv.style.background = 'rgba(22, 163, 74, 0.1)';
+                    messageDiv.style.border = '1px solid rgba(22, 163, 74, 0.2)';
+                    messageDiv.style.color = '#16a34a';
+                    messageDiv.style.display = 'block';
+                    // Reload page after delay to reflect changes
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    messageDiv.textContent = data.message;
+                    messageDiv.style.background = 'rgba(220, 38, 38, 0.1)';
+                    messageDiv.style.border = '1px solid rgba(220, 38, 38, 0.2)';
+                    messageDiv.style.color = '#dc2626';
+                    messageDiv.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnContent;
+                messageDiv.textContent = 'An error occurred. Please try again.';
+                messageDiv.style.background = 'rgba(220, 38, 38, 0.1)';
+                messageDiv.style.border = '1px solid rgba(220, 38, 38, 0.2)';
+                messageDiv.style.color = '#dc2626';
+                messageDiv.style.display = 'block';
+                console.error('Setup error:', err);
+            });
+        });
+    }
+});
+</script>
+ </body>
 </html>

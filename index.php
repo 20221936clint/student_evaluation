@@ -209,13 +209,16 @@ if ($is_logged_in) {
                  </button>
              </form>
 
-             <div class="demo-credentials" style="font-size: 0.75rem; color: var(--light-text); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-light);">
-                 <p style="margin-bottom: 6px; font-weight: 600; color: var(--gold-dark);">Demo Credentials:</p>
-                 <div style="font-size: 0.7rem; line-height: 1.5; margin-left: 8px;">
-                     <div><strong>Admin:</strong> admin@cjcm.edu / password123</div>
-                     <div><strong>Instructor:</strong> teacher@test.com / password123</div>
-                 </div>
-             </div>
+              <div class="demo-credentials" style="font-size: 0.75rem; color: var(--light-text); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-light); position: relative;">
+                  <button type="button" id="dismissDemoCredentials" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--light-text); cursor: pointer; font-size: 1rem; line-height: 1; padding: 4px; opacity: 0.6; transition: opacity 0.2s;">
+                      <i class="fas fa-times"></i>
+                  </button>
+                  <p style="margin-bottom: 6px; font-weight: 600; color: var(--gold-dark);">Demo Credentials:</p>
+                  <div style="font-size: 0.7rem; line-height: 1.5; margin-left: 8px;">
+                      <div><strong>Admin:</strong> admin@cjcm.edu / password123</div>
+                      <div><strong>Instructor:</strong> teacher@test.com / password123</div>
+                  </div>
+              </div>
 
              <div class="login-footer" id="loginFooter" style="display:none;">
                  <p style="color: var(--medium-text); font-size: 0.85rem; margin-bottom: 12px;">
@@ -239,8 +242,8 @@ if ($is_logged_in) {
                  <p class="login-subtitle">Create your instructor account</p>
              </div>
 
-             <form id="registerForm" class="register-form">
-                 <div class="form-row">
+              <form id="registerForm" class="register-form" action="./data/register.php" method="POST">
+                  <div class="form-row">
                      <div class="input-group">
                          <label class="field-label" for="regFirstName">First Name</label>
                          <div class="input-wrapper">
@@ -323,12 +326,14 @@ if ($is_logged_in) {
                      </div>
                  </div>
 
-                 <button type="submit" class="login-btn" id="registerBtn">
-                     <span class="btn-text"><i class="fas fa-user-plus"></i> Create Account</span>
-                     <span class="btn-loader"><i class="fas fa-spinner fa-spin"></i></span>
-                 </button>
+                  <button type="submit" class="login-btn" id="registerBtn">
+                      <span class="btn-text"><i class="fas fa-user-plus"></i> Create Account</span>
+                      <span class="btn-loader"><i class="fas fa-spinner fa-spin"></i></span>
+                  </button>
 
-                 <div class="login-footer">
+                  <div class="form-message" id="formMessage" style="display:none; margin-top:12px; padding:10px; border-radius:6px; font-size:0.9rem;"></div>
+
+                  <div class="login-footer">
                      <p>Already have an account?</p>
                      <button type="button" class="create-account-btn" id="switchToLogin">
                          <i class="fas fa-arrow-left"></i> Back to Login
@@ -338,8 +343,9 @@ if ($is_logged_in) {
          </div>
      </div>
 
-    <script src="./function/register.js"></script>
-    <script type="module" src="./js/landing.js"></script>
- </body>
+     <script src="./function/login.js"></script>
+     <script src="./function/register.js"></script>
+     <script type="module" src="./js/landing.js"></script>
+  </body>
 
 </html>

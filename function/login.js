@@ -1,10 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Role dropdown element (used only for reading selected value)
     const dropdownTrigger = document.getElementById('dropdownTrigger');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const dropdownArrow = document.getElementById('dropdownArrow');
-    const selectedRole = document.getElementById('selectedRole');
-    const dropdownItems = document.querySelectorAll('.dropdown-item');
-    const roleInput = document.getElementById('roleInput');
 
     // Check for saved credentials on page load
     const savedCredentials = localStorage.getItem('rememberMeCredentials');
@@ -17,49 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error parsing saved credentials:', e);
         }
     }
-
-    // Toggle dropdown
-    dropdownTrigger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        this.classList.toggle('active');
-        dropdownMenu.classList.toggle('open');
-        dropdownArrow.classList.toggle('rotated');
-    });
-
-    // Handle role selection
-    dropdownItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const value = this.getAttribute('data-value');
-            const title = this.querySelector('.dropdown-item-title').textContent;
-            
-            // Remove selected class from all items
-            dropdownItems.forEach(i => i.classList.remove('selected'));
-            
-            // Add selected class to clicked item
-            this.classList.add('selected');
-            
-            // Update displayed text
-            selectedRole.textContent = title;
-            selectedRole.classList.remove('placeholder');
-            
-            // Store selected value
-            dropdownTrigger.setAttribute('data-selected', value);
-            
-            // Close dropdown
-            dropdownTrigger.classList.remove('active');
-            dropdownMenu.classList.remove('open');
-            dropdownArrow.classList.remove('rotated');
-        });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            dropdownTrigger.classList.remove('active');
-            dropdownMenu.classList.remove('open');
-            dropdownArrow.classList.remove('rotated');
-        }
-    });
 
     // Password toggle functionality
     const togglePassword = document.getElementById('togglePassword');
@@ -84,8 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form submission
     const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
 
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
@@ -110,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('email', email);
                 formData.append('password', password);
 
-                const response = await fetch('../data/login_process.php', {
+                const response = await fetch('./data/login_process.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -153,12 +104,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function showToast(message) {
-        toastMessage.textContent = message;
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+    // Dismiss demo credentials permanently
+    const dismissDemoBtn = document.getElementById('dismissDemoCredentials');
+    const demoCredentialsDiv = dismissDemoBtn ? dismissDemoBtn.closest('.demo-credentials') : null;
+
+    if (dismissDemoBtn && demoCredentialsDiv) {
+        // Check if dismissed previously
+        if (localStorage.getItem('demoCredentialsDismissed') === 'true') {
+            demoCredentialsDiv.style.display = 'none';
+        }
+
+        dismissDemoBtn.addEventListener('click', function() {
+            demoCredentialsDiv.style.display = 'none';
+            localStorage.setItem('demoCredentialsDismissed', 'true');
+        });
     }
 });

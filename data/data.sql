@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS admins (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'admin',
+    is_demo BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
@@ -165,8 +166,9 @@ CREATE TABLE IF NOT EXISTS admin_promotions (
 
 -- Sample Users
 -- Note: All passwords are 'password123' (hashed with bcrypt)
-INSERT INTO admins (first_name, last_name, email, password, role) VALUES
-('System', 'Administrator', 'admin@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+-- is_demo = 1 means it's a demo account that requires setup on first login
+INSERT INTO admins (first_name, last_name, email, password, role, is_demo) VALUES
+('System', 'Administrator', 'admin@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 1);
 
 -- Majors
 INSERT INTO majors (major_name, display_name, description, icon_class, gradient_from, gradient_to, sort_order, is_active) VALUES

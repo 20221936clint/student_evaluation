@@ -49,24 +49,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
-        if ($user && password_verify($password, $user['password'])) {
-            // Check if account is active (for instructors) or exists (for program heads/admins)
-            if ($role === 'instructor') {
-                // Check if instructor is promoted/approved to have an account
-                // instructors table has status column (active, pending, etc.)
-                if (isset($user['status']) && $user['status'] !== 'active') {
-                    echo json_encode([
-                        'success' => false,
-                        'message' => 'Your account is not yet approved. Please contact your administrator.'
-                    ]);
-                    exit;
-                }
-            }
-            
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_email'] = $user['email'];
-            $_SESSION['user_role'] = $role;
-            $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
+         if ($user && password_verify($password, $user['password'])) {
+             // Check if account is active (for instructors) or exists (for program heads/admins)
+             if ($role === 'instructor') {
+                 // Check if instructor is promoted/approved to have an account
+                 // instructors table has status column (active, pending, etc.)
+                 if (isset($user['status']) && $user['status'] !== 'active') {
+                     echo json_encode([
+                         'success' => false,
+                         'message' => 'Your account is not yet approved. Please contact your administrator.'
+                     ]);
+                     exit;
+                 }
+             }
+             
+             // Check if admin is using demo account and requires setup
+             if ($role === 'admin' && isset($user['is_demo']) && $user['is_demo']) {
+                 $_SESSION['admin_requires_setup'] = true;
+             }
+             
+             $_SESSION['user_id'] = $user['id'];
+             $_SESSION['user_email'] = $user['email'];
+             $_SESSION['user_role'] = $role;
+             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
             
             $redirect = match($role) {
                 'admin' => 'Door/admin/dashboard.php',

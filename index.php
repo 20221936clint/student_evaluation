@@ -294,24 +294,11 @@ if ($is_logged_in) {
                  </div>
 
                  <div class="input-group">
-                     <label class="field-label" for="regEmployeeId">Employee ID</label>
+                     <label class="field-label" for="regPhone">Phone Number</label>
                      <div class="input-wrapper">
-                         <i class="fas fa-id-badge input-icon"></i>
-                         <input type="text" id="regEmployeeId" name="employee_id" placeholder="e.g. EMP0001" required>
+                         <i class="fas fa-phone input-icon"></i>
+                         <input type="tel" id="regPhone" name="phone" placeholder="09xx-xxx-xxxx" maxlength="13" required autocomplete="off">
                          <div class="input-focus-line"></div>
-                     </div>
-                 </div>
-
-                 <div class="input-group">
-                     <label class="field-label" for="regDepartment">Department</label>
-                     <div class="input-wrapper">
-                         <i class="fas fa-building input-icon"></i>
-                         <select id="regDepartment" name="department" required>
-                             <option value="">Select department</option>
-                             <option value="Operational Management">Operational Management (OM)</option>
-                             <option value="Financial Management">Financial Management (FM)</option>
-                             <option value="Marketing Management">Marketing Management (MM)</option>
-                         </select>
                      </div>
                  </div>
 
@@ -351,7 +338,8 @@ if ($is_logged_in) {
          </div>
      </div>
 
-     <script type="module" src="./js/landing.js"></script>
+    <script src="./function/register.js"></script>
+    <script type="module" src="./js/landing.js"></script>
  </body>
 
 </html>

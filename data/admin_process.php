@@ -36,13 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $middle_name = trim($_POST['middle_name'] ?? '');
     $suffix = trim($_POST['suffix'] ?? '');
     $email = trim($_POST['email'] ?? '');
-    $employee_id = trim($_POST['employee_id'] ?? '');
-    $department = trim($_POST['department'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    // Validation (required: first_name, last_name, email, employee_id, department, password)
-    if (empty($first_name) || empty($last_name) || empty($email) || empty($employee_id) || empty($department) || empty($password)) {
+    // Validation (required: first_name, last_name, email, phone, password)
+    if (empty($first_name) || empty($last_name) || empty($email) || empty($phone) || empty($password)) {
         echo json_encode(['success' => false, 'message' => 'Please fill in all required fields']);
+        exit;
+    }
+
+    // Validate Philippine phone number format
+    if (!preg_match('/^(09|\+639)\d{9}$/', $phone)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid Philippine phone number. Use 09XXXXXXXXX or +639XXXXXXXXX']);
         exit;
     }
 
@@ -74,16 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                  exit;
              }
 
-            $stmt = $pdo->prepare("SELECT id FROM instructors WHERE employee_id = ?");
-            $stmt->execute([$employee_id]);
-            if ($stmt->fetch()) {
-                echo json_encode(['success' => false, 'message' => 'Employee ID already registered']);
-                exit;
-            }
-
             // Insert into instructors table (columns match data.sql)
-            $stmt = $pdo->prepare("INSERT INTO instructors (first_name, middle_name, last_name, suffix, email, employee_id, department, password, position, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Instructor', 'active')");
-            $stmt->execute([$first_name, $middle_name ?: null, $last_name, $suffix ?: null, $email, $employee_id, $department, $hashed_password]);
+            $stmt = $pdo->prepare("INSERT INTO instructors (first_name, middle_name, last_name, suffix, email, phone, password, position, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'Instructor', 'active')");
+            $stmt->execute([$first_name, $middle_name ?: null, $last_name, $suffix ?: null, $email, $phone, $hashed_password]);
 
             echo json_encode(['success' => true, 'message' => 'Registration successful! You can now login.']);
         } catch (PDOException $e) {

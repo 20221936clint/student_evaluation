@@ -780,7 +780,6 @@ if (!file_exists($page_file)) {
                     <i class="fas fa-crown"></i>
                 </div>
                 <h2 class="sidebar-title">Admin Panel</h2>
-                <p class="sidebar-subtitle">Faculty Evaluation</p>
             </div>
 
             <nav class="sidebar-menu">
@@ -803,15 +802,6 @@ if (!file_exists($page_file)) {
             </nav>
 
             <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <?php echo strtoupper(substr($user_name, 0, 2)); ?>
-                    </div>
-                    <div class="user-details">
-                        <div class="user-name"><?php echo htmlspecialchars($user_name); ?></div>
-                        <div class="user-role"><?php echo ucfirst($user_role); ?></div>
-                    </div>
-                </div>
                 <a href="../../data/logout.php" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>

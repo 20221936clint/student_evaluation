@@ -113,7 +113,7 @@ if ($pdo) {
                 <tr>
                     <th>Instructor</th>
                     <th>Email</th>
-                    <th>Status</th>
+                    <th>Role</th>
                     <th>Joined</th>
                     <th>Actions</th>
                 </tr>

@@ -1,26 +1,21 @@
 <?php
 require_once '../../data/config.php';
 
-$instructor_count = 0;
-$department_count = 3;
 $recent_instructors = [];
 $error_message = '';
 $promoted_ids = [];
+$program_head_emails = [];
+$current_program_head = null;
 
 if ($pdo) {
     try {
-        // Get instructor count
-        $stmt = $pdo->query("SELECT COUNT(*) as count FROM instructors");
-        $result = $stmt->fetch();
-        $instructor_count = $result['count'] ?? 0;
-        
         // Get all instructors for Instructor List table
         $stmt = $pdo->query("SELECT * FROM instructors ORDER BY first_name ASC");
         $recent_instructors = $stmt->fetchAll();
         
         // Get promoted instructor IDs (Role = Program Head for these)
         try {
-            $stmt = $pdo->query("SELECT instructor_id FROM admin_promotions WHERE promoted_to = 'program_head' AND status = 'active'");
+            $stmt = $pdo->query("SELECT instructor_id FROM admin_promotions WHERE promoted_to = 'program_head'");
             $promotions = $stmt->fetchAll(PDO::FETCH_COLUMN);
             $promoted_ids = array_map('intval', is_array($promotions) ? $promotions : []);
         } catch (PDOException $e) {
@@ -33,12 +28,39 @@ if ($pdo) {
                     promotion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     status ENUM('active', 'revoked') DEFAULT 'active'
                 )");
-                $stmt = $pdo->query("SELECT instructor_id FROM admin_promotions WHERE promoted_to = 'program_head' AND status = 'active'");
+                $stmt = $pdo->query("SELECT instructor_id FROM admin_promotions WHERE promoted_to = 'program_head'");
                 $promotions = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $promoted_ids = array_map('intval', is_array($promotions) ? $promotions : []);
             } catch (PDOException $e2) {
                 $promoted_ids = [];
             }
+        }
+        
+        // Get program head emails from program_heads table
+        try {
+            $stmt = $pdo->query("SELECT email FROM program_heads");
+            $program_head_emails = array_map('strtolower', $stmt->fetchAll(PDO::FETCH_COLUMN) ?: []);
+        } catch (PDOException $e) {
+            $program_head_emails = [];
+        }
+        
+        // Get current program head details
+        try {
+            $stmt = $pdo->query("
+                SELECT i.first_name, i.last_name, i.email, i.middle_name, i.suffix 
+                FROM instructors i 
+                INNER JOIN admin_promotions ap ON i.id = ap.instructor_id 
+                WHERE ap.promoted_to = 'program_head' AND ap.status = 'active' 
+                LIMIT 1
+            ");
+            $current_program_head = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$current_program_head) {
+                // Check program_heads table as fallback
+                $stmt = $pdo->query("SELECT first_name, last_name, email FROM program_heads ORDER BY id DESC LIMIT 1");
+                $current_program_head = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
+        } catch (PDOException $e) {
+            $current_program_head = null;
         }
         
     } catch (PDOException $e) {
@@ -63,30 +85,78 @@ if ($pdo) {
 </div>
 <?php endif; ?>
 
-<!-- Stats Grid -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon gold">
-            <i class="fas fa-user-tie"></i>
-        </div>
+ <!-- Stats Grid -->
+ <div class="stats-grid">
+     <div class="stat-card program-head-card">
+         <?php if ($current_program_head): ?>
+             <?php 
+             $full_name = trim(($current_program_head['first_name'] ?? '') . ' ' . ($current_program_head['middle_name'] ?? '') . ' ' . ($current_program_head['last_name'] ?? ''));
+             $full_name = preg_replace('/\s+/', ' ', $full_name);
+             $initials = strtoupper(substr($current_program_head['first_name'], 0, 1) . ($current_program_head['middle_name'] ? substr($current_program_head['middle_name'], 0, 1) : '') . substr($current_program_head['last_name'], 0, 1));
+             ?>
+             <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 0;">
+                 <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 20px; box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);">
+                     <?php echo $initials; ?>
+                 </div>
+                 <div style="text-align: center;">
+                     <div style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 4px;"><?php echo htmlspecialchars($full_name); ?></div>
+                     <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;"><?php echo htmlspecialchars($current_program_head['email'] ?? ''); ?></div>
+                     <span class="status-badge" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15)); color: #059669; padding: 6px 14px; border-radius: 24px; font-size: 13px; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.3);">Program Head</span>
+                 </div>
+             </div>
+         <?php else: ?>
+             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 0; color: #9ca3af;">
+                 <i class="fas fa-user-tie" style="font-size: 48px; opacity: 0.5;"></i>
+                 <div style="font-size: 14px; font-weight: 600;">No Program Head</div>
+                 <div style="font-size: 12px; text-align: center;">Promote an instructor to become Program Head</div>
+             </div>
+         <?php endif; ?>
+     </div>
+     
+     <div class="stat-card">
+         <div class="stat-icon purple">
+             <i class="fas fa-book-open"></i>
+         </div>
+         <div class="stat-value" style="font-size: 14px; line-height: 1.3; text-align: center;">
+             <?php 
+             if (!empty($majors)) {
+                 echo htmlspecialchars(implode(', ', $majors));
+             } else {
+                 echo '<span style="color: #9ca3af;">No majors</span>';
+             }
+             ?>
+         </div>
+         <div class="stat-label">Majors</div>
+     </div>
+     
+     <div class="stat-card">
+         <div class="stat-icon blue">
+             <i class="fas fa-users"></i>
+         </div>
+         <div class="stat-value"><?php echo count($recent_instructors); ?></div>
+         <div class="stat-label">Total Instructors</div>
+     </div>
+ </div>
         <div class="stat-value"><?php echo $instructor_count; ?></div>
         <div class="stat-label">Total Instructors</div>
     </div>
     
-    <div class="stat-card">
-        <div class="stat-icon green">
-            <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="stat-value"><?php echo $instructor_count * 5; ?></div>
-        <div class="stat-label">Evaluations Completed</div>
-    </div>
+
     
     <div class="stat-card">
         <div class="stat-icon purple">
             <i class="fas fa-book"></i>
         </div>
-        <div class="stat-value"><?php echo $department_count; ?></div>
-        <div class="stat-label">Courses</div>
+        <div class="stat-value" style="font-size: 14px; line-height: 1.3; text-align: center;">
+            <?php 
+            if (!empty($majors)) {
+                echo htmlspecialchars(implode(', ', $majors));
+            } else {
+                echo '<span style="color: #9ca3af;">No majors</span>';
+            }
+            ?>
+        </div>
+        <div class="stat-label">Majors</div>
     </div>
 </div>
 
@@ -110,10 +180,8 @@ if ($pdo) {
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Department</th>
                     <th>Role</th>
                     <th>Joined Date</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -121,6 +189,9 @@ if ($pdo) {
                 <?php 
                     $initials = strtoupper(substr($instructor['first_name'], 0, 1) . substr($instructor['last_name'], 0, 1));
                     $joined_date = isset($instructor['created_at']) ? date('M j, Y', strtotime($instructor['created_at'])) : 'N/A';
+                    $instructor_id_int = (int)$instructor['id'];
+                    $email_raw = strtolower(trim($instructor['email'] ?? ''));
+                    $is_program_head = in_array($instructor_id_int, $promoted_ids, true) || in_array($email_raw, $program_head_emails, true);
                 ?>
                 <tr>
                     <td>
@@ -132,52 +203,14 @@ if ($pdo) {
                             </div>
                         </div>
                     </td>
-                    <td><?php echo htmlspecialchars($instructor['department']); ?></td>
-                    <td><?php echo in_array((int)$instructor['id'], $promoted_ids, true) ? '<span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Program Head</span>' : '<span class="status-badge" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">Instructor</span>'; ?></td>
-                    <td><?php echo $joined_date; ?></td>
                     <td>
-                        <?php if (in_array((int)$instructor['id'], $promoted_ids, true)): ?>
-                            <button class="btn btn-sm demote-btn" data-id="<?php echo $instructor['id']; ?>" style="background: #f87171; color: white; border: none; cursor: pointer;">Remove as Program Head</button>
+                        <?php if ($is_program_head): ?>
+                            <span class="status-badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Program Head</span>
                         <?php else: ?>
-                            <button class="btn btn-sm promote-btn" data-id="<?php echo $instructor['id']; ?>" style="background: #10b981; color: white; border: none; cursor: pointer;">Promote to Program Head</button>
+                            <span class="status-badge" style="background: rgba(99, 102, 241, 0.15); color: #4f46e5; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Instructor</span>
                         <?php endif; ?>
                     </td>
-                <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.promote-btn').forEach(function(btn) {
-                        btn.addEventListener('click', function() {
-                            if (!confirm('Promote this instructor to Program Head? This will replace the current Program Head.')) return;
-                            const id = this.getAttribute('data-id');
-                            fetch('../../data/admin_promote_instructor.php', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: 'instructor_id=' + encodeURIComponent(id)
-                            })
-                            .then(r => r.json())
-                            .then(data => {
-                                alert(data.message);
-                                if (data.success) location.reload();
-                            });
-                        });
-                    });
-                    document.querySelectorAll('.demote-btn').forEach(function(btn) {
-                        btn.addEventListener('click', function() {
-                            if (!confirm('Remove this Program Head?')) return;
-                            const id = this.getAttribute('data-id');
-                            fetch('../../data/admin_promote_instructor.php', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: 'instructor_id=0'
-                            })
-                            .then(r => r.json())
-                            .then(data => {
-                                alert('Program Head removed.');
-                                if (data.success) location.reload();
-                            });
-                        });
-                    });
-                });
-                </script>
+                    <td><?php echo $joined_date; ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -40,13 +40,11 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
         // Mark that user has logged out - this flag persists until next successful login
         sessionStorage.setItem('logged_out', 'true');
         
-        // Use replace to navigate to login page
-        // This removes the current page (logout) from history
-        // Combined with login page's replaceState, forward button won't work
-        window.location.replace('../Door/login.php');
+         // Use replace to navigate to home page
+         window.location.replace('/bs/index.php');
     </script>
 </head>
 <body>
-    <p>Logging out... If you are not redirected, <a href="../Door/login.php">click here</a>.</p>
+     <p>Logging out... If you are not redirected, <a href="/bs/index.php">click here</a>.</p>
 </body>
 </html>

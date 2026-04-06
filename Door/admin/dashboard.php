@@ -802,7 +802,7 @@ if (!file_exists($page_file)) {
             </nav>
 
             <div class="sidebar-footer">
-                <a href="../../data/logout.php" class="logout-btn">
+                 <a href="/bs/data/logout.php" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>

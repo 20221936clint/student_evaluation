@@ -214,3 +214,7 @@ INSERT INTO pending_instructors (first_name, middle_name, last_name, suffix, ema
 ('Alice', NULL, 'Smith', NULL, 'alice.smith@pending.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'pending'),
 ('Bob', NULL, 'Johnson', NULL, 'bob.johnson@pending.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'pending'),
 ('Carol', 'M.', 'Williams', NULL, 'carol.williams@pending.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'approved');
+
+-- Add system settings columns to admins table
+ALTER TABLE admins ADD COLUMN system_name VARCHAR(255) NULL;
+ALTER TABLE admins ADD COLUMN system_tagline TEXT NULL;

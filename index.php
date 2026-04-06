@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if user is already logged in
+ // Check if user is already logged in
 $is_logged_in = isset($_SESSION['user_role']) && !empty($_SESSION['user_role']);
 $user_role = $_SESSION['user_role'] ?? '';
 $user_name = $_SESSION['user_name'] ?? 'User';
@@ -30,6 +30,32 @@ if ($is_logged_in) {
         'instructor' => 'Instructor',
         default => 'User'
     };
+}
+
+// Fetch system settings from database
+$system_name = "Student Evaluation System";
+$system_tagline = "Empowering excellence in education through comprehensive student performance tracking, evaluation, and assessment reporting.";
+
+// Include DB config if available
+$config_path = __DIR__ . '/data/config.php';
+if (file_exists($config_path)) {
+    require_once $config_path;
+    if (isset($pdo) && $pdo) {
+        try {
+            $stmt = $pdo->query("SELECT system_name, system_tagline FROM admins ORDER BY id LIMIT 1");
+            $settings = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($settings) {
+                if (!empty($settings['system_name'])) {
+                    $system_name = $settings['system_name'];
+                }
+                if (!empty($settings['system_tagline'])) {
+                    $system_tagline = $settings['system_tagline'];
+                }
+            }
+        } catch (Exception $e) {
+            // Fallback to defaults
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -97,25 +123,25 @@ if ($is_logged_in) {
 
         <div class="particles" id="particles"></div>
 
-        <div class="hero-content" id="heroContent">
-            <span class="hero-badge">Welcome IBM</span>
-            <h1 class="hero-title">
-                Institute For Business Management<br>
-                <span class="gold-highlight">Student Evaluation System</span>
-            </h1>
-            <p class="hero-subtitle">
-                Empowering excellence in education through comprehensive student performance tracking, evaluation, and assessment reporting.
-            </p>
-           
-        </div>
+         <div class="hero-content" id="heroContent">
+             <span class="hero-badge">Welcome IBM</span>
+             <h1 class="hero-title">
+                 Institute For Business Management<br>
+                 <span class="gold-highlight"><?php echo htmlspecialchars($system_name); ?></span>
+             </h1>
+             <p class="hero-subtitle">
+                 <?php echo htmlspecialchars($system_tagline); ?>
+             </p>
+            
+         </div>
     </section>
 
     <footer class="footer">
         <div class="footer-content">
-            <div class="footer-brand">
-                <img src="./media/LOGO.jpg" alt="Logo" class="footer-logo">
-                <span>Student Evaluation System</span>
-            </div>
+             <div class="footer-brand">
+                 <img src="./media/LOGO.jpg" alt="Logo" class="footer-logo">
+                 <span><?php echo htmlspecialchars($system_name); ?></span>
+             </div>
             <p>&copy; 2026 CJCM. All Rights Reserved.</p>
             <ul class="footer-links">
                 <li><a href="#">Privacy Policy</a></li>

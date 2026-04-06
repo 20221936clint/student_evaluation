@@ -97,21 +97,53 @@ if (isset($pdo) && $pdo) {
     </div>
     <div class="card-body" style="padding: 24px;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <?php
+            $instructor_count = 0;
+            $major_count = 0;
+            try {
+                if (isset($pdo) && $pdo) {
+                    $instructor_count = $pdo->query("SELECT COUNT(*) FROM instructors WHERE status = 'active'")->fetchColumn();
+                    $major_count = $pdo->query("SELECT COUNT(*) FROM programs")->fetchColumn();
+                }
+            } catch (Exception $e) {
+                $instructor_count = 0;
+                $major_count = 0;
+            }
+            ?>
             <div style="padding: 16px; background: var(--cream); border-radius: 12px;">
-                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;">Total Users</div>
-                <div style="font-size: 24px; font-weight: 700; color: var(--dark-text);">54</div>
+                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Instructor Registered</div>
+                <div style="font-size: 32px; font-weight: 800; color: var(--dark-text); line-height: 1;"><?php echo $instructor_count ?: '0'; ?></div>
             </div>
             <div style="padding: 16px; background: var(--cream); border-radius: 12px;">
-                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;">Evaluations</div>
-                <div style="font-size: 24px; font-weight: 700; color: var(--dark-text);">156</div>
+                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Majors</div>
+                <div style="font-size: 14px; color: var(--dark-text); line-height: 1.8;">
+                    <?php
+                    $majors_list = [];
+                    try {
+                        if (isset($pdo) && $pdo) {
+                            $stmt = $pdo->query("SELECT major_name FROM majors ORDER BY major_name");
+                            $majors_list = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                        }
+                    } catch (Exception $e) {}
+                    if (empty($majors_list)) {
+                        echo '<span style="color: var(--light-text); font-size: 13px;">No majors defined</span>';
+                    } else {
+                        echo '<ul style="margin: 0; padding-left: 16px; list-style-type: disc;">';
+                        foreach ($majors_list as $major) {
+                            echo '<li>' . htmlspecialchars($major) . '</li>';
+                        }
+                        echo '</ul>';
+                    }
+                    ?>
+                </div>
             </div>
             <div style="padding: 16px; background: var(--cream); border-radius: 12px;">
-                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;">Departments</div>
-                <div style="font-size: 24px; font-weight: 700; color: var(--dark-text);">3</div>
+                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Departments</div>
+                <div style="font-size: 32px; font-weight: 800; color: var(--dark-text); line-height: 1;">3</div>
             </div>
             <div style="padding: 16px; background: var(--cream); border-radius: 12px;">
-                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;">Courses</div>
-                <div style="font-size: 24px; font-weight: 700; color: var(--dark-text);">42</div>
+                <div style="font-size: 12px; color: var(--light-text); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Courses</div>
+                <div style="font-size: 32px; font-weight: 800; color: var(--dark-text); line-height: 1;">42</div>
             </div>
         </div>
     </div>

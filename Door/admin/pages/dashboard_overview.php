@@ -136,10 +136,48 @@ if ($pdo) {
                     <td><?php echo in_array((int)$instructor['id'], $promoted_ids, true) ? '<span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Program Head</span>' : '<span class="status-badge" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">Instructor</span>'; ?></td>
                     <td><?php echo $joined_date; ?></td>
                     <td>
-                        <a href="dashboard.php?page=manage_program_heads" class="btn btn-sm" style="background: none; border: none; color: var(--gold); cursor: pointer;">
-                            <i class="fas fa-eye"></i>
-                        </a>
+                        <?php if (in_array((int)$instructor['id'], $promoted_ids, true)): ?>
+                            <button class="btn btn-sm demote-btn" data-id="<?php echo $instructor['id']; ?>" style="background: #f87171; color: white; border: none; cursor: pointer;">Remove as Program Head</button>
+                        <?php else: ?>
+                            <button class="btn btn-sm promote-btn" data-id="<?php echo $instructor['id']; ?>" style="background: #10b981; color: white; border: none; cursor: pointer;">Promote to Program Head</button>
+                        <?php endif; ?>
                     </td>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.promote-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            if (!confirm('Promote this instructor to Program Head? This will replace the current Program Head.')) return;
+                            const id = this.getAttribute('data-id');
+                            fetch('../../data/admin_promote_instructor.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: 'instructor_id=' + encodeURIComponent(id)
+                            })
+                            .then(r => r.json())
+                            .then(data => {
+                                alert(data.message);
+                                if (data.success) location.reload();
+                            });
+                        });
+                    });
+                    document.querySelectorAll('.demote-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            if (!confirm('Remove this Program Head?')) return;
+                            const id = this.getAttribute('data-id');
+                            fetch('../../data/admin_promote_instructor.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: 'instructor_id=0'
+                            })
+                            .then(r => r.json())
+                            .then(data => {
+                                alert('Program Head removed.');
+                                if (data.success) location.reload();
+                            });
+                        });
+                    });
+                });
+                </script>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

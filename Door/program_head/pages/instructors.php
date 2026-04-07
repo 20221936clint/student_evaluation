@@ -540,8 +540,10 @@ if (!$show_role_modal) {
         <nav class="sidebar-nav">
             <div class="sidebar-nav-label">Menu</div>
             <a href="../dashboard.php" class="sidebar-nav-item"><i class="fas fa-chart-pie"></i><span>Overview</span></a>
-            <a href="instructors.php" class="sidebar-nav-item active"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a>
-            <a href="departments.php" class="sidebar-nav-item"><i class="fas fa-building"></i><span>Departments</span></a>
+             <a href="instructors.php" class="sidebar-nav-item active"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a>
+              <a href="student_enrollment.php" class="sidebar-nav-item"><i class="fas fa-user-graduate"></i><span>Enrollment</span></a>
+               <a href="mentee_flow.php" class="sidebar-nav-item"><i class="fas fa-users"></i><span>MenteeFlow</span></a>
+              <a href="departments.php" class="sidebar-nav-item"><i class="fas fa-building"></i><span>Departments</span></a>
             <a href="reports.php" class="sidebar-nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
             <a href="settings.php" class="sidebar-nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
         </nav>
@@ -653,13 +655,12 @@ if (!$show_role_modal) {
                                      <td><?php echo htmlspecialchars($inst['email']); ?></td>
                                      <td><span class="status-badge" style="background: #f0ebe3; color: #4a5568; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;"><?php echo $role; ?></span></td>
                                      <td><span class="status-badge status-<?php echo htmlspecialchars($status); ?>"><i class="fas fa-circle" style="font-size: 8px; margin-right: 4px;"></i><?php echo ucwords(str_replace('_', ' ', htmlspecialchars($status))); ?></span></td>
-                                      <td>
-                                          <button class="action-btn view-instructor" data-id="<?php echo $inst['id']; ?>" title="View Details"><i class="fas fa-eye"></i></button>
-                                          <button class="action-btn edit-instructor" data-id="<?php echo $inst['id']; ?>" title="Edit"><i class="fas fa-edit"></i></button>
-                                          <?php if (!$is_program_head): ?>
-                                          <button class="action-btn promote-instructor" data-id="<?php echo $inst['id']; ?>" data-name="<?php echo htmlspecialchars($inst['first_name'] . ' ' . $inst['last_name']); ?>" title="Promote to Program Head" style="color: #059669;"><i class="fas fa-user-tie"></i></button>
-                                          <?php endif; ?>
-                                      </td>
+                                       <td>
+                                           <button class="action-btn view-instructor" data-id="<?php echo $inst['id']; ?>" title="View Details"><i class="fas fa-eye"></i></button>
+                                           <?php if (!$is_program_head): ?>
+                                           <button class="action-btn sign-mentees" data-id="<?php echo $inst['id']; ?>" data-name="<?php echo htmlspecialchars($inst['first_name'] . ' ' . $inst['last_name']); ?>" title="Sign Instructor Mentees" style="color: #059669;"><i class="fas fa-user-check"></i></button>
+                                           <?php endif; ?>
+                                       </td>
 
 
                                  </tr>
@@ -934,13 +935,13 @@ if (!$show_role_modal) {
      const promotedIds = <?php echo json_encode($promoted_ids ?? []); ?>;
      const programHeadEmails = <?php echo json_encode($program_head_emails ?? []); ?>;
      
-     document.addEventListener('DOMContentLoaded', function() {
-         // Initialize
-         let currentPage = 1;
-         const rowsPerPage = 10;
-         let filteredData = [...instructorsData];
-         let sortColumn = 'name';
-         let sortDirection = 'asc';
+      document.addEventListener('DOMContentLoaded', function() {
+          // Initialize
+          let currentPage = 1;
+          const rowsPerPage = 6;
+          let filteredData = [...instructorsData];
+          let sortColumn = 'name';
+          let sortDirection = 'asc';
          
          // Filter functions
          function applyFilters() {
@@ -1031,11 +1032,10 @@ if (!$show_role_modal) {
                          <td>${escapeHtml(inst.email)}</td>
                          <td><span class="status-badge" style="background: #f0ebe3; color: #4a5568; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">${role}</span></td>
                          <td><span class="status-badge status-${escapeHtml(status)}"><i class="fas fa-circle" style="font-size: 8px; margin-right: 4px;"></i>${escapeHtml(ucwords(status.replace('_', ' ')))}</span></td>
-                         <td>
-                             <button class="action-btn view-instructor" data-id="${inst.id}" title="View Details"><i class="fas fa-eye"></i></button>
-                             <button class="action-btn edit-instructor" data-id="${inst.id}" title="Edit"><i class="fas fa-edit"></i></button>
-                             ${!isProgHead ? `<button class="action-btn promote-instructor" data-id="${inst.id}" data-name="${escapeHtml(inst.first_name + ' ' + inst.last_name)}" title="Promote to Program Head" style="color: #059669;"><i class="fas fa-user-tie"></i></button>` : ''}
-                         </td>
+                          <td>
+                              <button class="action-btn view-instructor" data-id="${inst.id}" title="View Details"><i class="fas fa-eye"></i></button>
+                              ${!isProgHead ? `<button class="action-btn sign-mentees" data-id="${inst.id}" data-name="${escapeHtml(inst.first_name + ' ' + inst.last_name)}" title="Sign Instructor Mentees" style="color: #059669;"><i class="fas fa-user-check"></i></button>` : ''}
+                          </td>
                      `;
                      tbody.appendChild(tr);
                  });
@@ -1122,28 +1122,56 @@ if (!$show_role_modal) {
          });
          
           // Action buttons
-          document.addEventListener('click', function(e) {
-              const editBtn = e.target.closest('.edit-instructor');
-              if (editBtn) {
-                  const id = editBtn.dataset.id;
-                  window.location.href = `edit_instructor.php?id=${id}`;
-              }
-              
-              const promoteBtn = e.target.closest('.promote-instructor');
-              if (promoteBtn) {
-                  if (confirm('Promote ' + promoteBtn.dataset.name + ' to Program Head? This will replace the current Program Head.')) {
-                      fetch('../../data/admin_promote_instructor.php', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                          body: 'instructor_id=' + encodeURIComponent(promoteBtn.dataset.id)
-                      })
-                      .then(r => r.json())
-                      .then(data => {
-                          alert(data.message);
-                          if (data.success) location.reload();
-                      });
-                  }
-              }
+           document.addEventListener('click', function(e) {
+               const editBtn = e.target.closest('.edit-instructor');
+               if (editBtn) {
+                   const id = editBtn.dataset.id;
+                   window.location.href = `edit_instructor.php?id=${id}`;
+               }
+               
+               const signMenteesBtn = e.target.closest('.sign-mentees');
+               if (signMenteesBtn) {
+                   const instructorId = signMenteesBtn.dataset.id;
+                   const instructorName = signMenteesBtn.dataset.name;
+                   
+                   // Open a simple prompt to enter student email to assign as mentee
+                   const studentEmail = prompt(`Assign a mentee to ${instructorName}.\n\nEnter the student's email address:`);
+                   
+                   if (studentEmail) {
+                       // First check if student exists
+                       fetch('../../data/get_student_by_email.php?email=' + encodeURIComponent(studentEmail))
+                           .then(r => r.json())
+                           .then(data => {
+                               if (data.success && data.student) {
+                                   // Assign student as mentee to this instructor
+                                   return fetch('../../data/assign_mentee.php', {
+                                       method: 'POST',
+                                       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                       body: 'instructor_id=' + encodeURIComponent(instructorId) + 
+                                             '&student_id=' + encodeURIComponent(data.student.id)
+                                   });
+                               } else {
+                                   alert('Student not found with email: ' + studentEmail);
+                                   return null;
+                               }
+                           })
+                           .then(r => {
+                               if (r) {
+                                   return r.json();
+                               }
+                           })
+                           .then(data => {
+                               if (data && data.success) {
+                                   alert('Mentee assigned successfully!');
+                               } else if (data) {
+                                   alert('Failed to assign mentee: ' + data.message);
+                               }
+                           })
+                           .catch(err => {
+                               alert('Error assigning mentee: ' + err.message);
+                           });
+                   }
+               }
 
               const viewBtn = e.target.closest('.view-instructor');
               if (viewBtn) {

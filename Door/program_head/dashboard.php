@@ -103,6 +103,9 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="icon" href="../../media/LOGO.jpg" type="image/jpeg">
     <title>Program Head Dashboard - Faculty Evaluation System</title>
     <link rel="stylesheet" href="../../css/common.css">
@@ -138,14 +141,22 @@ try {
                 <i class="fas fa-chart-pie"></i>
                 <span>Overview</span>
             </a>
-            <a href="pages/instructors.php" class="sidebar-nav-item">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <span>Instructors</span>
-            </a>
-            <a href="pages/departments.php" class="sidebar-nav-item">
-                <i class="fas fa-building"></i>
-                <span>Departments</span>
-            </a>
+             <a href="pages/instructors.php" class="sidebar-nav-item">
+                 <i class="fas fa-chalkboard-teacher"></i>
+                 <span>Instructors</span>
+             </a>
+              <a href="pages/student_enrollment.php" class="sidebar-nav-item">
+                  <i class="fas fa-user-graduate"></i>
+                  <span>Enrollment</span>
+              </a>
+               <a href="pages/mentee_flow.php" class="sidebar-nav-item">
+                   <i class="fas fa-users"></i>
+                   <span>MenteeFlow</span>
+               </a>
+              <a href="pages/departments.php" class="sidebar-nav-item">
+                  <i class="fas fa-building"></i>
+                  <span>Departments</span>
+              </a>
             <a href="pages/reports.php" class="sidebar-nav-item">
                 <i class="fas fa-file-alt"></i>
                 <span>Reports</span>

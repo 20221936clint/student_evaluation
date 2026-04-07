@@ -114,10 +114,26 @@ CREATE TABLE IF NOT EXISTS students (
     INDEX idx_email (email),
     INDEX idx_major_id (major_id),
     INDEX idx_year_level (year_level),
-    FOREIGN KEY (major_id) REFERENCES majors(id) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+     FOREIGN KEY (major_id) REFERENCES majors(id) ON DELETE SET NULL ON UPDATE CASCADE
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Reports Table
+ -- Mentees Table (student assignments to instructors)
+ CREATE TABLE IF NOT EXISTS mentees (
+     id INT PRIMARY KEY AUTO_INCREMENT,
+     student_id INT NOT NULL,
+     first_name VARCHAR(100) NOT NULL,
+     last_name VARCHAR(100) NOT NULL,
+     email VARCHAR(255) NOT NULL,
+     mentor_id INT NOT NULL,
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     INDEX idx_mentor_id (mentor_id),
+     INDEX idx_student_id (student_id),
+     INDEX idx_email (email),
+     FOREIGN KEY (mentor_id) REFERENCES instructors(id) ON DELETE CASCADE ON UPDATE CASCADE,
+     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE ON UPDATE CASCADE
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ -- Reports Table
 CREATE TABLE IF NOT EXISTS reports (
     id INT PRIMARY KEY AUTO_INCREMENT,
     report_name VARCHAR(200) NOT NULL,
@@ -192,12 +208,12 @@ INSERT INTO instructors (first_name, middle_name, last_name, suffix, email, pass
 ('James', 'K.', 'Wilson', NULL, 'james.wilson@cjcm.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Instructor', '+1 234 567 8950', '1984-12-01', '#a18cd1', '#fbc2eb', 'on duty');
 
 -- Students
-INSERT INTO students (first_name, middle_name, last_name, suffix, email, major_id, year_level, avatar_initials, avatar_gradient_from, avatar_gradient_to) VALUES
-('John', 'M.', 'Doe', NULL, 'john.doe@student.edu', 1, '3rd Year', 'JD', '#3b82f6', '#60a5fa'),
-('Jane', 'A.', 'Wilson', NULL, 'jane.wilson@student.edu', 1, '2nd Year', 'JW', '#10b981', '#34d399'),
-('Mike', 'R.', 'Johnson', 'Jr.', 'mike.j@student.edu', 3, '3rd Year', 'MJ', '#8b5cf6', '#a78bfa'),
-('Sarah', 'L.', 'Williams', NULL, 'sarah.w@student.edu', 1, '4th Year', 'SW', '#f43f5e', '#fb7185'),
-('Tom', 'B.', 'Brown', NULL, 'tom.b@student.edu', 1, '2nd Year', 'TB', '#f59e0b', '#fbbf24');
+INSERT INTO students (first_name, middle_name, last_name, suffix, email, major_id, year_level, student_id, avatar_initials, avatar_gradient_from, avatar_gradient_to) VALUES
+('John', 'M.', 'Doe', NULL, 'john.doe@student.edu', 1, '3rd Year', 'STU-001', 'JD', '#3b82f6', '#60a5fa'),
+('Jane', 'A.', 'Wilson', NULL, 'jane.wilson@student.edu', 1, '2nd Year', 'STU-002', 'JW', '#10b981', '#34d399'),
+('Mike', 'R.', 'Johnson', 'Jr.', 'mike.j@student.edu', 3, '3rd Year', 'STU-003', 'MJ', '#8b5cf6', '#a78bfa'),
+('Sarah', 'L.', 'Williams', NULL, 'sarah.w@student.edu', 1, '4th Year', 'STU-004', 'SW', '#f43f5e', '#fb7185'),
+('Tom', 'B.', 'Brown', NULL, 'tom.b@student.edu', 1, '2nd Year', 'STU-005', 'TB', '#f59e0b', '#fbbf24');
 
 -- Reports
 INSERT INTO reports (report_name, report_description, report_type, icon_class, download_count, generated_by) VALUES
@@ -218,3 +234,6 @@ INSERT INTO pending_instructors (first_name, middle_name, last_name, suffix, ema
 -- Add system settings columns to admins table
 ALTER TABLE admins ADD COLUMN system_name VARCHAR(255) NULL;
 ALTER TABLE admins ADD COLUMN system_tagline TEXT NULL;
+
+-- Add student_id column to students table
+ALTER TABLE students ADD COLUMN student_id VARCHAR(50) NULL UNIQUE;

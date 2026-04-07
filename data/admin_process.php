@@ -126,6 +126,38 @@ if ($action === 'add_instructor') {
     }
     exit;
 
+} elseif ($action === 'add_student') {
+    $first_name = trim($_POST['first_name'] ?? '');
+    $middle_name = trim($_POST['middle_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+    $suffix = trim($_POST['suffix'] ?? '');
+    $student_id = trim($_POST['student_id'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $major_id = intval($_POST['major_id'] ?? 0);
+    $year_level = $_POST['year_level'] ?? '';
+
+    if (empty($first_name) || empty($last_name) || empty($student_id) || empty($email) || empty($major_id) || empty($year_level)) {
+        header('Location: ../Door/admin/dashboard.php?page=student_enrollment&error=' . urlencode('Please fill in all required fields'));
+        exit;
+    }
+
+    $initials = strtoupper(substr($first_name, 0, 1) . substr($last_name, 0, 1));
+    $gradient_from = '#3b82f6';
+    $gradient_to = '#60a5fa';
+
+    if ($pdo) {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO students (first_name, middle_name, last_name, suffix, student_id, email, major_id, year_level, avatar_initials, avatar_gradient_from, avatar_gradient_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$first_name, $middle_name ?: null, $last_name, $suffix ?: null, $student_id, $email, $major_id, $year_level, $initials, $gradient_from, $gradient_to]);
+            header('Location: ../Door/admin/dashboard.php?page=student_enrollment&success=' . urlencode('Student enrolled successfully!'));
+        } catch (PDOException $e) {
+            header('Location: ../Door/admin/dashboard.php?page=student_enrollment&error=' . urlencode('Email or Student ID already exists'));
+        }
+    } else {
+        header('Location: ../Door/admin/dashboard.php?page=student_enrollment&success=' . urlencode('Student enrolled successfully! (Demo Mode)'));
+    }
+    exit;
+
 } elseif ($action === 'add_program_head') {
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');

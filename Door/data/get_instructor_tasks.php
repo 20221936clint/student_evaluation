@@ -1,7 +1,7 @@
 <?php
 session_start();
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(1);
+ini_set('display_errors', 1);
 
 header('Content-Type: application/json');
 
@@ -23,6 +23,27 @@ try {
         exit;
     }
     
+    // First, let's check what tasks exist for this instructor
+    $debugStmt = $pdo->prepare("SELECT * FROM tasks WHERE instructor_id = ?");
+    $debugStmt->execute([$instructor_id]);
+    $debugTasks = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // If no tasks found, try with instructors.user_id
+    if (empty($debugTasks)) {
+        $debugStmt2 = $pdo->query("SELECT id FROM instructors WHERE user_id = " . intval($instructor_id));
+        $instructorRow = $debugStmt2->fetch(PDO::FETCH_ASSOC);
+        if ($instructorRow) {
+            $debugStmt3 = $pdo->prepare("SELECT * FROM tasks WHERE instructor_id = ?");
+            $debugStmt3->execute([$instructorRow['id']]);
+            $debugTasks = $debugStmt3->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+    
+    if (empty($debugTasks)) {
+        echo json_encode(['success' => true, 'tasks' => [], 'debug' => 'No tasks found for instructor_id: ' . $instructor_id]);
+        exit;
+    }
+    
     // Fetch tasks with their assignments and mentee details
     $stmt = $pdo->prepare("
         SELECT 
@@ -33,16 +54,9 @@ try {
             t.due_date,
             t.status as task_status,
             t.created_at,
-            GROUP_CONCAT(
-                CONCAT(me.first_name, ' ', me.last_name, ' (', s.email, ')')
-                SEPARATOR '; '
-            ) as mentees_list,
             COUNT(ta.id) as assigned_count
         FROM tasks t
         LEFT JOIN task_assignments ta ON t.id = ta.task_id
-        LEFT JOIN mentees m ON ta.mentee_id = m.id
-        LEFT JOIN students s ON m.student_id = s.id
-        LEFT JOIN instructors i ON t.instructor_id = i.id
         WHERE t.instructor_id = ?
         GROUP BY t.id
         ORDER BY 
@@ -81,7 +95,8 @@ try {
     
     echo json_encode([
         'success' => true,
-        'tasks' => $tasks
+        'tasks' => $tasks,
+        'debug' => 'Found ' . count($tasks) . ' tasks'
     ]);
     
 } catch (PDOException $e) {

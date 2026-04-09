@@ -2347,10 +2347,13 @@ function getGradient($student) {
                 const response = await fetch('../../../Door/data/get_instructor_tasks.php');
                 const result = await response.json();
                 
+                console.log('Tasks response:', result);
+                
                 loading.style.display = 'none';
                 
                 if (!result.success || result.tasks.length === 0) {
                     noTasks.style.display = 'block';
+                    noTasks.innerHTML = '<p>' + (result.message || result.debug || 'You haven\'t assigned any tasks yet.') + '</p>';
                     return;
                 }
                 
@@ -2384,12 +2387,6 @@ function getGradient($student) {
                 'low': '#059669'
             };
             
-            const statusBadges = {
-                'active': '<span class="status-badge" style="background: #3b82f620; color: #1d4ed8; border: 1px solid #93c5fd;">Active</span>',
-                'completed': '<span class="status-badge" style="background: #05966920; color: #047857; border: 1px solid #34d399;">Completed</span>',
-                'cancelled': '<span class="status-badge" style="background: #dc262620; color: #b91c1c; border: 1px solid #f87171;">Cancelled</span>'
-            };
-            
             let html = `
                 <div class="tasks-table-container">
                     <table class="tasks-table">
@@ -2398,7 +2395,6 @@ function getGradient($student) {
                                 <th>Task</th>
                                 <th>Priority</th>
                                 <th>Due Date</th>
-                                <th>Status</th>
                                 <th>Assigned To</th>
                                 <th>Completion</th>
                             </tr>
@@ -2410,7 +2406,6 @@ function getGradient($student) {
                 const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date';
                 const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.task_status === 'active';
                 const priorityColor = priorityColors[task.priority] || '#6b7280';
-                const statusBadge = statusBadges[task.task_status] || '';
                 
                 // Calculate completion count
                 const completedCount = task.mentees.filter(m => m.assignment_status === 'completed').length;
@@ -2446,9 +2441,6 @@ function getGradient($student) {
                                 </span>` : 
                                 `<span style="color: var(--dark-text);">${dueDate}</span>`
                             }
-                        </td>
-                        <td>
-                            ${statusBadge}
                         </td>
                         <td>
                             <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">

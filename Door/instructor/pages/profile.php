@@ -4,7 +4,7 @@ require_once '../../../data/session_security.php';
 $role_access = check_role_access('instructor');
 $show_role_modal = !$role_access['allowed'];
 
-$instructor_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+$instructor_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 1;
 $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jane Teacher';
 
 $profile = [
@@ -18,6 +18,7 @@ $profile = [
     'birthday' => '',
     'position' => '',
     'status' => '',
+    'avatar' => '',
     'avatar_gradient_from' => '#667eea',
     'avatar_gradient_to' => '#764ba2',
     'total_mentees' => 0,
@@ -26,6 +27,17 @@ $profile = [
     'member_since' => ''
 ];
 
+$avatarCheckPath = realpath(__DIR__ . '/../../../media/instructors/' . $profile['avatar']);
+$hasAvatar = !empty($profile['avatar']) && $avatarCheckPath && file_exists($avatarCheckPath);
+$avatarSrc = $hasAvatar ? '../../../media/instructors/' . htmlspecialchars($profile['avatar']) : '';
+
+function getAvatarUrl($profile) {
+    if (!empty($profile['avatar'])) {
+        return '../../../media/instructors/' . $profile['avatar'];
+    }
+    return null;
+}
+
 if (!$show_role_modal) {
     require_once '../../../data/config.php';
     
@@ -33,21 +45,26 @@ if (!$show_role_modal) {
         // Fetch instructor data
         $stmt = $pdo->prepare("
             SELECT i.*, 
-                   COUNT(DISTINCT m.id) as total_mentees,
-                   COUNT(DISTINCT ic.course_id) as total_courses,
-                   COALESCE(AVG(e.rating), 0) as avg_rating
+                   (SELECT COUNT(*) FROM mentees WHERE mentor_id = i.id) as total_mentees
             FROM instructors i
-            LEFT JOIN mentees m ON i.id = m.mentor_id
-            LEFT JOIN instructor_courses ic ON i.id = ic.instructor_id
-            LEFT JOIN evaluations e ON ic.course_id = e.course_id AND e.instructor_id = i.id
             WHERE i.id = ?
-            GROUP BY i.id
         ");
         $stmt->execute([$instructor_id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($data) {
             $profile = array_merge($profile, $data);
+        } else {
+            // Check if avatar column exists
+            try {
+                $check = $pdo->query("SELECT avatar FROM instructors WHERE id = " . intval($instructor_id));
+                $avatar = $check->fetchColumn();
+                if ($avatar) {
+                    $profile['avatar'] = $avatar;
+                }
+            } catch (Exception $e) {
+                // Column might not exist
+            }
         }
         
         // Get member since date
@@ -143,24 +160,43 @@ function getFullName($profile) {
         
         .profile-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 50%;
             border: 1px solid var(--border-light);
             overflow: hidden;
         }
         
         .profile-card-header {
             padding: 24px;
+            <?php if ($hasAvatar): ?>
+            background: url('<?php echo $avatarSrc; ?>') center/cover no-repeat !important;
+            position: relative;
+            <?php else: ?>
             background: linear-gradient(135deg, <?php echo $profile['avatar_gradient_from']; ?>, <?php echo $profile['avatar_gradient_to']; ?>);
+            <?php endif; ?>
             color: white;
             text-align: center;
             position: relative;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
         
+        <?php if ($hasAvatar): ?>
+        .profile-card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+        }
+        <?php endif; ?>
+        
         .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -169,6 +205,8 @@ function getFullName($profile) {
             margin: 0 auto 16px;
             border: 4px solid rgba(255,255,255,0.5);
             box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 1;
         }
         
         .profile-name {
@@ -508,12 +546,18 @@ function getFullName($profile) {
                 <!-- Sidebar Card -->
                 <div class="profile-sidebar">
                     <div class="profile-card">
-                        <div class="profile-card-header">
-                            <div class="profile-avatar">
+                        <div class="profile-card-header" style="padding: 30px 24px 100px; position: relative;">
+                            <?php if ($hasAvatar): ?>
+                            <div class="profile-avatar" style="display: none;"></div>
+                            <?php else: ?>
+                            <div class="profile-avatar" style="font-size: 72px; padding: 60px 0;">
                                 <?php echo htmlspecialchars(getInitials($profile)); ?>
                             </div>
-                            <h3 class="profile-name"><?php echo htmlspecialchars(getFullName($profile)); ?></h3>
-                            <p class="profile-role">Instructor</p>
+                            <?php endif; ?>
+                            <label for="avatarUpload" style="position: absolute; bottom: 16px; right: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 50%; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 10;" onmouseover="this.style.background='white'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='scale(1)'">
+                                <i class="fas fa-camera" style="color: #d4a843; font-size: 16px;"></i>
+                            </label>
+                            <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="uploadAvatar(this)">
                         </div>
                         <div class="profile-card-body">
                             <div class="stat-item">
@@ -566,42 +610,81 @@ function getFullName($profile) {
                             </button>
                         </div>
                         <div class="section-body">
-                            <form id="personalForm">
+                            <!-- View Mode -->
+                            <div id="personalViewMode">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-user"></i> First Name</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo htmlspecialchars($profile['first_name'] ?? '-'); ?></div>
+                                    </div>
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-user"></i> Middle Name</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo htmlspecialchars($profile['middle_name'] ?? '-'); ?></div>
+                                    </div>
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-user"></i> Last Name</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo htmlspecialchars($profile['last_name'] ?? '-'); ?></div>
+                                    </div>
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-asterisk"></i> Suffix</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo htmlspecialchars($profile['suffix'] ?? '-'); ?></div>
+                                    </div>
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-envelope"></i> Email Address</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo htmlspecialchars($profile['email'] ?? '-'); ?></div>
+                                    </div>
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-phone"></i> Phone Number</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo htmlspecialchars($profile['phone'] ?? '-'); ?></div>
+                                    </div>
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-birthday-cake"></i> Birthday</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo !empty($profile['birthday']) ? htmlspecialchars($profile['birthday']) : '-'; ?></div>
+                                    </div>
+                                    <div style="padding: 12px; background: var(--cream); border-radius: 8px; border: 1px solid var(--border-light);">
+                                        <div style="font-size: 12px; color: var(--light-text); margin-bottom: 4px;"><i class="fas fa-calendar"></i> Position</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo htmlspecialchars($profile['position'] ?? 'Instructor'); ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Edit Mode -->
+                            <form id="personalForm" style="display: none;">
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label><i class="fas fa-user"></i> First Name</label>
-                                        <input type="text" class="form-control" name="first_name" value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>" readonly>
+                                        <input type="text" class="form-control" name="first_name" value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>">
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-user"></i> Middle Name</label>
-                                        <input type="text" class="form-control" name="middle_name" value="<?php echo htmlspecialchars($profile['middle_name'] ?? ''); ?>" readonly>
+                                        <input type="text" class="form-control" name="middle_name" value="<?php echo htmlspecialchars($profile['middle_name'] ?? ''); ?>">
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-user"></i> Last Name</label>
-                                        <input type="text" class="form-control" name="last_name" value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>" readonly>
+                                        <input type="text" class="form-control" name="last_name" value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>">
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-asterisk"></i> Suffix</label>
-                                        <input type="text" class="form-control" name="suffix" value="<?php echo htmlspecialchars($profile['suffix'] ?? ''); ?>" placeholder="Jr., Sr., III" readonly>
+                                        <input type="text" class="form-control" name="suffix" value="<?php echo htmlspecialchars($profile['suffix'] ?? ''); ?>" placeholder="Jr., Sr., III">
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-envelope"></i> Email Address</label>
-                                        <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" readonly>
+                                        <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>">
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-phone"></i> Phone Number</label>
-                                        <input type="tel" class="form-control" name="phone" value="<?php echo htmlspecialchars($profile['phone'] ?? ''); ?>" readonly>
+                                        <input type="tel" class="form-control" name="phone" value="<?php echo htmlspecialchars($profile['phone'] ?? ''); ?>">
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-birthday-cake"></i> Birthday</label>
-                                        <input type="date" class="form-control" name="birthday" value="<?php echo htmlspecialchars($profile['birthday'] ?? ''); ?>" readonly>
+                                        <input type="date" class="form-control" name="birthday" value="<?php echo htmlspecialchars($profile['birthday'] ?? ''); ?>">
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-calendar"></i> Position</label>
-                                        <input type="text" class="form-control" name="position" value="<?php echo htmlspecialchars($profile['position'] ?? 'Instructor'); ?>" readonly>
+                                        <input type="text" class="form-control" name="position" value="<?php echo htmlspecialchars($profile['position'] ?? 'Instructor'); ?>">
                                     </div>
                                 </div>
-                                <div class="form-actions" id="personalFormActions" style="display: none;">
+                                <div class="form-actions" id="personalFormActions">
                                     <button type="button" class="btn btn-secondary" onclick="cancelEdit('personalForm')">
                                         <i class="fas fa-times"></i> Cancel
                                     </button>
@@ -650,6 +733,15 @@ function getFullName($profile) {
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 32px 48px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <div id="uploadStatus" style="font-size: 18px; font-weight: 600; color: #3b82f6;">
+                <i class="fas fa-spinner fa-spin"></i> Uploading...
+            </div>
+        </div>
+    </div>
+
     <script>
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -669,26 +761,61 @@ function getFullName($profile) {
         }
 
         function enableEdit(formId) {
-            const form = document.getElementById(formId);
-            const inputs = form.querySelectorAll('input[readonly]');
-            const actions = document.getElementById(formId + 'Actions');
-            
-            inputs.forEach(input => {
-                input.removeAttribute('readonly');
-                input.focus();
-            });
-            
-            if (actions) {
-                actions.style.display = 'flex';
-            }
-            
-            if (formId === 'personalForm') {
-                document.getElementById('editPersonalBtn').style.display = 'none';
-            }
+            document.getElementById('personalViewMode').style.display = 'none';
+            document.getElementById(formId).style.display = 'block';
+            document.getElementById('editPersonalBtn').style.display = 'none';
         }
 
         function cancelEdit(formId) {
-            location.reload();
+            document.getElementById('personalViewMode').style.display = 'block';
+            document.getElementById(formId).style.display = 'none';
+            document.getElementById('editPersonalBtn').style.display = 'flex';
+        }
+
+        function uploadAvatar(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            
+            document.getElementById('uploadModal').style.display = 'flex';
+            document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            document.getElementById('uploadStatus').style.color = '#3b82f6';
+            
+            const formData = new FormData();
+            formData.append('avatar', file);
+            
+            fetch('../../../Door/data/upload_avatar.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                console.log('Upload response:', data);
+                if (data.success) {
+                    document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-check-circle"></i> Profile picture updated!';
+                    document.getElementById('uploadStatus').style.color = '#059669';
+                    setTimeout(() => {
+                        document.getElementById('uploadModal').style.display = 'none';
+                        location.reload();
+                    }, 1500);
+                } else {
+                    document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + (data.message || 'Failed to upload');
+                    document.getElementById('uploadStatus').style.color = '#dc2626';
+                    setTimeout(() => {
+                        document.getElementById('uploadModal').style.display = 'none';
+                    }, 2000);
+                }
+            })
+            .catch(err => {
+                console.error('Upload error:', err);
+                document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-exclamation-circle"></i> Error: ' + err.message;
+                document.getElementById('uploadStatus').style.color = '#dc2626';
+                setTimeout(() => {
+                    document.getElementById('uploadModal').style.display = 'none';
+                }, 2000);
+            });
+            
+            input.value = '';
         }
 
         document.getElementById('personalForm').addEventListener('submit', function(e) {

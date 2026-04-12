@@ -768,46 +768,48 @@ if (!$show_role_modal && $pdo) {
                     <h2 style="margin: 0; font-size: 22px; color: var(--dark-text);">My Mentees</h2>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
-                    <?php foreach ($assigned_mentees as $mentee): 
-                        $fullName = htmlspecialchars(trim(($mentee['first_name'] ?? '') . ' ' . ($mentee['last_name'] ?? '')));
-                        $initials = strtoupper(substr($mentee['first_name'] ?? '', 0, 1) . substr($mentee['last_name'] ?? '', 0, 1));
-                        $assignedDate = !empty($mentee['created_at']) ? date('M j, Y', strtotime($mentee['created_at'])) : '-';
-                    ?>
-                    <div style="background: white; border-radius: 12px; padding: 14px; border: 1px solid var(--border-light); box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--gold-light)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.borderColor='var(--border-light)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; flex-shrink: 0;">
+                <div style="background: white; border-radius: 12px; border: 1px solid var(--border-light); overflow: hidden;">
+                    <div style="display: grid; grid-template-columns: 50px 1fr 120px 100px 100px; gap: 12px; padding: 12px 16px; background: var(--cream); border-bottom: 1px solid var(--border-light); font-size: 11px; font-weight: 700; color: var(--light-text); text-transform: uppercase;">
+                        <div></div>
+                        <div>Student</div>
+                        <div>Major</div>
+                        <div>Year</div>
+                        <div>Date</div>
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <?php foreach ($assigned_mentees as $mentee): 
+                            $fullName = htmlspecialchars(trim(($mentee['first_name'] ?? '') . ' ' . ($mentee['last_name'] ?? '')));
+                            $initials = strtoupper(substr($mentee['first_name'] ?? '', 0, 1) . substr($mentee['last_name'] ?? '', 0, 1));
+                            $assignedDate = !empty($mentee['created_at']) ? date('M j, Y', strtotime($mentee['created_at'])) : '-';
+                            $studentId = htmlspecialchars($mentee['student_id'] ?? '');
+                        ?>
+                        <div style="display: grid; grid-template-columns: 50px 1fr 120px 100px 100px; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-light); align-items: center; transition: background 0.2s;" onmouseover="this.style.background='var(--cream)'" onmouseout="this.style.background='white'">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 11px; flex-shrink: 0;">
                                 <?php echo $initials; ?>
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 13px; font-weight: 700; color: var(--dark-text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    <?php echo $fullName; ?>
-                                </div>
-                                <div style="font-size: 11px; color: var(--light-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    <?php echo htmlspecialchars($mentee['email'] ?? ''); ?>
-                                </div>
+                            <div style="min-width: 0;">
+                                <div style="font-size: 14px; font-weight: 700; color: var(--dark-text);"><?php echo $fullName; ?></div>
+                                <div style="font-size: 11px; color: var(--light-text);"><?php echo htmlspecialchars($mentee['email'] ?? ''); ?></div>
+                                <?php if ($studentId): ?>
+                                <div style="font-size: 10px; font-weight: 600; color: #9a7b0a; background: #fef3c7; padding: 2px 6px; border-radius: 6px; display: inline-block; margin-top: 2px;"><?php echo $studentId; ?></div>
+                                <?php endif; ?>
+                            </div>
+                            <div style="font-size: 11px; color: var(--dark-text);">
+                                <span style="padding: 2px 8px; background: rgba(212, 168, 67, 0.12); color: #9a7b0a; border-radius: 10px; font-size: 10px; font-weight: 600;">
+                                    <?php echo htmlspecialchars($mentee['major_name'] ?? '-'); ?>
+                                </span>
+                            </div>
+                            <div style="font-size: 11px;">
+                                <span style="padding: 2px 8px; background: rgba(59, 130, 246, 0.12); color: #2563eb; border-radius: 10px; font-size: 10px; font-weight: 600;">
+                                    <?php echo htmlspecialchars($mentee['year_level'] ?? '-'); ?>
+                                </span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--light-text);">
+                                <?php echo $assignedDate; ?>
                             </div>
                         </div>
-                        <div style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
-                            <?php if (!empty($mentee['major_name'])): ?>
-                            <span style="padding: 2px 8px; background: rgba(212, 168, 67, 0.12); color: #9a7b0a; border-radius: 12px; font-size: 10px; font-weight: 600;">
-                                <?php echo htmlspecialchars($mentee['major_name']); ?>
-                            </span>
-                            <?php endif; ?>
-                            <?php if (!empty($mentee['year_level'])): ?>
-                            <span style="padding: 2px 8px; background: rgba(59, 130, 246, 0.12); color: #2563eb; border-radius: 12px; font-size: 10px; font-weight: 600;">
-                                <?php echo htmlspecialchars($mentee['year_level']); ?>
-                            </span>
-                            <?php endif; ?>
-                        </div>
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);">
-                            <span style="font-size: 10px; color: var(--light-text);">
-                                <i class="fas fa-calendar-alt" style="margin-right: 4px;"></i>
-                                <?php echo $assignedDate; ?>
-                            </span>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endforeach; ?>
                 </div>
                 <div style="margin-top: 16px; font-size: 14px; color: var(--light-text); text-align: center;">
                     <strong><?php echo $mentee_count; ?></strong> mentee<?php echo $mentee_count != 1 ? 's' : ''; ?> assigned to you

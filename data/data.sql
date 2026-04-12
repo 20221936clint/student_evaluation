@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS instructors (
     position VARCHAR(100) DEFAULT 'Instructor',
     phone VARCHAR(50),
     birthday DATE,
+    avatar VARCHAR(255) DEFAULT NULL,
     avatar_gradient_from VARCHAR(20) DEFAULT '#667eea',
     avatar_gradient_to VARCHAR(20) DEFAULT '#764ba2',
     status ENUM('on duty', 'on leave', 'on travel') DEFAULT 'on duty',

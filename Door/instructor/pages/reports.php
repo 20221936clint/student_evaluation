@@ -199,43 +199,50 @@ if (!$show_role_modal && $pdo) {
             border-color: var(--gold);
         }
         
-        .tabs-container {
-            margin-bottom: 24px;
-        }
-        
-        .tabs {
+        .section-tabs {
             display: flex;
             gap: 4px;
             background: white;
-            padding: 4px;
-            border-radius: 12px;
+            padding: 6px;
+            border-radius: 14px;
             border: 1px solid var(--border-light);
             margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        .tab {
+        .section-tab {
             flex: 1;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 20px;
+            border-radius: 10px;
             font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             border: none;
             background: transparent;
             color: var(--light-text);
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
-        .tab.active {
-            background: var(--gold);
+        .section-tab.active {
+            background: linear-gradient(135deg, var(--gold), #b8922f);
             color: white;
-            box-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+            box-shadow: 0 2px 10px rgba(212, 168, 67, 0.4);
         }
         
-        .tab:hover:not(.active) {
+        .section-tab:hover:not(.active) {
             background: var(--cream);
+            color: var(--dark-text);
         }
+        
+        .section-tab i { font-size: 14px; }
+        
+        .section-content { display: none; }
+        .section-content.active { display: block; }
         
         .stats-grid {
             display: grid;
@@ -336,28 +343,41 @@ if (!$show_role_modal && $pdo) {
         
         .reports-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 20px;
-            margin-bottom: 32px;
         }
         
         .report-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 18px;
             border: 1px solid var(--border-light);
             overflow: hidden;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
         
         .report-card:hover {
             border-color: var(--gold-light);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
         }
         
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold), #d4a843);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .report-card:hover::before { opacity: 1; }
+        
         .report-card-header {
-            padding: 24px;
+            padding: 20px;
             background: var(--cream);
             border-bottom: 1px solid var(--border-light);
             display: flex;
@@ -366,96 +386,130 @@ if (!$show_role_modal && $pdo) {
         }
         
         .report-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 12px;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 24px;
             color: white;
-            margin-bottom: 16px;
         }
         
         .report-card-body {
-            padding: 24px;
+            padding: 20px;
         }
         
         .report-title {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             color: var(--dark-text);
             margin: 0 0 8px 0;
             line-height: 1.3;
         }
         
         .report-description {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--light-text);
-            margin: 0 0 16px 0;
+            margin: 0 0 12px 0;
             line-height: 1.5;
         }
         
         .report-meta {
             display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         
         .report-badge {
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .report-badge.pdf {
-            background: rgba(239, 68, 68, 0.1);
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
             color: #dc2626;
         }
         
         .report-badge.excel {
-            background: rgba(16, 185, 129, 0.1);
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
             color: #059669;
         }
         
         .report-badge.csv {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #2563eb;
         }
         
         .report-card-footer {
-            padding: 16px 24px;
+            padding: 14px 20px;
             border-top: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #fafaf8;
         }
         
         .download-stats {
             font-size: 12px;
             color: var(--light-text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
-        .download-stats i {
-            margin-right: 4px;
-        }
+        .download-stats i { color: var(--gold); }
         
         .generated-date {
             font-size: 12px;
             color: var(--light-text);
         }
         
-        .action-buttons {
+        .card-actions {
             display: flex;
             gap: 8px;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border-light);
         }
         
-        .action-buttons .btn {
-            padding: 8px 16px;
+        .card-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 10px;
             font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .card-btn-primary {
+            background: linear-gradient(135deg, var(--gold), #b8922f);
+            color: white;
+        }
+        
+        .card-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 168, 67, 0.4);
+        }
+        
+        .card-btn-secondary {
+            background: var(--cream);
+            color: var(--dark-text);
+            border: 1px solid var(--border-light);
+        }
+        
+        .card-btn-secondary:hover {
+            background: white;
+            border-color: var(--gold);
         }
         
         .generator-section {
@@ -667,17 +721,33 @@ if (!$show_role_modal && $pdo) {
             <div class="page-header">
                 <div class="page-title-area">
                     <h1>Reports & Analytics</h1>
-                    <p>Generate, download, and manage reports</p>
-                </div>
-                <div class="page-actions">
-                    <button class="btn btn-primary" onclick="showGenerator()">
-                        <i class="fas fa-plus"></i> Generate New Report
-                    </button>
-                    <button class="btn btn-secondary" onclick="refreshData()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
+                    <p>Generate, download, and manage your reports</p>
                 </div>
             </div>
+
+            <!-- Section Tabs -->
+            <div class="section-tabs">
+                <button class="section-tab active" onclick="switchSection('reports')">
+                    <i class="fas fa-file-alt"></i> Available Reports
+                </button>
+                <button class="section-tab" onclick="switchSection('mentees')">
+                    <i class="fas fa-users"></i> My Mentees
+                    <?php if ($mentee_count > 0): ?>
+                    <span style="background: var(--gold); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">
+                        <?php echo $mentee_count; ?>
+                    </span>
+                    <?php endif; ?>
+                </button>
+                <button class="section-tab" onclick="switchSection('generate')">
+                    <i class="fas fa-magic"></i> Generate
+                </button>
+                <button class="section-tab" onclick="switchSection('analytics')">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </button>
+            </div>
+
+            <!-- Reports Section -->
+            <div class="section-content active" id="reportsSection">
 
             <!-- Stats Grid -->
             <div class="stats-grid">
@@ -822,46 +892,126 @@ if (!$show_role_modal && $pdo) {
                 <p style="margin: 0; font-size: 14px; color: var(--light-text);">No students have been assigned to you yet. Contact the Program Head for mentee assignments.</p>
             </div>
             <?php endif; ?>
+            </div>
 
-            <!-- Report Generator -->
-            <div class="generator-section" id="generatorSection" style="display: none;">
-                <div class="generator-header">
-                    <i class="fas fa-magic"></i>
-                    <h2>Generate Custom Report</h2>
+            <!-- Mentees Section -->
+            <div class="section-content" id="menteesSection">
+                <?php if ($mentee_count > 0): ?>
+                <div class="reports-grid">
+                    <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid var(--border-light);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 18px; font-weight: 700; color: var(--dark-text);">
+                                <i class="fas fa-user-graduate" style="color: var(--gold);"></i> My Mentees (<?php echo $mentee_count; ?>)
+                            </h3>
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="downloadMenteeReport()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                        <div style="display: grid; gap: 8px;">
+                            <?php foreach ($assigned_mentees as $mentee): 
+                                $fullName = htmlspecialchars(trim(($mentee['first_name'] ?? '') . ' ' . ($mentee['last_name'] ?? '')));
+                                $initials = strtoupper(substr($mentee['first_name'] ?? '', 0, 1) . substr($mentee['last_name'] ?? '', 0, 1));
+                            ?>
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--cream); border-radius: 10px; transition: all 0.2s;">
+                                <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px;">
+                                    <?php echo $initials; ?>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 14px; font-weight: 600; color: var(--dark-text);"><?php echo $fullName; ?></div>
+                                    <div style="font-size: 11px; color: var(--light-text);"><?php echo htmlspecialchars($mentee['email'] ?? ''); ?></div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="padding: 4px 10px; background: rgba(212, 168, 67, 0.15); color: #9a7b0a; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                                        <?php echo htmlspecialchars($mentee['year_level'] ?? '-'); ?>
+                                    </span>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
-                <form id="reportForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="reportName">Report Name</label>
-                            <input type="text" class="form-control" id="reportName" placeholder="e.g., Student Performance Report" required>
+                <?php else: ?>
+                <div style="text-align: center; padding: 60px; background: white; border-radius: 16px; border: 1px solid var(--border-light);">
+                    <i class="fas fa-user-slash" style="font-size: 56px; color: var(--gold-light); opacity: 0.5;"></i>
+                    <h3 style="margin: 16px 0 8px 0; font-size: 18px; color: var(--dark-text);">No Mentees Assigned</h3>
+                    <p style="font-size: 14px; color: var(--light-text);">Contact the Program Head for mentee assignments.</p>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Generate Section -->
+            <div class="section-content" id="generateSection">
+                <div style="background: white; border-radius: 16px; padding: 24px; border: 1px solid var(--border-light); margin-bottom: 24px;">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-magic" style="color: var(--gold);"></i> Generate Custom Report
+                    </h3>
+                    <form id="reportForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="reportName">Report Name</label>
+                                <input type="text" class="form-control" id="reportName" placeholder="e.g., Student Performance Report" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reportType">Report Type</label>
+                                <select class="form-control" id="reportType" required>
+                                    <option value="">Select type...</option>
+                                    <option value="pdf">PDF Document</option>
+                                    <option value="excel">Excel Spreadsheet</option>
+                                    <option value="csv">CSV File</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="dateFrom">Date From</label>
+                                <input type="date" class="form-control" id="dateFrom">
+                            </div>
+                            <div class="form-group">
+                                <label for="dateTo">Date To</label>
+                                <input type="date" class="form-control" id="dateTo">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="reportType">Report Type</label>
-                            <select class="form-control" id="reportType" required>
-                                <option value="">Select type...</option>
-                                <option value="pdf">PDF Document</option>
-                                <option value="excel">Excel Spreadsheet</option>
-                                <option value="csv">CSV File</option>
-                            </select>
+                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-download"></i> Generate Report
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label for="dateFrom">Date From (Optional)</label>
-                            <input type="date" class="form-control" id="dateFrom">
+                    </form>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div class="section-content" id="analyticsSection">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-type">Reports Generated</div>
+                                <div class="stat-value"><?php echo $stats['total_reports']; ?></div>
+                            </div>
+                            <div class="stat-icon blue"><i class="fas fa-file-alt"></i></div>
                         </div>
-                        <div class="form-group">
-                            <label for="dateTo">Date To (Optional)</label>
-                            <input type="date" class="form-control" id="dateTo">
-                        </div>
+                        <div class="stat-label">All time reports</div>
                     </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="hideGenerator()">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-file-download"></i> Generate Report
-                        </button>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-type">Total Downloads</div>
+                                <div class="stat-value"><?php echo $stats['total_downloads']; ?></div>
+                            </div>
+                            <div class="stat-icon purple"><i class="fas fa-download"></i></div>
+                        </div>
+                        <div class="stat-label">Downloads this period</div>
                     </div>
-                </form>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-type">Mentees</div>
+                                <div class="stat-value"><?php echo $mentee_count; ?></div>
+                            </div>
+                            <div class="stat-icon green"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="stat-label">Assigned students</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Reports Grid -->
@@ -925,6 +1075,13 @@ if (!$show_role_modal && $pdo) {
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        function switchSection(section) {
+            document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.section-content').forEach(c => c.classList.remove('active'));
+            event.target.closest('.section-tab').classList.add('active');
+            document.getElementById(section + 'Section').classList.add('active');
+        }
+        
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -940,16 +1097,6 @@ if (!$show_role_modal && $pdo) {
                 toast.style.animation = 'slideIn 0.4s ease reverse';
                 setTimeout(() => toast.remove(), 400);
             }, 4000);
-        }
-
-        function showGenerator() {
-            document.getElementById('generatorSection').style.display = 'block';
-            document.getElementById('generatorSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function hideGenerator() {
-            document.getElementById('generatorSection').style.display = 'none';
-            document.getElementById('reportForm').reset();
         }
 
         function refreshData() {

@@ -97,6 +97,47 @@ CREATE TABLE IF NOT EXISTS majors (
     UNIQUE KEY uk_major_name (major_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Subjects Table
+CREATE TABLE IF NOT EXISTS subjects (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    subject_code VARCHAR(20) NOT NULL,
+    subject_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    units DECIMAL(3,1) DEFAULT 3.0,
+    lecture_hours INT DEFAULT 2,
+    lab_hours INT DEFAULT 0,
+    credit_type VARCHAR(20) DEFAULT 'lec' COMMENT 'lec, lec-lab, practical, project',
+    icon_class VARCHAR(100) DEFAULT 'fas fa-book',
+    color VARCHAR(20) DEFAULT '#3b82f6',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_subject_code (subject_code),
+    INDEX idx_is_active (is_active),
+    UNIQUE KEY uk_subject_code (subject_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Major Subjects Table (links majors to subjects with prerequisite info)
+CREATE TABLE IF NOT EXISTS major_subjects (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    major_id INT NOT NULL,
+    subject_id INT NOT NULL,
+    year_level VARCHAR(20) DEFAULT '1st Year',
+    semester VARCHAR(20) DEFAULT '1st Semester',
+    is_required BOOLEAN DEFAULT TRUE,
+    is_prerequisite BOOLEAN DEFAULT FALSE,
+    prerequisite_for INT DEFAULT NULL COMMENT 'subject_id that this is prerequisite for',
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_major_id (major_id),
+    INDEX idx_subject_id (subject_id),
+    INDEX idx_prerequisite_for (prerequisite_for),
+    FOREIGN KEY (major_id) REFERENCES majors(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uk_major_subject (major_id, subject_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Students Table
 CREATE TABLE IF NOT EXISTS students (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -227,6 +268,28 @@ INSERT INTO majors (major_name, display_name, description, icon_class, gradient_
 ('Financial Management', 'Financial Management', 'Specializes in financial analysis, accounting, investment decisions, and corporate finance strategies.', 'fas fa-dollar-sign', '#3b82f6', '#60a5fa', 2, TRUE),
 ('Marketing Management', 'Marketing Management', 'Covers marketing principles, consumer behavior, market research, and strategic marketing planning.', 'fas fa-chart-line', '#ec4899', '#f472b6', 3, TRUE);
 
+-- Subjects (Sample subjects for Operational Management major)
+INSERT INTO subjects (subject_code, subject_name, description, units, icon_class, color, is_active) VALUES
+('OPM 101', 'Introduction to Operations Management', 'Fundamental concepts of operations management including process design, capacity planning, and inventory management.', 3.0, 'fas fa-cogs', '#d4a843', TRUE),
+('OPM 201', 'Production and Operations Management', 'Advanced topics in production planning, scheduling, and quality control.', 3.0, 'fas fa-industry', '#e8c768', TRUE),
+('OPM 301', 'Supply Chain Management', 'End-to-end supply chain coordination, logistics, and procurement strategies.', 3.0, 'fas fa-truck', '#3b82f6', TRUE),
+('OPM 302', 'Quality Management', 'Total quality management, Six Sigma methodologies, and continuous improvement.', 3.0, 'fas fa-check-double', '#10b981', TRUE),
+('OPM 401', 'Strategic Operations', 'Strategic planning for operations, lean management, and business process reengineering.', 3.0, 'fas fa-chess', '#ec4899', TRUE),
+('MATH 101', 'Business Mathematics', 'Mathematical techniques for business decision-making including calculus and statistics.', 3.0, 'fas fa-calculator', '#8b5cf6', TRUE),
+('STAT 201', 'Business Statistics', 'Statistical analysis methods for business research and decision making.', 3.0, 'fas fa-chart-bar', '#6366f1', TRUE),
+('MGMT 101', 'Principles of Management', 'Foundational management principles, organizational behavior, and leadership.', 3.0, 'fas fa-users', '#f59e0b', TRUE);
+
+-- Major Subjects (Link subjects to Operational Management major with prerequisites)
+INSERT INTO major_subjects (major_id, subject_id, year_level, semester, is_required, is_prerequisite) VALUES
+(1, 1, '1st Year', '1st Semester', TRUE, FALSE),
+(1, 6, '1st Year', '1st Semester', TRUE, FALSE),
+(1, 7, '1st Year', '2nd Semester', TRUE, FALSE),
+(1, 8, '1st Year', '2nd Semester', TRUE, FALSE),
+(1, 2, '2nd Year', '1st Semester', TRUE, TRUE),
+(1, 3, '2nd Year', '2nd Semester', TRUE, FALSE),
+(1, 4, '3rd Year', '1st Semester', TRUE, FALSE),
+(1, 5, '4th Year', '1st Semester', TRUE, FALSE);
+
 -- Program Heads
 INSERT INTO program_heads (first_name, last_name, email, password, position, office_location) VALUES
 ('John', 'Head', 'head@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Program Head', 'Room 201, Building A'),
@@ -272,3 +335,8 @@ ALTER TABLE admins ADD COLUMN system_tagline TEXT NULL;
 
 -- Add student_id column to students table
 ALTER TABLE students ADD COLUMN student_id VARCHAR(50) NULL UNIQUE;
+
+-- Add new columns to subjects table (if not exists)
+ALTER TABLE subjects ADD COLUMN lecture_hours INT DEFAULT 2;
+ALTER TABLE subjects ADD COLUMN lab_hours INT DEFAULT 0;
+ALTER TABLE subjects ADD COLUMN credit_type VARCHAR(20) DEFAULT 'lec' COMMENT 'lec, lec-lab, practical, project';

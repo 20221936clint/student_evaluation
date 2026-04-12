@@ -1,0 +1,63 @@
+<?php
+header('Content-Type: application/json');
+require_once 'config.php';
+
+$message = [];
+
+try {
+    // Check if subjects table exists
+    $stmt = $pdo->query("SHOW TABLES LIKE 'subjects'");
+    if ($stmt->rowCount() == 0) {
+        // Create subjects table
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS subjects (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                subject_code VARCHAR(20) NOT NULL,
+                subject_name VARCHAR(100) NOT NULL,
+                description TEXT,
+                units DECIMAL(3,1) DEFAULT 3.0,
+                lecture_hours INT DEFAULT 2,
+                lab_hours INT DEFAULT 0,
+                credit_type VARCHAR(20) DEFAULT 'lec',
+                icon_class VARCHAR(100) DEFAULT 'fas fa-book',
+                color VARCHAR(20) DEFAULT '#3b82f6',
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE KEY uk_subject_code (subject_code)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+        $message[] = 'Created subjects table';
+    } else {
+        // Add columns if they don't exist
+        try { $pdo->exec("ALTER TABLE subjects ADD COLUMN lecture_hours INT DEFAULT 2"); $message[] = 'Added lecture_hours'; } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE subjects ADD COLUMN lab_hours INT DEFAULT 0"); $message[] = 'Added lab_hours'; } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE subjects ADD COLUMN credit_type VARCHAR(20) DEFAULT 'lec'"); $message[] = 'Added credit_type'; } catch (Exception $e) {}
+    }
+    
+    // Check if major_subjects table exists
+    $stmt = $pdo->query("SHOW TABLES LIKE 'major_subjects'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS major_subjects (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                major_id INT NOT NULL,
+                subject_id INT NOT NULL,
+                year_level VARCHAR(20) DEFAULT '1st Year',
+                semester VARCHAR(20) DEFAULT '1st Semester',
+                is_required BOOLEAN DEFAULT TRUE,
+                is_prerequisite BOOLEAN DEFAULT FALSE,
+                prerequisite_for INT DEFAULT NULL,
+                sort_order INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE KEY uk_major_subject (major_id, subject_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+        $message[] = 'Created major_subjects table';
+    }
+    
+    echo json_encode(['success' => true, 'message' => implode(', ', $message)]);
+} catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+}

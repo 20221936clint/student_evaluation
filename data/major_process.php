@@ -181,14 +181,10 @@ function addSubject() {
     global $pdo;
     $subject_code = isset($_POST['subject_code']) ? trim($_POST['subject_code']) : '';
     $subject_name = isset($_POST['subject_name']) ? trim($_POST['subject_name']) : '';
-    $description = isset($_POST['description']) ? trim($_POST['description']) : '';
     $units = isset($_POST['units']) ? floatval($_POST['units']) : 3.0;
-    $lecture_hours = isset($_POST['lecture_hours']) ? intval($_POST['lecture_hours']) : 2;
-    $lab_hours = isset($_POST['lab_hours']) ? intval($_POST['lab_hours']) : 0;
-    $credit_type = isset($_POST['credit_type']) ? trim($_POST['credit_type']) : 'lec';
-    $default_year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
-    $icon_class = isset($_POST['icon_class']) ? trim($_POST['icon_class']) : 'fas fa-book';
-    $color = isset($_POST['color']) ? trim($_POST['color']) : '#3b82f6';
+    $year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
+    $semester = isset($_POST['default_semester']) ? trim($_POST['default_semester']) : '1st Semester';
+    $prerequisite = isset($_POST['prerequisite']) ? trim($_POST['prerequisite']) : '';
     
     if (empty($subject_code) || empty($subject_name)) {
         echo json_encode(['success' => false, 'message' => 'Subject code and name are required']);
@@ -196,12 +192,24 @@ function addSubject() {
     }
     
     try {
-        $stmt = $pdo->prepare("INSERT INTO subjects (subject_code, subject_name, description, units, lecture_hours, lab_hours, credit_type, default_year_level, icon_class, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$subject_code, $subject_name, $description, $units, $lecture_hours, $lab_hours, $credit_type, $default_year_level, $icon_class, $color]);
+        // Check for duplicate subject code first
+        $check = $pdo->prepare("SELECT id FROM subjects WHERE subject_code = ?");
+        $check->execute([$subject_code]);
+        if ($check->rowCount() > 0) {
+            echo json_encode(['success' => false, 'message' => 'Error: Subject code already exists. Please use a different subject code.']);
+            return;
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO subjects (subject_code, subject_name, units, default_year_level, semester, prerequisite) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$subject_code, $subject_name, $units, $year_level, $semester, $prerequisite]);
         $subject_id = $pdo->lastInsertId();
         echo json_encode(['success' => true, 'message' => 'Subject added successfully', 'subject_id' => $subject_id]);
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+            echo json_encode(['success' => false, 'message' => 'Error: Subject code already exists. Please use a different subject code.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 }
 
@@ -210,15 +218,10 @@ function updateSubject() {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $subject_code = isset($_POST['subject_code']) ? trim($_POST['subject_code']) : '';
     $subject_name = isset($_POST['subject_name']) ? trim($_POST['subject_name']) : '';
-    $description = isset($_POST['description']) ? trim($_POST['description']) : '';
     $units = isset($_POST['units']) ? floatval($_POST['units']) : 3.0;
-    $lecture_hours = isset($_POST['lecture_hours']) ? intval($_POST['lecture_hours']) : 2;
-    $lab_hours = isset($_POST['lab_hours']) ? intval($_POST['lab_hours']) : 0;
-    $credit_type = isset($_POST['credit_type']) ? trim($_POST['credit_type']) : 'lec';
-    $default_year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
-    $icon_class = isset($_POST['icon_class']) ? trim($_POST['icon_class']) : 'fas fa-book';
-    $color = isset($_POST['color']) ? trim($_POST['color']) : '#3b82f6';
-    $is_active = isset($_POST['is_active']) ? boolval($_POST['is_active']) : true;
+    $year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
+    $semester = isset($_POST['default_semester']) ? trim($_POST['default_semester']) : '1st Semester';
+    $prerequisite = isset($_POST['prerequisite']) ? trim($_POST['prerequisite']) : '';
     
     if ($id <= 0 || empty($subject_code) || empty($subject_name)) {
         echo json_encode(['success' => false, 'message' => 'Invalid subject ID or missing required fields']);
@@ -226,8 +229,8 @@ function updateSubject() {
     }
     
     try {
-        $stmt = $pdo->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, description = ?, units = ?, lecture_hours = ?, lab_hours = ?, credit_type = ?, default_year_level = ?, icon_class = ?, color = ?, is_active = ? WHERE id = ?");
-        $stmt->execute([$subject_code, $subject_name, $description, $units, $lecture_hours, $lab_hours, $credit_type, $default_year_level, $icon_class, $color, $is_active, $id]);
+        $stmt = $pdo->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, units = ?, default_year_level = ?, semester = ?, prerequisite = ? WHERE id = ?");
+        $stmt->execute([$subject_code, $subject_name, $units, $year_level, $semester, $prerequisite, $id]);
         echo json_encode(['success' => true, 'message' => 'Subject updated successfully']);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -289,14 +292,31 @@ function addMajorSubject() {
     global $pdo;
     $major_id = isset($_POST['major_id']) ? intval($_POST['major_id']) : 0;
     $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : 0;
-    $year_level = isset($_POST['year_level']) ? trim($_POST['year_level']) : '1st Year';
-    $semester = isset($_POST['semester']) ? trim($_POST['semester']) : '1st Semester';
+    $year_level = isset($_POST['year_level']) ? trim($_POST['year_level']) : '';
+    $semester = isset($_POST['semester']) ? trim($_POST['semester']) : '';
     $is_required = isset($_POST['is_required']) ? boolval($_POST['is_required']) : true;
     $is_prerequisite = isset($_POST['is_prerequisite']) ? boolval($_POST['is_prerequisite']) : false;
     
     if ($major_id <= 0 || $subject_id <= 0) {
         echo json_encode(['success' => false, 'message' => 'Invalid major or subject ID']);
         return;
+    }
+    
+    // If year_level or semester not provided, get from subject defaults
+    try {
+        $stmt = $pdo->prepare("SELECT default_year_level, default_semester FROM subjects WHERE id = ?");
+        $stmt->execute([$subject_id]);
+        $subject = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($subject) {
+            $year_level = $year_level ?: ($subject['default_year_level'] ?: '1st Year');
+            $semester = $semester ?: ($subject['default_semester'] ?: '1st Semester');
+        } else {
+            $year_level = $year_level ?: '1st Year';
+            $semester = $semester ?: '1st Semester';
+        }
+    } catch (PDOException $e) {
+        $year_level = $year_level ?: '1st Year';
+        $semester = $semester ?: '1st Semester';
     }
     
     try {

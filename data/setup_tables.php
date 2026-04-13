@@ -20,6 +20,7 @@ try {
                 lab_hours INT DEFAULT 0,
                 credit_type VARCHAR(20) DEFAULT 'lec',
                 default_year_level VARCHAR(20) DEFAULT '1st Year',
+                default_semester VARCHAR(20) DEFAULT '1st Semester',
                 icon_class VARCHAR(100) DEFAULT 'fas fa-book',
                 color VARCHAR(20) DEFAULT '#3b82f6',
                 is_active BOOLEAN DEFAULT TRUE,
@@ -35,6 +36,7 @@ try {
         try { $pdo->exec("ALTER TABLE subjects ADD COLUMN lab_hours INT DEFAULT 0"); $message[] = 'Added lab_hours'; } catch (Exception $e) {}
         try { $pdo->exec("ALTER TABLE subjects ADD COLUMN credit_type VARCHAR(20) DEFAULT 'lec'"); $message[] = 'Added credit_type'; } catch (Exception $e) {}
         try { $pdo->exec("ALTER TABLE subjects ADD COLUMN default_year_level VARCHAR(20) DEFAULT '1st Year'"); $message[] = 'Added default_year_level'; } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE subjects ADD COLUMN default_semester VARCHAR(20) DEFAULT '1st Semester'"); $message[] = 'Added default_semester'; } catch (Exception $e) {}
     }
     
     // Check if major_subjects table exists

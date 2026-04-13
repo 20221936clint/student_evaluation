@@ -331,6 +331,14 @@ INSERT INTO reports (report_name, report_description, report_type, icon_class, d
 ('Instructor Ranking Report', 'Top Performers - Academic Year 2025-2026', 'pdf', 'fas fa-file-pdf', 7, 'program_head'),
 ('Course Completion Report', 'Evaluation Completion Rates', 'excel', 'fas fa-file-excel', 3, 'program_head');
 
+-- Sample Mentee Assignments (assign students to instructors)
+INSERT INTO mentees (student_id, first_name, last_name, email, mentor_id, assigned_by_id, assigned_by_name, assignment_notes, created_at) VALUES
+(1, 'John', 'Doe', 'john.doe@student.edu', 1, 1, 'Admin', 'Best overall performer', '2026-01-15 10:30:00'),
+(2, 'Jane', 'Wilson', 'jane.wilson@student.edu', 1, 1, 'Admin', 'Strong analytical skills', '2026-02-01 14:20:00'),
+(3, 'Mike', 'Johnson', 'mike.j@student.edu', 1, 1, 'Admin', 'Excellent communication', '2026-02-10 09:15:00'),
+(4, 'Sarah', 'Williams', 'sarah.w@student.edu', 1, 1, 'Admin', 'Top performer in Marketing', '2026-03-05 11:45:00'),
+(5, 'Tom', 'Brown', 'tom.b@student.edu', 1, 1, 'Admin', 'Shows great potential', '2026-03-12 16:30:00');
+
 -- Pending Instructor Registrations (self-registration)
 INSERT INTO pending_instructors (first_name, middle_name, last_name, suffix, email, password, instructor_id, status) VALUES
 ('Alice', NULL, 'Smith', NULL, 'alice.smith@pending.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'pending'),

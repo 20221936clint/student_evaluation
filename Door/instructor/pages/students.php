@@ -468,6 +468,18 @@ function getGradient($student) {
             background: var(--cream);
         }
         
+        .student-row-table:hover {
+            background: #f9fafb;
+        }
+        
+        .list-view-table table tbody tr {
+            transition: background 0.2s;
+        }
+        
+        .list-view-table table tbody tr:hover {
+            background: #fefce8;
+        }
+        
         .students-container {
             background: white;
             border-radius: 16px;
@@ -785,7 +797,7 @@ function getGradient($student) {
         
         .year-section > .year-section-header {
             padding: 12px 16px;
-            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            background: #ffffff;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 700;
@@ -795,11 +807,12 @@ function getGradient($student) {
             display: flex;
             align-items: center;
             gap: 8px;
-            border: 2px solid transparent;
+            border: 2px solid #e5e7eb;
         }
         
         .year-section > .year-section-header:hover {
-            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+            background: #f9fafb;
+            border-color: #d4a843;
             transform: translateY(-2px);
         }
         
@@ -1630,53 +1643,8 @@ function getGradient($student) {
         </header>
 
         <main class="dashboard-content">
-            <div class="page-header">
-                 <div class="page-title-area">
-                     <h1>Students</h1>
-                     <p>View and manage your assigned mentees</p>
-                 </div>
-
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card" style="border: 2px solid #e5e7eb; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-value"><?php echo number_format($stats['total_students']); ?></div>
-                    <div class="stat-label">Total Students</div>
-                    <div class="stat-change">
-                        <i class="fas fa-arrow-up"></i> Across all majors
-                    </div>
-                </div>
-                <div class="stat-card" style="border: 2px solid #e5e7eb; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <div class="stat-value"><?php echo number_format($stats['total_tasks'] ?? 0); ?></div>
-                    <div class="stat-label">Total Tasks Created</div>
-                </div>
-                <?php if (!empty($stats['by_year'])): 
-                    $yearsCount = count($stats['by_year']);
-                ?>
-                <div class="stat-card" style="border: 2px solid #e5e7eb; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #059669, #34d399); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
-                        <i class="fas fa-calendar"></i>
-                    </div>
-                    <div class="stat-value"><?php echo $yearsCount; ?></div>
-                    <div class="stat-label">Year Levels</div>
-                </div>
-                <?php endif; ?>
-            </div>
-
              <!-- Tools Bar -->
             <div class="tools-bar" style="box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; flex-wrap: wrap;">
-                <div class="tools-actions">
-                    <button class="btn btn-primary" onclick="openViewTasksModal()" style="display: flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 12px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; border: none; background: linear-gradient(135deg, #d4a843, #e8c768); color: white; box-shadow: 0 4px 15px rgba(212, 168, 67, 0.4);">
-                        <i class="fas fa-tasks"></i> <span class="btn-text">My Assigned Tasks</span>
-                    </button>
-                </div>
                 <div class="search-wrapper">
                     <i class="fas fa-search"></i>
                     <input type="text" class="search-input" id="searchInput" placeholder="Search by name, email, or student ID...">
@@ -1755,41 +1723,99 @@ function getGradient($student) {
                           </div>
                       </div>
                       
-                      <div class="all-students-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
-                      <?php foreach ($students as $student): 
-                         $fullName = getFullName($student);
-                         $initials = getInitials($student);
-                         $gradient = getGradient($student);
-                     ?>
-                     <div class="student-card-horizontal"
-                          data-name="<?php echo strtolower($fullName); ?>"
-                          data-email="<?php echo strtolower($student['email'] ?? ''); ?>"
-                          data-student-id="<?php echo strtolower($student['student_id'] ?? ''); ?>"
-                          data-major="<?php echo strtolower($student['major_name'] ?? ''); ?>"
-                          data-year="<?php echo strtolower($student['year_level'] ?? ''); ?>"
-                          data-mentee-id="<?php echo $student['mentee_id']; ?>">
-                         <input type="checkbox" class="student-checkbox" value="<?php echo $student['mentee_id']; ?>" onchange="updateSelection()">
-                         <div class="student-avatar" style="background: <?php echo $gradient; ?>;">
-                             <?php echo htmlspecialchars($initials); ?>
+                       <div class="all-students-grid" id="gridView" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                       <?php foreach ($students as $student): 
+                          $fullName = getFullName($student);
+                          $initials = getInitials($student);
+                          $gradient = getGradient($student);
+                      ?>
+                      <div class="student-card-horizontal"
+                           data-name="<?php echo strtolower($fullName); ?>"
+                           data-email="<?php echo strtolower($student['email'] ?? ''); ?>"
+                           data-student-id="<?php echo strtolower($student['student_id'] ?? ''); ?>"
+                           data-major="<?php echo strtolower($student['major_name'] ?? ''); ?>"
+                           data-year="<?php echo strtolower($student['year_level'] ?? ''); ?>"
+                           data-mentee-id="<?php echo $student['mentee_id']; ?>">
+                          <input type="checkbox" class="student-checkbox" value="<?php echo $student['mentee_id']; ?>" onchange="updateSelection()">
+                          <div class="student-avatar" style="background: <?php echo $gradient; ?>;">
+                              <?php echo htmlspecialchars($initials); ?>
+                          </div>
+                          <div class="student-info">
+                              <div class="student-name"><?php echo htmlspecialchars($fullName); ?></div>
+                              <div class="student-id"><?php echo htmlspecialchars($student['student_id'] ?? 'N/A'); ?></div>
+                              <div class="student-email"><?php echo htmlspecialchars($student['email'] ?? 'N/A'); ?></div>
+                          </div>
+                          <div class="student-meta">
+                              <span class="student-major"><?php echo htmlspecialchars($student['major_name'] ?? 'N/A'); ?></span>
+                              <span class="student-year"><?php echo htmlspecialchars($student['year_level'] ?? 'N/A'); ?> Year</span>
+                          </div>
+                          <div class="student-actions-list">
+                               <button class="btn" onclick="viewStudent(<?php echo $student['mentee_id']; ?>)">
+                                  <i class="fas fa-eye"></i> View
+                              </button>
                          </div>
-                         <div class="student-info">
-                             <div class="student-name"><?php echo htmlspecialchars($fullName); ?></div>
-                             <div class="student-id"><?php echo htmlspecialchars($student['student_id'] ?? 'N/A'); ?></div>
-                             <div class="student-email"><?php echo htmlspecialchars($student['email'] ?? 'N/A'); ?></div>
-                         </div>
-                         <div class="student-meta">
-                             <span class="student-major"><?php echo htmlspecialchars($student['major_name'] ?? 'N/A'); ?></span>
-                             <span class="student-year"><?php echo htmlspecialchars($student['year_level'] ?? 'N/A'); ?> Year</span>
-                         </div>
-                         <div class="student-actions-list">
-                              <button class="btn" onclick="viewStudent(<?php echo $student['mentee_id']; ?>)">
-                                 <i class="fas fa-eye"></i> View
-                             </button>
-                        </div>
-                     </div>
-                     <?php endforeach; ?>
-                     </div>
-                  </div>
+                      </div>
+                      <?php endforeach; ?>
+                      </div>
+                      
+                       <!-- List View Table -->
+                       <div class="list-view-table" id="listView" style="display: none; width: 100%; overflow-x: auto; padding: 4px;">
+                           <div style="background: #FAFAFA; border-radius: 16px; border: 2px solid #d1d5db; padding: 16px;">
+                           <table style="width: 100%; border-collapse: separate; border-spacing: 0; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                               <thead style="background: linear-gradient(135deg, #d4a843 0%, #e8c768 100%); color: white;">
+                                   <tr>
+                                       <th style="padding: 16px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #b8922f;">Select</th>
+                                       <th style="padding: 16px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #b8922f;">Initials</th>
+                                       <th style="padding: 16px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #b8922f;">Name</th>
+                                       <th style="padding: 16px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #b8922f;">Student ID</th>
+                                       <th style="padding: 16px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #b8922f;">Major</th>
+                                       <th style="padding: 16px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #b8922f;">Year</th>
+                                       <th style="padding: 16px 14px; text-align: center; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #b8922f;">Action</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                  <?php foreach ($students as $student): 
+                                      $fullName = getFullName($student);
+                                      $initials = getInitials($student);
+                                      $gradient = getGradient($student);
+                                  ?>
+                                  <tr class="student-row-table" data-mentee-id="<?php echo $student['mentee_id']; ?>" data-name="<?php echo strtolower($fullName); ?>" data-email="<?php echo strtolower($student['email'] ?? ''); ?>" data-student-id="<?php echo strtolower($student['student_id'] ?? ''); ?>" data-major="<?php echo strtolower($student['major_name'] ?? ''); ?>" data-year="<?php echo strtolower($student['year_level'] ?? ''); ?>">
+                                      <td style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb;">
+                                          <input type="checkbox" class="student-checkbox-table" value="<?php echo $student['mentee_id']; ?>" onchange="updateSelection()" style="accent-color: #d4a843; cursor: pointer;">
+                                      </td>
+                                      <td style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb;">
+                                          <div style="width: 40px; height: 40px; border-radius: 10px; background: <?php echo $gradient; ?>; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                              <?php echo htmlspecialchars($initials); ?>
+                                          </div>
+                                      </td>
+                                      <td style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1f2937; font-size: 14px;">
+                                          <?php echo htmlspecialchars($fullName); ?>
+                                      </td>
+                                      <td style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px; font-family: monospace;">
+                                          <?php echo htmlspecialchars($student['student_id'] ?? 'N/A'); ?>
+                                      </td>
+                                      <td style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb;">
+                                          <span style="padding: 6px 12px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.25)); color: #6d28d9; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; display: inline-block;">
+                                              <?php echo htmlspecialchars($student['major_name'] ?? 'N/A'); ?>
+                                          </span>
+                                      </td>
+                                      <td style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb;">
+                                          <span style="padding: 6px 12px; background: linear-gradient(135deg, rgba(212, 168, 67, 0.15), rgba(212, 168, 67, 0.25)); color: #9a7b0a; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; display: inline-block;">
+                                              <?php echo htmlspecialchars($student['year_level'] ?? 'N/A'); ?>
+                                          </span>
+                                      </td>
+                                      <td style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                                          <button class="btn" onclick="viewStudent(<?php echo $student['mentee_id']; ?>)" style="padding: 8px 16px; font-size: 12px; border-radius: 8px; background: linear-gradient(135deg, #d4a843, #e8c768); color: white; border: none; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(212,168,67,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+                                              <i class="fas fa-eye"></i> View
+                                          </button>
+                                      </td>
+                                  </tr>
+                                  <?php endforeach; ?>
+                              </tbody>
+                           </table>
+                           </div>
+                       </div>
+                    </div>
                     
                 </main>
      </div>
@@ -2165,24 +2191,24 @@ function getGradient($student) {
         document.getElementById('majorFilter').addEventListener('change', filterStudents);
 
          function setView(view) {
-             currentView = view;
-             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-             event.target.closest('.view-btn').classList.add('active');
-             
-             const gridView = document.getElementById('studentsView');
-             const listView = document.getElementById('studentsList');
-             
-             if (view === 'grid') {
-                 gridView.style.display = 'grid';
-                 listView.style.display = 'none';
-             } else {
-                 gridView.style.display = 'none';
-                 listView.style.display = 'flex';
-             }
-             
-             // Update Select All state after view change
-             updateSelection();
-         }
+              currentView = view;
+              document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+              event.target.closest('.view-btn').classList.add('active');
+              
+              const gridView = document.getElementById('gridView');
+              const listView = document.getElementById('listView');
+              
+              if (view === 'grid') {
+                  gridView.style.display = 'grid';
+                  listView.style.display = 'none';
+              } else {
+                  gridView.style.display = 'none';
+                  listView.style.display = 'block';
+              }
+              
+              // Update Select All state after view change
+              updateSelection();
+          }
 
         function closeModal() {
             document.getElementById('studentDetailModal').style.display = 'none';

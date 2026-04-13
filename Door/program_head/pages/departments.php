@@ -1417,13 +1417,14 @@ if (!$show_role_modal) {
                                             <th style="padding: 6px 4px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); font-size: 10px;">Code</th>
                                             <th style="padding: 6px 4px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); font-size: 10px;">Subject Title</th>
                                             <th style="padding: 6px 4px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px; font-size: 10px;">Units</th>
+                                            <th style="padding: 6px 4px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px; font-size: 10px;"></th>
                                         </tr>
                                     </thead>
                                     <tbody>`;
 
                 if (sem1.length === 0) {
                     html += `
-                                        <tr><td colspan="4" style="padding: 25px; text-align: center; color: var(--light-text); font-style: italic; font-size: 11px;">No subjects</td></tr>`;
+                                        <tr><td colspan="5" style="padding: 25px; text-align: center; color: var(--light-text); font-style: italic; font-size: 11px;">No subjects</td></tr>`;
                 } else {
                     sem1.forEach(s => {
                         const isPrereq = s.is_prerequisite ? 'background: linear-gradient(135deg, #fef2f2, #fee2e2); border-left: 3px solid #ef4444;' : '';
@@ -1434,7 +1435,12 @@ if (!$show_role_modal) {
                                             </td>
                                             <td style="padding: 6px; font-weight: 600; color: var(--dark-text); border-right: 1px solid var(--border-light);">${s.subject_code || ''}</td>
                                             <td style="padding: 6px; color: var(--dark-text); border-right: 1px solid var(--border-light);">${s.subject_name || ''}</td>
-                                            <td style="padding: 6px; text-align: center; font-weight: 600;">${s.units || '0'}</td>
+                                            <td style="padding: 6px; text-align: center; font-weight: 600; border-right: 1px solid var(--border-light);">${s.units || '0'}</td>
+                                            <td style="padding: 6px; text-align: center;">
+                                                <button onclick="editSubject(${s.id})" style="background: transparent; border: none; cursor: pointer; color: var(--gold-dark); padding: 2px 4px; font-size: 12px;" title="Edit Subject">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
                                         </tr>`;
                     });
                 }
@@ -1444,6 +1450,7 @@ if (!$show_role_modal) {
                                         <tr style="background: var(--cream); border-top: 2px solid var(--gold);">
                                             <td colspan="3" style="padding: 6px; font-weight: 700; color: var(--gold-dark); text-align: right; font-size: 10px;">Total:</td>
                                             <td style="padding: 6px; text-align: center; font-weight: 700; color: var(--gold-dark);">${totalSem1}</td>
+                                            <td></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -1463,13 +1470,14 @@ if (!$show_role_modal) {
                                             <th style="padding: 6px 4px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); font-size: 10px;">Code</th>
                                             <th style="padding: 6px 4px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); font-size: 10px;">Subject Title</th>
                                             <th style="padding: 6px 4px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px; font-size: 10px;">Units</th>
+                                            <th style="padding: 6px 4px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px; font-size: 10px;"></th>
                                         </tr>
                                     </thead>
                                     <tbody>`;
 
                 if (sem2.length === 0) {
                     html += `
-                                        <tr><td colspan="4" style="padding: 25px; text-align: center; color: var(--light-text); font-style: italic; font-size: 11px;">No subjects</td></tr>`;
+                                        <tr><td colspan="5" style="padding: 25px; text-align: center; color: var(--light-text); font-style: italic; font-size: 11px;">No subjects</td></tr>`;
                 } else {
                     sem2.forEach(s => {
                         const isPrereq = s.is_prerequisite ? 'background: linear-gradient(135deg, #fef2f2, #fee2e2); border-left: 3px solid #ef4444;' : '';
@@ -1480,7 +1488,12 @@ if (!$show_role_modal) {
                                             </td>
                                             <td style="padding: 6px; font-weight: 600; color: var(--dark-text); border-right: 1px solid var(--border-light);">${s.subject_code || ''}</td>
                                             <td style="padding: 6px; color: var(--dark-text); border-right: 1px solid var(--border-light);">${s.subject_name || ''}</td>
-                                            <td style="padding: 6px; text-align: center; font-weight: 600;">${s.units || '0'}</td>
+                                            <td style="padding: 6px; text-align: center; font-weight: 600; border-right: 1px solid var(--border-light);">${s.units || '0'}</td>
+                                            <td style="padding: 6px; text-align: center;">
+                                                <button onclick="editSubject(${s.id})" style="background: transparent; border: none; cursor: pointer; color: var(--gold-dark); padding: 2px 4px; font-size: 12px;" title="Edit Subject">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
                                         </tr>`;
                     });
                 }

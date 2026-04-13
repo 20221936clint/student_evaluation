@@ -273,7 +273,7 @@ if (!$show_role_modal) {
             <a href="instructors.php" class="sidebar-nav-item"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a>
             <a href="student_enrollment.php" class="sidebar-nav-item"><i class="fas fa-user-graduate"></i><span>Enrollment</span></a>
             <a href="mentee_flow.php" class="sidebar-nav-item"><i class="fas fa-users"></i><span>MenteeFlow</span></a>
-            <a href="departments.php" class="sidebar-nav-item active"><i class="fas fa-graduation-cap"></i><span>Majors</span></a>
+            <a href="departments.php" class="sidebar-nav-item active"><i class="fas fa-graduation-cap"></i><span>Department</span></a>
             <a href="reports.php" class="sidebar-nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
             <a href="settings.php" class="sidebar-nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
         </nav>
@@ -283,7 +283,7 @@ if (!$show_role_modal) {
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-                <div><div class="topbar-title">Major Management</div><div class="topbar-subtitle">Program Head Panel</div></div>
+                <div><div class="topbar-title">Department Management</div><div class="topbar-subtitle">Program Head Panel</div></div>
             </div>
             <div class="topbar-right">
                 <div class="topbar-date"><i class="fas fa-calendar-alt"></i><span><?php echo date('F j, Y'); ?></span></div>
@@ -294,20 +294,19 @@ if (!$show_role_modal) {
             <div class="page-container">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Major Management</h1>
-                        <p class="page-subtitle">Manage majors, subjects, and prerequisites</p>
+                        <h1 class="page-title">Department Management</h1>
+                        <p class="page-subtitle">Manage departments, subjects, and prerequisites</p>
                     </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn-add" style="background: #6366f1;" onclick="setupSampleData()"><i class="fas fa-magic"></i> Quick Setup</button>
+                     <div style="display: flex; gap: 12px;">
                         <button class="btn-add" onclick="showSubjectModal()"><i class="fas fa-book"></i> Add Subject</button>
                         <button class="btn-add" onclick="showMajorModal()"><i class="fas fa-plus"></i> Add Major</button>
                     </div>
                 </div>
                 
                 <div class="card">
-                    <div class="tab-container">
+                     <div class="tab-container">
                         <button class="tab active" onclick="switchTab('majors')"><i class="fas fa-graduation-cap"></i> Majors</button>
-                        <button class="tab" onclick="switchTab('subjects')"><i class="fas fa-book"></i> All Subjects</button>
+                        <button class="tab" onclick="switchTab('subjects')"><i class="fas fa-book"></i> Prospectus</button>
                     </div>
                     
                     <div id="majorsTab">
@@ -354,35 +353,32 @@ if (!$show_role_modal) {
                         <?php endif; ?>
                     </div>
                     
-                    <div id="subjectsTab" style="display: none;">
-                        <?php if (empty($all_subjects)): ?>
-                        <div class="empty-state">
-                            <i class="fas fa-book empty-icon"></i>
-                            <h3 class="empty-title">No Subjects Created</h3>
-                            <p class="empty-desc">Create subjects that can be assigned to majors as requirements or prerequisites.</p>
-                            <button class="btn-add" style="margin: 20px auto 0;" onclick="showSubjectModal()"><i class="fas fa-plus"></i> Add Subject</button>
-                        </div>
-                        <?php else: ?>
-                        <div class="subject-list">
-                            <?php foreach ($all_subjects as $subject): ?>
-                            <div class="subject-item" data-id="<?php echo $subject['id']; ?>">
-                                <div class="subject-icon" style="background: linear-gradient(135deg, <?php echo htmlspecialchars($subject['color']); ?>, <?php echo htmlspecialchars($subject['color']); ?>);">
-                                    <i class="<?php echo htmlspecialchars($subject['icon_class']); ?>"></i>
-                                </div>
-                                <div class="subject-info">
-                                    <div class="subject-name"><?php echo htmlspecialchars($subject['subject_code']); ?> - <?php echo htmlspecialchars($subject['subject_name']); ?></div>
-                                    <div class="subject-meta"><?php echo htmlspecialchars($subject['units']); ?> Units</div>
-                                </div>
-                                <button class="btn-action btn-edit" style="padding: 6px 12px;" onclick="editSubject(<?php echo $subject['id']; ?>)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-action btn-delete" style="padding: 6px 12px;" onclick="deleteSubject(<?php echo $subject['id']; ?>)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <?php endif; ?>
+<div id="subjectsTab" style="display: none;">
+                          <div class="table-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                              <div>
+                                  <h3 style="font-size: 16px; font-weight: 700; color: var(--dark-text); margin: 0;"><i class="fas fa-book" style="color: var(--gold-dark); margin-right: 8px;"></i>Subject Prospectus</h3>
+                                  <p style="font-size: 13px; color: var(--light-text); margin: 4px 0 0 0;">Student Evaluation Prospectus - View subjects by major, year, and semester</p>
+                              </div>
+                              <div style="display: flex; gap: 12px; align-items: center;">
+                                  <select id="prospectusMajorSelect" class="form-select" style="min-width: 220px; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 10px; font-size: 14px; font-family: 'Poppins', sans-serif; background: white;" onchange="loadProspectus()">
+                                      <option value="">-- Select Major --</option>
+                                      <?php foreach ($majors as $major): ?>
+                                      <option value="<?php echo $major['id']; ?>"><?php echo htmlspecialchars($major['display_name']); ?></option>
+                                      <?php endforeach; ?>
+                                  </select>
+                              </div>
+                          </div>
+
+                         <!-- Prospectus Header (like Student Evaluation) -->
+                         <div id="prospectusContent">
+                             <div class="empty-state" style="padding: 60px 20px; text-align: center; background: white; border-radius: 12px; border: 1px solid var(--border-light);">
+                                 <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--cream); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                                     <i class="fas fa-graduation-cap" style="font-size: 32px; color: var(--gold-dark);"></i>
+                                 </div>
+                                 <h3 style="font-size: 18px; font-weight: 700; color: var(--dark-text); margin-bottom: 8px;">Select a Major</h3>
+                                 <p style="font-size: 14px; color: var(--light-text); max-width: 400px; margin: 0 auto 20px;">Choose a major from the dropdown above to view its prospectus.</p>
+                             </div>
+                         </div>
                     </div>
                 </div>
             </div>
@@ -469,13 +465,9 @@ if (!$show_role_modal) {
                             <input type="text" class="form-input" id="subjectCode" name="subject_code" placeholder="e.g., OPM 101" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Subject Name *</label>
+                            <label class="form-label">Subject Title *</label>
                             <input type="text" class="form-input" id="subjectName" name="subject_name" placeholder="e.g., Introduction to Operations" required>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-textarea" id="subjectDesc" name="description" placeholder="Enter detailed subject description" style="min-height: 60px;"></textarea>
                     </div>
                 </div>
                 
@@ -488,17 +480,7 @@ if (!$show_role_modal) {
                             <small style="color: var(--light-text); font-size: 11px;">Number of credit hours for this subject</small>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Lecture Hours/Week</label>
-                            <input type="number" class="form-input" id="subjectLecture" name="lecture_hours" value="2" min="0" max="10">
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Lab Hours/Week</label>
-                            <input type="number" class="form-input" id="subjectLab" name="lab_hours" value="0" min="0" max="10">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Credit Type</label>
+                            <label class="form-label">Prerequisite Type</label>
                             <select class="form-select" id="subjectCreditType" name="credit_type">
                                 <option value="lec">Lecture Only</option>
                                 <option value="lec-lab">Lecture + Lab</option>
@@ -508,44 +490,23 @@ if (!$show_role_modal) {
                         </div>
                     </div>
                 </div>
-                
+
                 <div style="background: var(--cream); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--gold-dark);"><i class="fas fa-palette"></i> Appearance</h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Icon</label>
-                            <select class="form-select" id="subjectIcon" name="icon_class">
-                                <option value="fas fa-book">Book</option>
-                                <option value="fas fa-calculator">Calculator</option>
-                                <option value="fas fa-chart-bar">Chart Bar</option>
-                                <option value="fas fa-cogs">Cogs</option>
-                                <option value="fas fa-file-alt">File</option>
-                                <option value="fas fa-lightbulb">Lightbulb</option>
-                                <option value="fas fa-pencil-alt">Pencil</option>
-                                <option value="fas fa-laptop">Laptop</option>
-                                <option value="fas fa-industry">Industry</option>
-                                <option value="fas fa-truck">Truck</option>
-                                <option value="fas fa-check-double">Check Double</option>
-                                <option value="fas fa-chess">Chess</option>
-                                <option value="fas fa-users">Users</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Color</label>
-                            <input type="color" class="form-input" id="subjectColor" name="color" value="#3b82f6" style="height: 42px;">
-                        </div>
+                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--gold-dark);"><i class="fas fa-layer-group"></i> Year Level</h4>
+                    <div class="form-group">
+                        <label class="form-label">Default Year Level</label>
+                        <select class="form-select" id="subjectYearLevel" name="default_year_level">
+                            <option value="">-- Select Year Level --</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
+                        <small style="color: var(--light-text); font-size: 11px;">This will be the default year level when adding to a major</small>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" id="subjectActive" name="is_active">
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-                
-                <div class="form-actions">
+                  <div class="form-actions">
                     <button type="button" class="btn-cancel" onclick="closeSubjectModal()">Cancel</button>
                     <button type="submit" class="btn-submit">Save Subject</button>
                 </div>
@@ -934,11 +895,9 @@ if (!$show_role_modal) {
                 if (subject) {
                     document.getElementById('subjectCode').value = subject.subject_code;
                     document.getElementById('subjectName').value = subject.subject_name;
-                    document.getElementById('subjectDesc').value = subject.description || '';
                     document.getElementById('subjectUnits').value = subject.units;
-                    document.getElementById('subjectIcon').value = subject.icon_class;
-                    document.getElementById('subjectColor').value = subject.color;
-                    document.getElementById('subjectActive').value = subject.is_active ? '1' : '0';
+                    document.getElementById('subjectCreditType').value = subject.credit_type || 'lec';
+                    document.getElementById('subjectYearLevel').value = subject.default_year_level || '';
                 }
             } else {
                 document.getElementById('subjectForm').reset();
@@ -951,10 +910,11 @@ if (!$show_role_modal) {
         
         function saveSubject(e) {
             e.preventDefault();
+            const subjectId = document.getElementById('subjectId').value;
             const formData = new FormData(document.getElementById('subjectForm'));
-            formData.append('action', document.getElementById('subjectId').value ? 'update_subject' : 'add_subject');
-            if (document.getElementById('subjectId').value) {
-                formData.append('id', document.getElementById('subjectId').value);
+            formData.append('action', subjectId && subjectId !== '0' ? 'update_subject' : 'add_subject');
+            if (subjectId && subjectId !== '0') {
+                formData.append('id', subjectId);
             }
             
             fetch('../../../data/major_process.php', {
@@ -991,6 +951,467 @@ if (!$show_role_modal) {
                     if (data.success) location.reload();
                 });
             }
+        }
+
+        function loadProspectus() {
+            const majorId = document.getElementById('prospectusMajorSelect').value;
+            const container = document.getElementById('prospectusContent');
+            const majorName = document.getElementById('prospectusMajorSelect').selectedOptions[0].text;
+            
+            if (!majorId) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 60px 20px; text-align: center; background: white; border-radius: 12px; border: 1px solid var(--border-light);">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--cream); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-graduation-cap" style="font-size: 32px; color: var(--gold-dark);"></i>
+                        </div>
+                        <h3 style="font-size: 18px; font-weight: 700; color: var(--dark-text); margin-bottom: 8px;">Select a Major</h3>
+                        <p style="font-size: 14px; color: var(--light-text); max-width: 400px; margin: 0 auto 20px;">Choose a major from the dropdown above to view its prospectus.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--gold-dark);"></i><p style="margin-top: 12px; color: var(--light-text);">Loading prospectus...</p></div>';
+
+            const formData = new FormData();
+            formData.append('action', 'get_major_subjects');
+            formData.append('major_id', majorId);
+
+            fetch('../../../data/major_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    renderEmptyProspectus(majorName);
+                    return;
+                }
+
+                if (!data.subjects || data.subjects.length === 0) {
+                    renderEmptyProspectus(majorName);
+                } else {
+                    renderProspectus(data.subjects, majorName);
+                }
+            })
+            .catch(err => {
+                renderEmptyProspectus(majorName);
+            });
+        }
+
+        function renderEmptyProspectus(majorName) {
+            const container = document.getElementById('prospectusContent');
+            majorName = majorName || 'this Major';
+            
+            let html = `
+                <div style="background: white; border-radius: 16px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <!-- College Header with Logos -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 2px solid var(--gold-dark); background: linear-gradient(180deg, #fffdf5 0%, #fff 100%);">
+                        <div style="width: 70px; height: 70px; border-radius: 12px; overflow: hidden; border: 2px solid var(--gold-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <img src="../../../media/LOGO.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-text); margin: 0 0 4px; letter-spacing: 1px; text-transform: uppercase;">NORTHERN BUKIDNON STATE COLLEGE</h2>
+                            <p style="font-size: 13px; color: var(--light-text); margin: 0 0 4px;">Manolo Fortich, Bukidnon</p>
+                            <h3 style="font-size: 15px; font-weight: 700; color: var(--gold-dark); margin: 8px 0 2px; text-transform: uppercase;">INSTITUTE FOR BUSINESS MANAGEMENT</h3>
+                            <p style="font-size: 14px; font-weight: 600; color: var(--dark-text); margin: 0;">Major in ${majorName}</p>
+                        </div>
+                        <div style="width: 70px; height: 70px; border-radius: 12px; overflow: hidden; border: 2px solid var(--gold-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <img src="../../../media/LOGO.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <div style="padding: 20px;">
+                        <!-- Year tables with semesters -->
+                        
+                        <!-- 1st Year -->
+                        <div style="margin-bottom: 24px;">
+                            <div style="background: linear-gradient(135deg, var(--gold-dark), var(--gold)); color: white; padding: 12px 20px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span style="font-weight: 700; font-size: 15px;">1st Year</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">1st Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">2nd Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2nd Year -->
+                        <div style="margin-bottom: 24px;">
+                            <div style="background: linear-gradient(135deg, var(--gold-dark), var(--gold)); color: white; padding: 12px 20px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span style="font-weight: 700; font-size: 15px;">2nd Year</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">1st Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">2nd Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3rd Year -->
+                        <div style="margin-bottom: 24px;">
+                            <div style="background: linear-gradient(135deg, var(--gold-dark), var(--gold)); color: white; padding: 12px 20px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span style="font-weight: 700; font-size: 15px;">3rd Year</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">1st Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">2nd Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4th Year -->
+                        <div style="margin-bottom: 24px;">
+                            <div style="background: linear-gradient(135deg, var(--gold-dark), var(--gold)); color: white; padding: 12px 20px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span style="font-weight: 700; font-size: 15px;">4th Year</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">1st Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: var(--cream); padding: 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 12px;">2nd Semester</div>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background: var(--cream);">
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Grade</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Code</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Subject Title</th>
+                                                <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light); width: 40px;">Units</th>
+                                                <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 1px solid var(--border-light);">Pre-Req</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" style="padding: 15px; text-align: center; color: var(--light-text); font-style: italic;">No subjects</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bridging Subjects Table -->
+                        <div style="margin-top: 24px;">
+                            <div style="background: linear-gradient(135deg, #1B3A5C, #2d5a8e); color: white; padding: 10px 16px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                <i class="fas fa-bridge"></i>
+                                <span style="font-weight: 700; font-size: 14px;">BRIDGING SUBJECTS</span>
+                            </div>
+                            <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden; max-width: 600px;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                    <thead>
+                                        <tr style="background: var(--cream);">
+                                            <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light); width: 40px;">Grade</th>
+                                            <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light);">Code</th>
+                                            <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light);">Subject Title</th>
+                                            <th style="padding: 8px 6px; text-align: center; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light); width: 40px;">Units</th>
+                                            <th style="padding: 8px 6px; text-align: left; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light);">Pre-Req</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 6px; text-align: center;"><input type="checkbox" disabled style="width: 14px; height: 14px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 6px; font-weight: 600;">ACCTG 1</td>
+                                            <td style="padding: 6px;">FUNDAMENTALS OF ACCOUNTING</td>
+                                            <td style="padding: 6px; text-align: center;">3</td>
+                                            <td style="padding: 6px; color: var(--light-text); font-size: 10px;">-</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 6px; text-align: center;"><input type="checkbox" disabled style="width: 14px; height: 14px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 6px; font-weight: 600;">MKTG 1</td>
+                                            <td style="padding: 6px;">PRINCIPLES OF MARKETING</td>
+                                            <td style="padding: 6px; text-align: center;">3</td>
+                                            <td style="padding: 6px; color: var(--light-text); font-size: 10px;">-</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 6px; text-align: center;"><input type="checkbox" disabled style="width: 14px; height: 14px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 6px; font-weight: 600;">MNGT 1</td>
+                                            <td style="padding: 6px;">PRINCIPLES OF MANAGEMENT</td>
+                                            <td style="padding: 6px; text-align: center;">3</td>
+                                            <td style="padding: 6px; color: var(--light-text); font-size: 10px;">-</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 6px; text-align: center;"><input type="checkbox" disabled style="width: 14px; height: 14px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 6px; font-weight: 600;">ENG 1</td>
+                                            <td style="padding: 6px;">STUDY AND THINKING SKILLS</td>
+                                            <td style="padding: 6px; text-align: center;">3</td>
+                                            <td style="padding: 6px; color: var(--light-text); font-size: 10px;">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 6px; text-align: center;"><input type="checkbox" disabled style="width: 14px; height: 14px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 6px; font-weight: 600;">MATH 1</td>
+                                            <td style="padding: 6px;">COLLEGE ALGEBRA</td>
+                                            <td style="padding: 6px; text-align: center;">3</td>
+                                            <td style="padding: 6px; color: var(--light-text); font-size: 10px;">-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            container.innerHTML = html;
+        }
+
+        function renderProspectus(subjects, majorName) {
+            const container = document.getElementById('prospectusContent');
+
+            // Group subjects by year_level only (combine both semesters)
+            const yearOrder = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+            const grouped = {};
+
+            subjects.forEach(s => {
+                const year = s.year_level || '1st Year';
+                if (!grouped[year]) grouped[year] = [];
+                grouped[year].push(s);
+            });
+
+            // Build prospectus header
+            let html = `
+                <div style="background: white; border-radius: 16px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <!-- College Header with Logos -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 2px solid var(--gold-dark); background: linear-gradient(180deg, #fffdf5 0%, #fff 100%);">
+                        <div style="width: 70px; height: 70px; border-radius: 12px; overflow: hidden; border: 2px solid var(--gold-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <img src="../../../media/LOGO.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-text); margin: 0 0 4px; letter-spacing: 1px; text-transform: uppercase;">NORTHERN BUKIDNON STATE COLLEGE</h2>
+                            <p style="font-size: 13px; color: var(--light-text); margin: 0 0 4px;">Manolo Fortich, Bukidnon</p>
+                            <h3 style="font-size: 15px; font-weight: 700; color: var(--gold-dark); margin: 8px 0 2px; text-transform: uppercase;">INSTITUTE FOR BUSINESS MANAGEMENT</h3>
+                            <p style="font-size: 14px; font-weight: 600; color: var(--dark-text); margin: 0;">Major in ${majorName}</p>
+                        </div>
+                        <div style="width: 70px; height: 70px; border-radius: 12px; overflow: hidden; border: 2px solid var(--gold-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <img src="../../../media/LOGO.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <div style="padding: 20px;">`;
+
+            // For each year, render a single table with all subjects
+            yearOrder.forEach(year => {
+                const yearSubjects = grouped[year] || [];
+                
+                if (yearSubjects.length === 0) return;
+
+                html += `
+                    <div style="margin-bottom: 24px;">
+                        <!-- Year Header -->
+                        <div style="background: linear-gradient(135deg, var(--gold-dark), var(--gold)); color: white; padding: 12px 20px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span style="font-weight: 700; font-size: 15px;">${year}</span>
+                            <span style="font-weight: 400; font-size: 12px; opacity: 0.9;">(${yearSubjects.length} Subject${yearSubjects.length !== 1 ? 's' : ''})</span>
+                        </div>
+
+                        <!-- Single Table for Year -->
+                        <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                <thead>
+                                    <tr style="background: var(--cream);">
+<th style="padding: 10px 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); width: 50px; font-size: 11px;">Grade</th>
+                                            <th style="padding: 10px 8px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 11px;">Code</th>
+                                            <th style="padding: 10px 8px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 11px;">Subject Title</th>
+                                            <th style="padding: 10px 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); width: 60px; font-size: 11px;">Units</th>
+                                            <th style="padding: 10px 8px; text-align: center; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); width: 100px; font-size: 11px;">Sem</th>
+                                            <th style="padding: 10px 8px; text-align: left; font-weight: 700; color: var(--gold-dark); border-bottom: 2px solid var(--border-light); font-size: 11px;">Pre-Req</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+                yearSubjects.forEach(s => {
+                    const isPrereq = s.is_prerequisite ? 'background: linear-gradient(135deg, #fef2f2, #fee2e2); border-left: 3px solid #ef4444;' : '';
+                    html += `
+                                    <tr style="border-bottom: 1px solid var(--border-light); ${isPrereq}">
+                                        <td style="padding: 8px; text-align: center;">
+                                            <input type="checkbox" disabled style="width: 16px; height: 16px; accent-color: var(--gold-dark);">
+                                        </td>
+                                        <td style="padding: 8px; font-weight: 600; color: var(--dark-text); white-space: nowrap;">${s.subject_code}</td>
+                                        <td style="padding: 8px; color: var(--dark-text);">${s.subject_name}</td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${s.units}</td>
+                                        <td style="padding: 8px; text-align: center; font-size: 11px; color: var(--light-text);">${s.semester ? s.semester.replace(' Semester', '') : 'N/A'}</td>
+                                        <td style="padding: 8px; color: var(--light-text); font-size: 11px;">${s.prerequisite_name || '-'}</td>
+                                    </tr>`;
+                });
+
+                // Total units row for the year
+                const totalUnits = yearSubjects.reduce((sum, s) => sum + (parseFloat(s.units) || 0), 0);
+                html += `
+                                    <tr style="background: var(--cream); border-top: 2px solid var(--gold);">
+                                        <td colspan="3" style="padding: 10px; font-weight: 700; color: var(--gold-dark); text-align: right;">Total Units for ${year}:</td>
+                                        <td style="padding: 10px; text-align: center; font-weight: 800; color: var(--gold-dark); font-size: 14px;">${totalUnits}</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`;
+            });
+
+            // Bridging subjects section
+            html += `
+                        <!-- Bridging Subjects -->
+                        <div style="margin-top: 24px; padding-top: 20px; border-top: 3px solid var(--gold);">
+                            <div style="background: linear-gradient(135deg, #1B3A5C, #2d5a8e); color: white; padding: 12px 20px; border-radius: 10px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <i class="fas fa-bridge"></i>
+                                <span style="font-weight: 700; font-size: 15px;">BRIDGING SUBJECTS</span>
+                            </div>
+                            <div style="border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                    <thead>
+                                        <tr style="background: var(--cream);">
+                                            <th style="padding: 10px 8px; text-align: center; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light); width: 50px; font-size: 11px;">Grade</th>
+                                            <th style="padding: 10px 8px; text-align: left; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light); font-size: 11px;">Code</th>
+                                            <th style="padding: 10px 8px; text-align: left; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light); font-size: 11px;">Subject Title</th>
+                                            <th style="padding: 10px 8px; text-align: left; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid var(--border-light); font-size: 11px;">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 8px; text-align: center;"><input type="checkbox" disabled style="width: 16px; height: 16px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 8px; font-weight: 600;">ACCTG 1</td>
+                                            <td style="padding: 8px;">FUNDAMENTALS OF ACCOUNTING</td>
+                                            <td style="padding: 8px; color: var(--light-text); font-size: 11px;">SHS NON ABM / ALS GRAD</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 8px; text-align: center;"><input type="checkbox" disabled style="width: 16px; height: 16px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 8px; font-weight: 600;">MKTG 1</td>
+                                            <td style="padding: 8px;">PRINCIPLES OF MARKETING</td>
+                                            <td style="padding: 8px; color: var(--light-text); font-size: 11px;">SHS NON ABM</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 8px; text-align: center;"><input type="checkbox" disabled style="width: 16px; height: 16px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 8px; font-weight: 600;">MNGT 1</td>
+                                            <td style="padding: 8px;">PRINCIPLES OF MANAGEMENT</td>
+                                            <td style="padding: 8px; color: var(--light-text); font-size: 11px;">SHS NON ABM</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--border-light);">
+                                            <td style="padding: 8px; text-align: center;"><input type="checkbox" disabled style="width: 16px; height: 16px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 8px; font-weight: 600;">ENG 1</td>
+                                            <td style="padding: 8px;">STUDY AND THINKING SKILLS</td>
+                                            <td style="padding: 8px; color: var(--light-text); font-size: 11px;"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px; text-align: center;"><input type="checkbox" disabled style="width: 16px; height: 16px; accent-color: #1B3A5C;"></td>
+                                            <td style="padding: 8px; font-weight: 600;">MATH 1</td>
+                                            <td style="padding: 8px;">COLLEGE ALGEBRA</td>
+                                            <td style="padding: 8px; color: var(--light-text); font-size: 11px;"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+            container.innerHTML = html;
         }
     </script>
     <?php if ($show_role_modal): ?>

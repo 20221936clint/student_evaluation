@@ -186,6 +186,7 @@ function addSubject() {
     $lecture_hours = isset($_POST['lecture_hours']) ? intval($_POST['lecture_hours']) : 2;
     $lab_hours = isset($_POST['lab_hours']) ? intval($_POST['lab_hours']) : 0;
     $credit_type = isset($_POST['credit_type']) ? trim($_POST['credit_type']) : 'lec';
+    $default_year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
     $icon_class = isset($_POST['icon_class']) ? trim($_POST['icon_class']) : 'fas fa-book';
     $color = isset($_POST['color']) ? trim($_POST['color']) : '#3b82f6';
     
@@ -195,8 +196,8 @@ function addSubject() {
     }
     
     try {
-        $stmt = $pdo->prepare("INSERT INTO subjects (subject_code, subject_name, description, units, lecture_hours, lab_hours, credit_type, icon_class, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$subject_code, $subject_name, $description, $units, $lecture_hours, $lab_hours, $credit_type, $icon_class, $color]);
+        $stmt = $pdo->prepare("INSERT INTO subjects (subject_code, subject_name, description, units, lecture_hours, lab_hours, credit_type, default_year_level, icon_class, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$subject_code, $subject_name, $description, $units, $lecture_hours, $lab_hours, $credit_type, $default_year_level, $icon_class, $color]);
         $subject_id = $pdo->lastInsertId();
         echo json_encode(['success' => true, 'message' => 'Subject added successfully', 'subject_id' => $subject_id]);
     } catch (PDOException $e) {
@@ -214,6 +215,7 @@ function updateSubject() {
     $lecture_hours = isset($_POST['lecture_hours']) ? intval($_POST['lecture_hours']) : 2;
     $lab_hours = isset($_POST['lab_hours']) ? intval($_POST['lab_hours']) : 0;
     $credit_type = isset($_POST['credit_type']) ? trim($_POST['credit_type']) : 'lec';
+    $default_year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
     $icon_class = isset($_POST['icon_class']) ? trim($_POST['icon_class']) : 'fas fa-book';
     $color = isset($_POST['color']) ? trim($_POST['color']) : '#3b82f6';
     $is_active = isset($_POST['is_active']) ? boolval($_POST['is_active']) : true;
@@ -224,8 +226,8 @@ function updateSubject() {
     }
     
     try {
-        $stmt = $pdo->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, description = ?, units = ?, lecture_hours = ?, lab_hours = ?, credit_type = ?, icon_class = ?, color = ?, is_active = ? WHERE id = ?");
-        $stmt->execute([$subject_code, $subject_name, $description, $units, $lecture_hours, $lab_hours, $credit_type, $icon_class, $color, $is_active, $id]);
+        $stmt = $pdo->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, description = ?, units = ?, lecture_hours = ?, lab_hours = ?, credit_type = ?, default_year_level = ?, icon_class = ?, color = ?, is_active = ? WHERE id = ?");
+        $stmt->execute([$subject_code, $subject_name, $description, $units, $lecture_hours, $lab_hours, $credit_type, $default_year_level, $icon_class, $color, $is_active, $id]);
         echo json_encode(['success' => true, 'message' => 'Subject updated successfully']);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);

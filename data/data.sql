@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS subjects (
     lecture_hours INT DEFAULT 2,
     lab_hours INT DEFAULT 0,
     credit_type VARCHAR(20) DEFAULT 'lec' COMMENT 'lec, lec-lab, practical, project',
+    default_year_level VARCHAR(20) DEFAULT '1st Year',
     icon_class VARCHAR(100) DEFAULT 'fas fa-book',
     color VARCHAR(20) DEFAULT '#3b82f6',
     is_active BOOLEAN DEFAULT TRUE,

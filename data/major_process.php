@@ -48,8 +48,149 @@ switch ($action) {
     case 'update_major_subject_flag':
         updateMajorSubjectFlag();
         break;
+    case 'update_subject_prerequisite':
+        updateSubjectPrerequisite();
+        break;
+    case 'create_prereq_set':
+        createPrereqSet();
+        break;
+    case 'get_prereq_sets':
+        getPrereqSets();
+        break;
+    case 'delete_prereq_set':
+        deletePrereqSet();
+        break;
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
+}
+
+function updateSubjectPrerequisite() {
+    global $pdo;
+    $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : 0;
+    $prerequisite_codes = isset($_POST['prerequisite_subject_code']) ? trim($_POST['prerequisite_subject_code']) : '';
+    
+    if ($subject_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid subject ID']);
+        return;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("UPDATE subjects SET prerequisite_subject_code = ? WHERE id = ?");
+        $stmt->execute([$prerequisite_codes, $subject_id]);
+        echo json_encode(['success' => true, 'message' => 'Prerequisites saved successfully']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function createPrereqSet() {
+    global $pdo;
+    $prereq_code = isset($_POST['prereq_code']) ? trim($_POST['prereq_code']) : '';
+    $major_id = isset($_POST['major_id']) ? intval($_POST['major_id']) : 0;
+    $subject_ids = isset($_POST['subject_ids']) ? $_POST['subject_ids'] : '';
+    
+    if (empty($prereq_code)) {
+        echo json_encode(['success' => false, 'message' => 'Prerequisites code is required']);
+        return;
+    }
+if ($major_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Please select a major']);
+        return;
+    }
+    
+    $ids = json_decode($subject_ids, true);
+    if (!is_array($ids) || count($ids) === 0) {
+        echo json_encode(['success' => false, 'message' => 'At least one subject is required']);
+        return;
+    }
+    
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS prerequisite_sets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            code VARCHAR(100) NOT NULL UNIQUE,
+            major_id INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+        
+        try { $pdo->exec("ALTER TABLE prerequisite_sets ADD COLUMN major_id INT NOT NULL DEFAULT 0"); } catch (Exception $e) {}
+        
+        $pdo->exec("CREATE TABLE IF NOT EXISTS prerequisite_set_subjects (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            set_id INT NOT NULL,
+            subject_id INT NOT NULL,
+            FOREIGN KEY (set_id) REFERENCES prerequisite_sets(id) ON DELETE CASCADE,
+            FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+        )");
+        
+        $stmt = $pdo->prepare("INSERT INTO prerequisite_sets (code, major_id) VALUES (?, ?)");
+        $stmt->execute([$prereq_code, $major_id]);
+        $set_id = $pdo->lastInsertId();
+        
+        $stmt = $pdo->prepare("INSERT INTO prerequisite_set_subjects (set_id, subject_id) VALUES (?, ?)");
+        foreach ($ids as $sid) {
+            $stmt->execute([$set_id, intval($sid)]);
+        }
+        
+        echo json_encode(['success' => true, 'message' => 'Prerequisites created successfully']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function getPrereqSets() {
+    global $pdo;
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS prerequisite_sets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            code VARCHAR(100) NOT NULL UNIQUE,
+            major_id INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+        
+        try { $pdo->exec("ALTER TABLE prerequisite_sets ADD COLUMN major_id INT NOT NULL DEFAULT 0"); } catch (Exception $e) {}
+        
+        $pdo->exec("CREATE TABLE IF NOT EXISTS prerequisite_set_subjects (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            set_id INT NOT NULL,
+            subject_id INT NOT NULL,
+            FOREIGN KEY (set_id) REFERENCES prerequisite_sets(id) ON DELETE CASCADE,
+            FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+        )");
+        
+        $stmt = $pdo->query("SELECT ps.*, m.display_name as major_name FROM prerequisite_sets ps LEFT JOIN majors m ON ps.major_id = m.id ORDER BY m.display_name ASC, ps.code ASC");
+        $sets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($sets as &$set) {
+            $stmt = $pdo->prepare("SELECT s.* FROM subjects s 
+                JOIN prerequisite_set_subjects pss ON s.id = pss.subject_id 
+                WHERE pss.set_id = ?");
+            $stmt->execute([$set['id']]);
+            $set['subjects'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $set['subject_count'] = count($set['subjects']);
+        }
+        
+        echo json_encode(['success' => true, 'sets' => $sets]);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function deletePrereqSet() {
+    global $pdo;
+    $set_id = isset($_POST['set_id']) ? intval($_POST['set_id']) : 0;
+    
+    if ($set_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid set ID']);
+        return;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("DELETE FROM prerequisite_sets WHERE id = ?");
+        $stmt->execute([$set_id]);
+        echo json_encode(['success' => true, 'message' => 'Prerequisites set deleted']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
 }
 
 function getMajors() {

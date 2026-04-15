@@ -202,7 +202,7 @@ if (!$show_role_modal) {
         /* ══ PROSPECTUS SCREEN STYLES ══════════════════════════ */
         .pro-wrap { font-family: 'Poppins', sans-serif; font-size: 13px; color: #1a1a1a; background: white; border-radius: 16px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .pro-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; background: linear-gradient(to bottom, #fffdf5, #fff); border-bottom: 3px solid #8B6914; }
-        .pro-logo { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; border: 2px solid #8B6914; }
+        .pro-logo { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; border: 2px solid #8B6914; }
         .pro-title-block { text-align: center; flex: 1; padding: 0 16px; }
         .pro-school { font-size: 16px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
         .pro-address { font-size: 12px; color: #666; margin: 3px 0; }
@@ -264,7 +264,7 @@ if (!$show_role_modal) {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            .pro-logo { width: 48pt !important; height: 48pt !important; border: 1pt solid #8B6914 !important; border-radius: 4pt !important; }
+            .pro-logo { width: 85pt !important; height: 85pt !important; border: 1pt solid #8B6914 !important; border-radius: 4pt !important; }
             .pro-school { font-size: 10pt !important; }
             .pro-address { font-size: 7pt !important; }
             .pro-institute { font-size: 8.5pt !important; }
@@ -1514,7 +1514,7 @@ if (!$show_role_modal) {
             bridgeHtml = `
             <div class="pro-bridging-block">
                 <div class="pro-year-block">
-                    <div class="pro-year-header" style="background:linear-gradient(135deg,#5f5e5a,#888780);">
+                    <div class="pro-year-header" style="background: linear-gradient(135deg, #8B6914, #B8860B);">
                         <span><i class="fas fa-exchange-alt" style="margin-right:6px;font-size:11px;"></i>Bridging Subjects</span>
                         <span class="pro-year-total">${bt%1===0?bt:bt.toFixed(1)} units</span>
                     </div>
@@ -1669,7 +1669,7 @@ if (!$show_role_modal) {
 
     .pro-wrap { width: 100% !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; font-size: 1rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .pro-header { padding: 5pt 6pt 4pt !important; border-bottom: 1.5pt solid #8B6914 !important; }
-    .pro-logo { width: 38pt !important; height: 38pt !important; border: 1pt solid #8B6914 !important; }
+    .pro-logo { width: 75pt !important; height: 75pt !important; border: 1pt solid #8B6914 !important; }
     .pro-school { font-size: 1.2rem !important; }
     .pro-address { font-size: .85rem !important; }
     .pro-institute { font-size: 1rem !important; }

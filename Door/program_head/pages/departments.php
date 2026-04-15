@@ -1437,7 +1437,7 @@ if (!$show_role_modal) {
                 <div class="pro-major">Major in <strong>${escHtml(majorName)}</strong></div>
                 <div class="pro-label">Student Evaluation Prospectus</div>
             </div>
-            <img src="../../../media/LOGO.jpg" alt="Logo" class="pro-logo">
+            <img src="../../../media/nbsc_logo.png" alt="Logo" class="pro-logo">
         </div>`;
     }
 

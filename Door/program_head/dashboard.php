@@ -54,6 +54,37 @@ try {
     $active_courses = 0;
 }
 
+// Get total students enrolled
+try {
+    $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM students");
+    $result = $stmt->fetch();
+    $total_students = $result['cnt'] ?? 0;
+} catch (PDOException $e) {
+    $total_students = 0;
+}
+
+// Get instructor status counts
+$on_duty = 0;
+$on_leave = 0;
+$on_travel = 0;
+try {
+    $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM instructors WHERE status = 'on duty'");
+    $result = $stmt->fetch();
+    $on_duty = $result['cnt'] ?? 0;
+    
+    $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM instructors WHERE status = 'on leave'");
+    $result = $stmt->fetch();
+    $on_leave = $result['cnt'] ?? 0;
+    
+    $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM instructors WHERE status = 'on travel'");
+    $result = $stmt->fetch();
+    $on_travel = $result['cnt'] ?? 0;
+} catch (PDOException $e) {
+    $on_duty = 0;
+    $on_leave = 0;
+    $on_travel = 0;
+}
+
 // Fetch recent evaluations only if table exists
 $recent_evaluations = [];
 try {
@@ -198,54 +229,71 @@ try {
         <!-- Dashboard Content -->
         <main class="dashboard-content" style="position: relative; z-index: 1;">
             <!-- Welcome Banner -->
-            <div class="welcome-banner">
-                <div class="welcome-banner-role">Program Head</div>
-                <h1>Welcome back, <?php echo htmlspecialchars($user_name); ?>!</h1>
-                <p>Monitor instructor performance, manage evaluations, and track department progress all in one place.</p>
-            </div>
-
-            <!-- Stats Row -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-card-icon gold">
-                            <i class="fas fa-chalkboard-teacher"></i>
+            <div class="welcome-banner" style="text-align: center; padding: 32px 40px;">
+                <div style="display: inline-block; background: rgba(255, 255, 255, 0.2); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.3);">Program Head</div>
+                <h1 style="font-size: 52px; font-weight: 800; color: white; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Welcome back, <?php echo htmlspecialchars($user_name); ?>!</h1>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.95); max-width: 600px; margin: 0 auto 20px;">Monitor instructor performance, manage evaluations, and track department progress all in one place.</p>
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+                    <div style="background: linear-gradient(135deg, #fff 0%, #fef9e7 100%); border-radius: 16px; padding: 16px 24px; min-width: 140px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid rgba(212,168,67,0.2); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #D4A843, #FFD700); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                            <i class="fas fa-chalkboard-teacher" style="color: white; font-size: 18px;"></i>
                         </div>
+                        <div style="font-size: 26px; font-weight: 800; color: #2D2D2D; line-height: 1;"><?php echo $total_instructors; ?></div>
+                        <div style="font-size: 11px; color: #888; font-weight: 600; margin-top: 4px;">Total Instructors</div>
                     </div>
-                    <div class="stat-card-value"><?php echo $total_instructors; ?></div>
-                    <div class="stat-card-label">Total Instructors</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-card-icon green">
-                            <i class="fas fa-check-circle"></i>
+                    <div style="background: linear-gradient(135deg, #fff 0%, #e8f8f5 100%); border-radius: 16px; padding: 16px 24px; min-width: 140px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid rgba(16,185,129,0.2); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                            <i class="fas fa-check-circle" style="color: white; font-size: 18px;"></i>
                         </div>
+                        <div style="font-size: 26px; font-weight: 800; color: #2D2D2D; line-height: 1;"><?php echo $completed_evaluations; ?></div>
+                        <div style="font-size: 11px; color: #888; font-weight: 600; margin-top: 4px;">Completed Evaluations</div>
                     </div>
-                    <div class="stat-card-value"><?php echo $completed_evaluations; ?></div>
-                    <div class="stat-card-label">Completed Evaluations</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-card-icon blue">
-                            <i class="fas fa-book"></i>
+                    <div style="background: linear-gradient(135deg, #fff 0%, #e7f3ff 100%); border-radius: 16px; padding: 16px 24px; min-width: 140px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid rgba(59,130,246,0.2); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #3b82f6, #60a5fa); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                            <i class="fas fa-user-graduate" style="color: white; font-size: 18px;"></i>
                         </div>
+                        <div style="font-size: 26px; font-weight: 800; color: #2D2D2D; line-height: 1;"><?php echo $total_students; ?></div>
+                        <div style="font-size: 11px; color: #888; font-weight: 600; margin-top: 4px;">Total Students Enrolled</div>
                     </div>
-                    <div class="stat-card-value"><?php echo $active_courses; ?></div>
-                    <div class="stat-card-label">Active Courses</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-card-icon purple">
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <div class="stat-card-value"><?php echo $avg_rating; ?></div>
-                    <div class="stat-card-label">Avg. Rating</div>
                 </div>
             </div>
+            
+            <!-- Time Display (Outside) -->
+            <div style="display: flex; justify-content: center; margin-top: -20px; margin-bottom: 24px;">
+                <div style="display: inline-flex; align-items: center; gap: 16px; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); border-radius: 16px; padding: 16px 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 1px solid rgba(30,58,95,0.3); color: white;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-clock" style="color: #FFD700; font-size: 18px;"></i>
+                        <span id="time-greeting" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #FFD700;">Morning</span>
+                    </div>
+                    <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.3);"></div>
+                    <div id="current-time" style="font-size: 28px; font-weight: 800; line-height: 1; color: white;">--:--:--</div>
+                    <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.3);"></div>
+                    <div id="current-date" style="font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 600;">Loading...</div>
+                </div>
+            </div>
+            <script>
+                function updateTime() {
+                    const now = new Date();
+                    const options = { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                    const timeString = now.toLocaleTimeString('en-US', options);
+                    const hour = parseInt(now.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', hour12: false }));
+                    const greetingEl = document.getElementById('time-greeting');
+                    if (hour >= 5 && hour < 12) {
+                        greetingEl.textContent = 'Morning';
+                    } else if (hour >= 12 && hour < 17) {
+                        greetingEl.textContent = 'Afternoon';
+                    } else if (hour >= 17 && hour < 21) {
+                        greetingEl.textContent = 'Evening';
+                    } else {
+                        greetingEl.textContent = 'Night';
+                    }
+                    document.getElementById('current-time').textContent = timeString;
+                    const dateOptions = { timeZone: 'Asia/Manila', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+                    document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', dateOptions);
+                }
+                updateTime();
+                setInterval(updateTime, 1000);
+            </script>
 
             <!-- Content Grid -->
             <div class="content-grid">
@@ -282,21 +330,91 @@ try {
                 <!-- Department Performance Card -->
                 <div class="content-card">
                     <div class="content-card-header">
-                        <h3><i class="fas fa-chart-bar"></i> Department Performance</h3>
+                        <h3><i class="fas fa-calendar-alt"></i> Calendar</h3>
                     </div>
                     <div class="content-card-body">
-                        <div class="performance-list">
-                            <?php foreach ($dept_performance as $dept): ?>
-                            <div class="performance-item">
-                                <div class="performance-info">
-                                    <span class="performance-name"><?php echo htmlspecialchars($dept['department']); ?></span>
-                                    <span class="performance-value"><?php echo number_format($dept['avg_rating'], 1); ?></span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: <?php echo round($dept['avg_rating'] * 20); ?>%;"></div>
-                                </div>
+                        <div style="text-align: center; padding: 10px;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px;">
+                                <button onclick="changeMonth(-1)" style="background: linear-gradient(135deg, #D4A843, #FFD700); border: none; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; color: white; font-size: 14px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div id="calendar-title" style="font-size: 18px; font-weight: 700; color: #2D2D2D; min-width: 160px;"></div>
+                                <button onclick="changeMonth(1)" style="background: linear-gradient(135deg, #D4A843, #FFD700); border: none; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; color: white; font-size: 14px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
-                            <?php endforeach; ?>
+                            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px;">
+                                <?php $days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; foreach($days as $d): ?>
+                                <div style="font-size: 11px; font-weight: 700; color: #888; padding: 6px; text-transform: uppercase;"><?php echo $d; ?></div>
+                                <?php endforeach; ?>
+                            </div>
+                            <div id="calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
+                        </div>
+                        <script>
+                            let currentDate = new Date();
+                            let currentMonth = currentDate.getMonth();
+                            let currentYear = currentDate.getFullYear();
+                            
+                            function renderCalendar() {
+                                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                                document.getElementById('calendar-title').textContent = monthNames[currentMonth] + ' ' + currentYear;
+                                
+                                const firstDay = new Date(currentYear, currentMonth, 1);
+                                const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                                const dayOfWeek = firstDay.getDay();
+                                const daysInMonth = lastDay.getDate();
+                                
+                                const today = new Date();
+                                let html = '';
+                                
+                                for (let i = 0; i < dayOfWeek; i++) {
+                                    html += '<div style="padding: 8px; font-size: 14px; color: #ccc;">&nbsp;</div>';
+                                }
+                                
+                                for (let day = 1; day <= daysInMonth; day++) {
+                                    const isToday = (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear());
+                                    const bg = isToday ? 'rgba(212,168,67,0.15)' : 'transparent';
+                                    const color = isToday ? '#D4A843' : '#2D2D2D';
+                                    const border = isToday ? 'border: 2px solid #D4A843;' : '';
+                                    html += '<div style="padding: 8px; font-size: 14px; font-weight: 600; color: ' + color + '; background: ' + bg + '; border-radius: 8px; ' + border + '">' + day + '</div>';
+                                }
+                                
+                                document.getElementById('calendar-days').innerHTML = html;
+                            }
+                            
+                            function changeMonth(delta) {
+                                currentMonth += delta;
+                                if (currentMonth > 11) {
+                                    currentMonth = 0;
+                                    currentYear++;
+                                } else if (currentMonth < 0) {
+                                    currentMonth = 11;
+                                    currentYear--;
+                                }
+                                renderCalendar();
+                            }
+                            
+                            renderCalendar();
+                        </script>
+                        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #E8E4D9;">
+                            <div style="font-size: 14px; font-weight: 700; color: #2D2D2D; text-align: center; margin-bottom: 12px;">Instructor Status</div>
+                            <div style="display: flex; gap: 12px; justify-content: center;">
+                            <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 12px; padding: 12px 20px; text-align: center; border: 1px solid rgba(16,185,129,0.2); flex: 1;">
+                                <i class="fas fa-briefcase" style="color: #10b981; font-size: 16px; margin-bottom: 4px;"></i>
+                                <div style="font-size: 20px; font-weight: 800; color: #2D2D2D;"><?php echo $on_duty; ?></div>
+                                <div style="font-size: 10px; color: #888; font-weight: 600;">On Duty</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-radius: 12px; padding: 12px 20px; text-align: center; border: 1px solid rgba(245,158,11,0.2); flex: 1;">
+                                <i class="fas fa-bed" style="color: #f59e0b; font-size: 16px; margin-bottom: 4px;"></i>
+                                <div style="font-size: 20px; font-weight: 800; color: #2D2D2D;"><?php echo $on_leave; ?></div>
+                                <div style="font-size: 10px; color: #888; font-weight: 600;">On Leave</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 12px; padding: 12px 20px; text-align: center; border: 1px solid rgba(59,130,246,0.2); flex: 1;">
+                                <i class="fas fa-plane" style="color: #3b82f6; font-size: 16px; margin-bottom: 4px;"></i>
+                                <div style="font-size: 20px; font-weight: 800; color: #2D2D2D;"><?php echo $on_travel; ?></div>
+                                <div style="font-size: 10px; color: #888; font-weight: 600;">On Travel</div>
+                            </div>
+                        </div>
                         </div>
                     </div>
                 </div>

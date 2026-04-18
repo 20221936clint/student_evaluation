@@ -200,40 +200,41 @@ if (!$show_role_modal) {
         .stat-pill.gold { background: #fef3c7; color: #92400e; border-color: #fbbf24; }
 
         /* ══ PROSPECTUS SCREEN STYLES ══════════════════════════ */
-        .pro-wrap { font-family: 'Poppins', sans-serif; font-size: 15px; color: #1a1a1a; background: white; border-radius: 16px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .pro-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; background: linear-gradient(to bottom, #fffdf5, #fff); border-bottom: 3px solid #8B6914; }
-        .pro-logo { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; border: 2px solid #8B6914; }
-        .pro-title-block { text-align: center; flex: 1; padding: 0 16px; }
-        .pro-school { font-size: 20px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
-        .pro-address { font-size: 14px; color: #666; margin: 3px 0; }
-        .pro-institute { font-size: 16px; font-weight: 700; color: #8B6914; text-transform: uppercase; margin-top: 6px; }
-        .pro-degree { font-size: 14px; color: #444; margin: 3px 0; }
-        .pro-major { font-size: 15px; font-weight: 600; margin: 4px 0; }
-        .pro-label { display: inline-block; margin-top: 6px; padding: 3px 14px; border: 1.5px solid #8B6914; border-radius: 20px; font-size: 13px; font-weight: 700; color: #8B6914; letter-spacing: .5px; text-transform: uppercase; }
-        .pro-body { padding: 16px 20px 20px; }
-        .pro-year-block { margin-bottom: 16px; border: 1px solid #e0dbd0; border-radius: 10px; overflow: hidden; }
-        .pro-year-header { background: linear-gradient(135deg, #8B6914, #B8860B); color: #fff; padding: 9px 16px; font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-        .pro-year-total { font-size: 13px; font-weight: 400; opacity: .85; }
-        .pro-sem-row { display: grid; grid-template-columns: 1fr 1fr; padding: 10px 12px 12px; gap: 10px; }
-        .pro-sem-label { font-size: 13px; font-weight: 700; color: #333; text-align: center; padding: 5px 0; background: #fde68a; border: 1px solid #d4cfc5; border-radius: 6px 6px 0 0; text-transform: uppercase; letter-spacing: .3px; }
-        .pro-table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: auto; }
-        .pro-th { background: #f0ece0; padding: 6px 8px; text-align: left; font-size: 13px; font-weight: 700; color: #8B6914; border: 1px solid #ccc; white-space: nowrap; }
-        .pro-table td { border: 1px solid #ddd; padding: 5px 8px; vertical-align: middle; word-wrap: break-word; word-break: break-word; }
-        .pro-grade-cell { text-align: center; background: #fafaf8; width: 28px; }
-        .pro-code { font-weight: 600; white-space: nowrap; font-size: 13px; }
+        .pro-wrap { font-family: 'Poppins', sans-serif; font-size: 12px; color: #1a1a1a; background: white; border-radius: 12px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .pro-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 10px; background: linear-gradient(to bottom, #fffdf5, #fff); border-bottom: 2px solid #8B6914; }
+        .pro-logo { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1.5px solid #8B6914; }
+        .pro-title-block { text-align: center; flex: 1; padding: 0 12px; }
+        .pro-school { font-size: 14px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; }
+        .pro-address { font-size: 10px; color: #666; margin: 2px 0; }
+        .pro-institute { font-size: 11px; font-weight: 700; color: #8B6914; text-transform: uppercase; margin-top: 4px; }
+        .pro-degree { font-size: 10px; color: #444; margin: 2px 0; }
+        .pro-major { font-size: 11px; font-weight: 600; margin: 2px 0; }
+        .pro-label { display: inline-block; margin-top: 4px; padding: 2px 10px; border: 1px solid #8B6914; border-radius: 12px; font-size: 9px; font-weight: 700; color: #8B6914; letter-spacing: .3px; text-transform: uppercase; }
+        .pro-body { padding: 10px 12px 12px; }
+        .pro-year-block { margin-bottom: 10px; border: 1px solid #e0dbd0; border-radius: 6px; overflow: hidden; }
+        .pro-year-header { background: linear-gradient(135deg, #8B6914, #B8860B); color: #fff; padding: 6px 10px; font-size: 11px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        .pro-year-total { font-size: 10px; font-weight: 400; opacity: .85; }
+        .pro-sem-row { display: grid; grid-template-columns: 1fr 1fr; padding: 8px 10px; gap: 8px; }
+        .pro-sem-label { font-size: 11px; font-weight: 700; color: #333; text-align: center; padding: 4px 0; background: #fde68a; border: 1px solid #d4cfc5; border-radius: 4px 4px 0 0; text-transform: uppercase; letter-spacing: .2px; }
+        .pro-table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: auto; }
+        .pro-th { background: #f0ece0; padding: 4px 6px; text-align: left; font-size: 10px; font-weight: 700; color: #8B6914; border: 1px solid #ccc; white-space: nowrap; }
+        .pro-table td { border: 1px solid #ddd; padding: 3px 5px; vertical-align: middle; word-wrap: break-word; word-break: break-word; }
+        .pro-grade-cell { text-align: center; background: #fafaf8; width: 24px; }
+        .pro-code { font-weight: 600; white-space: nowrap; font-size: 11px; }
         .pro-units { text-align: center; font-weight: 500; white-space: nowrap; }
-        .pro-prereq-col { color: #888; font-size: 13px; white-space: nowrap; }
+        .pro-prereq-col { color: #888; font-size: 10px; white-space: nowrap; }
+        .pro-prereq-screen { display: table-cell; }
         .pro-prereq-row { background: #fff8f8; border-left: 3px solid #dc2626; }
         .pro-star { color: #dc2626; }
-        .pro-total-row td { background: #f0ece0; font-weight: 700; color: #8B6914; border-top: 2px solid #B8860B; font-size: 13px; }
-        .pro-empty { text-align: center; color: #aaa; font-style: italic; padding: 14px; }
-        .pro-grand-total { text-align: right; font-size: 15px; font-weight: 600; padding: 8px 16px; background: #f7f5ef; border: 1px solid #d4cfc5; border-radius: 8px; margin: 0 0 16px 0; }
-        .pro-sig-block { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 16px 0 0; border-top: 2px solid #d4cfc5; }
+        .pro-total-row td { background: #f0ece0; font-weight: 700; color: #8B6914; border-top: 2px solid #B8860B; font-size: 11px; }
+        .pro-empty { text-align: center; color: #aaa; font-style: italic; padding: 8px; }
+        .pro-grand-total { text-align: right; font-size: 12px; font-weight: 600; padding: 6px 12px; background: #f7f5ef; border: 1px solid #d4cfc5; border-radius: 6px; margin: 0 0 12px 0; }
+        .pro-sig-block { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 12px 0 0; border-top: 2px solid #d4cfc5; }
         .pro-sig-col { text-align: center; }
-        .pro-sig-line { border-bottom: 1.5px solid #333; margin-bottom: 6px; height: 28px; }
-        .pro-sig-label { font-size: 14px; font-weight: 600; color: #333; }
-        .pro-sig-sub { font-size: 13px; color: #888; margin-top: 3px; }
-        .pro-legend { font-size: 13px; color: #999; padding: 6px 0; }
+        .pro-sig-line { border-bottom: 1.5px solid #333; margin-bottom: 4px; height: 20px; }
+        .pro-sig-label { font-size: 11px; font-weight: 600; color: #333; }
+        .pro-sig-sub { font-size: 10px; color: #888; margin-top: 2px; }
+        .pro-legend { font-size: 10px; color: #999; padding: 4px 0; }
         
         /* Responsive table with action column */
         @media screen and (max-width: 768px) {
@@ -317,6 +318,10 @@ if (!$show_role_modal) {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
+
+    /* ── Hide screen-only columns in print ── */
+    .pro-prereq-screen { display: none !important; }
+    .pro-th.pro-prereq-screen { display: none !important; }
 
     /* ── Hide ALL UI except the prospectus ── */
     body > *:not(.main-content),
@@ -1791,8 +1796,19 @@ if (!$show_role_modal) {
         const years = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Bridging'];
         let html = '';
         years.forEach(year => {
-            const yearSubjects = subjects.filter(s => (s.default_year_level || s.year_level || '1st Year') === year);
-            if (yearSubjects.length === 0) return;
+            const yearSubjects = subjects.filter(s => {
+                const y = s.year_level || s.default_year_level || '1st Year';
+                return y === year;
+            });
+            if (yearSubjects.length === 0) {
+                // Show empty section header to make it clear all years exist
+                html += `<div class="year-header" style="opacity:${year === 'Bridging' ? 0.5 : 0.3};"><i class="fas fa-calendar-alt"></i> ${year}</div>`;
+                html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">`;
+                html += `<div><div style="font-size:11px;font-weight:700;color:var(--gold-dark);margin-bottom:8px;padding-left:4px;">1st Semester</div><div style="grid-column:span 2;text-align:center;padding:12px;color:var(--light-text);font-size:12px;">No subjects</div></div>`;
+                html += `<div><div style="font-size:11px;font-weight:700;color:var(--gold-dark);margin-bottom:8px;padding-left:4px;">2nd Semester</div><div style="grid-column:span 2;text-align:center;padding:12px;color:var(--light-text);font-size:12px;">No subjects</div></div>`;
+                html += `</div>`;
+                return;
+            }
             
             let sem1Subjects = yearSubjects.filter(s => {
                 const sem = s.semester || '';
@@ -2037,28 +2053,31 @@ if (!$show_role_modal) {
         const unitsLabel = isSem1 ? 'LEC' : 'UNITS';
         const displayLabel = yearLabel ? (yearLabel.toUpperCase() + ' - ' + (isSem1 ? 'First Semester' : 'Second Semester')) : semLabel;
         if (!subjects || subjects.length === 0) {
-            rows = `<tr><td colspan="4" class="pro-empty">No subjects</td></tr>`;
+            rows = `<tr><td colspan="5" class="pro-empty">No subjects</td></tr>`;
         } else {
             subjects.forEach(s => {
                 const u = parseFloat(s.units) || 0;
                 total += u;
+                const prereqCode = prereqMap[s.id] || s.prerequisite || '';
                 rows += `<tr>
                     <td class="pro-grade-cell"></td>
                     <td class="pro-code">${escHtml(s.subject_code||'')}</td>
                     <td>${escHtml(s.subject_name||'')}</td>
+                    <td class="pro-prereq-col pro-prereq-screen">${prereqCode ? '<span class="pro-star">★</span> '+escHtml(prereqCode) : '—'}</td>
                     <td class="pro-units">${u%1===0?u:u.toFixed(1)}</td>
                 </tr>`;
             });
         }
         const t = total%1===0 ? total : total.toFixed(1);
-        rows += `<tr class="pro-total-row"><td colspan="3" style="text-align:right;padding-right:8px;">TOTAL</td><td class="pro-units">${t}</td></tr>`;
+        rows += `<tr class="pro-total-row"><td colspan="3" style="text-align:right;padding-right:8px;">TOTAL</td><td class="pro-prereq-col pro-prereq-screen"></td><td class="pro-units">${t}</td></tr>`;
         return `<div>
             <div class="pro-sem-label">${displayLabel}</div>
             <table class="pro-table">
                 <thead><tr>
                     <th class="pro-th" style="width:28px;">Final Grade</th>
-                    <th class="pro-th" style="width:80px;">Course No.</th>
+                    <th class="pro-th" style="width:70px;">Course No.</th>
                     <th class="pro-th">Description</th>
+                    <th class="pro-th pro-prereq-screen" style="width:60px;">Pre-Req</th>
                     <th class="pro-th" style="width:40px;">${unitsLabel}</th>
                 </tr></thead>
                 <tbody>${rows}</tbody>

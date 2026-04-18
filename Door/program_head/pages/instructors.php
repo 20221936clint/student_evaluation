@@ -648,7 +648,7 @@ if (!$show_role_modal) {
     </aside>
     <div class="main-content" style="position: relative; padding-top: 70px;">
         <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
-        <header class="topbar" style="position: sticky; top: 0; z-index: 100;">
+        <header class="topbar" style="position: fixed; top: 0; left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); z-index: 200;">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
                 <div><div class="topbar-title">Instructors</div><div class="topbar-subtitle">Program Head Panel</div></div>

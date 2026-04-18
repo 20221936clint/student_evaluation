@@ -54,6 +54,7 @@ if (!$show_role_modal) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Program Head Dashboard</title>
+    <link rel="icon" href="../../../media/LOGO.jpg" type="image/jpeg">
     <link rel="stylesheet" href="../../../css/common.css">
     <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">

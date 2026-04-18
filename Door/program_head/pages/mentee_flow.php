@@ -65,6 +65,7 @@ if (!$show_role_modal) {
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>MenteeFlow - Program Head</title>
+    <link rel="icon" href="../../../media/LOGO.jpg" type="image/jpeg">
     <link rel="stylesheet" href="../../../css/common.css">
     <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">

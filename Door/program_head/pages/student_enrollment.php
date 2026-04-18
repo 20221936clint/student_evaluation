@@ -64,6 +64,7 @@ if (!$show_role_modal) {
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Student Enrollment - Program Head</title>
+    <link rel="icon" href="../../../media/LOGO.jpg" type="image/jpeg">
     <link rel="stylesheet" href="../../../css/common.css">
     <link rel="stylesheet" href="../style/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1098,10 +1099,10 @@ if (!$show_role_modal) {
             </div>
         </header>
         <main class="page-container">
-            <div class="page-header">
+            <div class="page-header" style="background: linear-gradient(135deg, #D4A843, #FFD700); border-radius: 16px; padding: 24px 32px; margin-bottom: 24px; color: white;">
                 <div>
-                    <h1>Student Enrollment</h1>
-                    <p>Register new student accounts to the system</p>
+                    <h1 style="color: white; margin: 0 0 8px 0;">Student Enrollment</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 0;">Register new student accounts to the system</p>
                 </div>
             </div>
             

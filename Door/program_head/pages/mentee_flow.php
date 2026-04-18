@@ -692,7 +692,7 @@ if (!$show_role_modal) {
             <a href="settings.php" class="sidebar-nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
         </nav>
     </div>
-    <div class="main-content" style="position: relative;">
+    <div class="main-content" style="position: relative; padding-top: 70px;">
         <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <header class="topbar">
             <div class="topbar-left">

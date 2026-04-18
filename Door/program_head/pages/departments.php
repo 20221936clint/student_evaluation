@@ -855,8 +855,9 @@ if (!$show_role_modal) {
         </nav>
     </aside>
 
-    <div class="main-content">
-        <header class="topbar">
+    <div class="main-content" style="position: relative; padding-top: 70px;">
+        <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
+        <header class="topbar" style="position: sticky; top: 0; z-index: 100;">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
                 <div>
@@ -1267,9 +1268,6 @@ if (!$show_role_modal) {
                 <i class="fas fa-star" style="color:var(--gold-dark);"></i>
                 <span>Click the <strong>star</strong> to mark a subject as a prerequisite for this major. Red-highlighted subjects are prerequisite requirements.</span>
             </div>
-            <div style="margin-bottom:16px;">
-                <button class="btn-add" onclick="showAddSubjectToMajor()"><i class="fas fa-plus"></i> Add Subject to Major</button>
-            </div>
             <div id="majorSubjectsList"></div>
             <div id="majorPrereqPanel" style="margin-top:16px;"></div>
         </div>
@@ -1503,55 +1501,106 @@ let subjectsData = <?php echo json_encode($all_subjects, JSON_HEX_TAG|JSON_HEX_A
         container.innerHTML = '<div style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:var(--gold-dark);"></i></div>';
         const fd = new FormData();
         fd.append('action','get_major_subjects'); fd.append('major_id',majorId);
-        fetch('../../../data/major_process.php', { method:'POST', body:fd })
-        .then(r => r.json()).then(data => {
+        
+        const fd2 = new FormData();
+        fd2.append('action','get_prereq_sets'); fd2.append('major_id',majorId);
+        
+        Promise.all([
+            fetch('../../../data/major_process.php', { method:'POST', body:fd }).then(r => r.json()),
+            fetch('../../../data/major_process.php', { method:'POST', body:fd2 }).then(r => r.json())
+        ]).then(([data, prereqData]) => {
             if (!data.success || data.subjects.length === 0) {
                 container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--light-text);"><i class="fas fa-inbox" style="font-size:48px;opacity:0.2;display:block;margin-bottom:12px;"></i><p>No subjects assigned yet.</p></div>';
                 document.getElementById('majorPrereqPanel').innerHTML = '';
                 return;
             }
             const byYear = {};
-            data.subjects.forEach(s => { const y = s.year_level||'1st Year'; if(!byYear[y]) byYear[y]=[]; byYear[y].push(s); });
+            data.subjects.forEach(s => { 
+                const y = s.year_level||'1st Year'; 
+                if(!byYear[y]) byYear[y]={};
+                const sem = s.semester || '1st Semester';
+                if(!byYear[y][sem]) byYear[y][sem]=[];
+                byYear[y][sem].push(s);
+            });
             let html = '';
             const yearOrder = ['1st Year','2nd Year','3rd Year','4th Year','Bridging'];
             yearOrder.forEach(year => {
                 if (!byYear[year]) return;
-                html += `<div class="year-header"><i class="fas fa-calendar-alt" style="font-size:12px;"></i>${year} <span style="font-weight:400;font-size:11px;opacity:0.7;">(${byYear[year].length})</span></div>`;
-                byYear[year].forEach(s => {
+                html += `<div class="year-header" style="margin-top:16px;"><i class="fas fa-calendar-alt" style="font-size:12px;"></i>${year}</div>`;
+                const semOrder = ['1st Semester','2nd Semester'];
+                semOrder.forEach(sem => {
+                    if (!byYear[year][sem] || byYear[year][sem].length === 0) return;
+                    html += `<div style="padding-left:20px;margin-top:8px;font-size:12px;color:var(--gold-dark);font-weight:600;">${sem} <span style="font-weight:400;opacity:0.7;">(${byYear[year][sem].length})</span></div>`;
+                    byYear[year][sem].forEach(s => {
+                    const isPrereq = prereqData.success && prereqData.sets && prereqData.sets.some(set => 
+                        set.subjects && set.subjects.some(subj => subj.id === s.id)
+                    );
                     html += `
-                    <div class="subject-row ${s.is_prerequisite?'prerequisite':''}">
+                    <div class="subject-row ${isPrereq?'prerequisite':''}">
                         <div class="subject-icon"><i class="${s.icon_class||'fas fa-book'}"></i></div>
                         <div class="subject-info">
                             <div class="subject-name">${escHtml(s.subject_code)} — ${escHtml(s.subject_name)}</div>
                             <div class="subject-meta"><i class="fas fa-layer-group" style="font-size:10px;"></i> ${escHtml(s.semester||'')} &nbsp;·&nbsp; ${parseFloat(s.units)||0} Units</div>
                         </div>
-                        <span class="subject-badge ${s.is_prerequisite?'badge-prereq':'badge-required'}">
-                            ${s.is_prerequisite?'<i class="fas fa-star"></i> Prerequisite':'<i class="fas fa-check"></i> Required'}
+                        <span class="subject-badge ${isPrereq?'badge-prereq':'badge-required'}">
+                            ${isPrereq?'<i class="fas fa-star"></i> Prerequisite':'<i class="fas fa-check"></i> Required'}
                         </span>
-                        <div class="subject-actions">
-                            <button type="button" class="btn-icon btn-star ${s.is_prerequisite?'active':''}" onclick="togglePrerequisite(${majorId},${s.id},${s.is_prerequisite?'false':'true'})" title="Toggle prerequisite"><i class="fas fa-star"></i></button>
-                            <button type="button" class="btn-icon btn-edit-subj" onclick="openEditProspectus(${majorId},${s.id},'${escHtml(s.subject_code)} — ${escHtml(s.subject_name)}','${escHtml(s.year_level||'')}','${escHtml(s.semester||'')}')" title="Edit placement"><i class="fas fa-edit"></i></button>
-                            <button type="button" class="btn-icon btn-remove" onclick="removeMajorSubject(${majorId},${s.id})" title="Remove"><i class="fas fa-times"></i></button>
-                        </div>
+                        <button type="button" class="btn-icon btn-star ${isPrereq?'active':''}" onclick="togglePrerequisite(${majorId},${s.id},${isPrereq?'false':'true'})" title="Toggle prerequisite" style="margin-left:8px;"><i class="fas fa-star"></i></button>
                     </div>`;
+                    });
                 });
             });
             container.innerHTML = html;
 
-            const prereqs = data.subjects.filter(s => s.is_prerequisite);
-            if (prereqs.length) {
+            if (prereqData.success && prereqData.sets && prereqData.sets.length > 0) {
                 let pHtml = `<div class="prereq-panel"><div class="prereq-panel-title"><i class="fas fa-sitemap"></i> Prerequisite Chain</div>`;
-                prereqs.forEach((p, i) => {
-                    pHtml += `<div class="prereq-chain-item"><i class="fas fa-star" style="color:#ef4444;font-size:12px;"></i> <strong>${escHtml(p.subject_code)}</strong> — ${escHtml(p.subject_name)}`;
-                    if (p.prerequisite) pHtml += ` <span style="color:var(--light-text);font-size:11px;margin-left:8px;">← after: ${escHtml(p.prerequisite)}</span>`;
-                    pHtml += `</div>`;
-                    if (i < prereqs.length - 1) pHtml += `<div class="prereq-chain-arrow"><i class="fas fa-arrow-down" style="font-size:10px;"></i></div>`;
+                let chainItems = [];
+                prereqData.sets.forEach(set => {
+                    const setMajorId = parseInt(set.major_id);
+                    if (setMajorId === majorId) {
+                        if (set.target_subject) {
+                            chainItems.push({ type: 'target', code: set.code, target: set.target_subject, prerequisites: set.subjects || [] });
+                        } else if (set.subjects && set.subjects.length > 0) {
+                            chainItems.push({ type: 'group', code: set.code, subjects: set.subjects });
+                        }
+                    }
                 });
+                if (chainItems.length === 0) {
+                    pHtml += '<div style="color:var(--light-text);font-size:12px;padding:8px;">No prerequisite chains defined for this major</div>';
+                } else {
+                    chainItems.forEach((item, i) => {
+                        if (item.type === 'target') {
+                            pHtml += `<div class="prereq-chain-item" style="background:linear-gradient(135deg,#fef2f2,#fff5f5);border-left:3px solid #dc2626;">`;
+                            pHtml += `<div style="font-weight:700;color:#dc2626;font-size:13px;"><i class="fas fa-bullseye"></i> ${escHtml(item.code)}</div>`;
+                            if (item.prerequisites && item.prerequisites.length > 0) {
+                                pHtml += `<div style="margin-top:6px;font-size:11px;color:var(--light-text);">Must pass first:</div>`;
+                                item.prerequisites.forEach(p => {
+                                    pHtml += `<div style="font-size:12px;margin-top:4px;padding-left:8px;border-left:2px solid var(--gold-primary);"><strong>${escHtml(p.subject_code)}</strong> — ${escHtml(p.subject_name)}</div>`;
+                                });
+                            }
+                            pHtml += `</div>`;
+                        } else {
+                            pHtml += `<div class="prereq-chain-item" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-left:3px solid #f59e0b;">`;
+                            pHtml += `<div style="font-weight:700;color:#92400e;font-size:13px;"><i class="fas fa-layer-group"></i> ${escHtml(item.code)}</div>`;
+                            if (item.subjects && item.subjects.length > 0) {
+                                pHtml += `<div style="margin-top:6px;font-size:11px;color:var(--light-text);">Prerequisite subjects:</div>`;
+                                item.subjects.forEach(s => {
+                                    pHtml += `<div style="font-size:12px;margin-top:4px;padding-left:8px;border-left:2px solid var(--gold-primary);"><strong>${escHtml(s.subject_code)}</strong> — ${escHtml(s.subject_name)} <span style="color:#6b7280;font-size:10px;">${s.units} units</span></div>`;
+                                });
+                            }
+                            pHtml += `</div>`;
+                        }
+                        if (i < chainItems.length - 1) pHtml += `<div class="prereq-chain-arrow"><i class="fas fa-arrow-down" style="font-size:10px;"></i></div>`;
+                    });
+                }
                 pHtml += `</div>`;
                 document.getElementById('majorPrereqPanel').innerHTML = pHtml;
             } else {
                 document.getElementById('majorPrereqPanel').innerHTML = '';
             }
+        }).catch(err => {
+            console.error('Error loading major subjects:', err);
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--light-text);"><i class="fas fa-exclamation-triangle" style="font-size:48px;opacity:0.2;display:block;margin-bottom:12px;"></i><p>Error loading subjects.</p></div>';
         });
     }
 

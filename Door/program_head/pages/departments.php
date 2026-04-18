@@ -1381,10 +1381,20 @@ if (!$show_role_modal) {
     /* ══ DATA FROM PHP ══════════════════════════════════════════════ */
     let currentMajorId = 0;
     let majorsData   = <?php echo json_encode($majors, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
-    let subjectsData = <?php echo json_encode($all_subjects, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
+let subjectsData = <?php echo json_encode($all_subjects, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
     let phSettings = <?php echo json_encode($ph_settings, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
 
-    /* ══ TOAST NOTIFICATIONS ══════════════════════════════════════ */
+    /* ══ URL PARAMETER HANDLER ═══════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        if (tab === 'prerequisites' || tab === 'subjects') {
+            switchTab(tab);
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
+
+    /* ══ TOAST NOTIFICATIONS ══════════════════════════════════════════════ */
     function toast(msg, type = 'info', duration = 3000, customTitle = null) {
         const el = document.getElementById('toast');
         const titleEl = document.getElementById('toastTitle');

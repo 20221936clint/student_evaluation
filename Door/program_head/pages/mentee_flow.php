@@ -47,6 +47,13 @@ if (!$show_role_modal) {
     } catch (PDOException $e) {
         $menteeAssignments = [];
     }
+    
+    // Calculate stats for display
+    $totalStudents = count($students);
+    $assignedMentees = array_sum(array_map('count', $menteeAssignments));
+    $unassignedStudents = $totalStudents - $assignedMentees;
+    $instructorsWithMentees = count(array_filter($menteeAssignments, fn($m) => count($m) > 0));
+    $avgMenteesPerInstructor = count($instructors) > 0 ? round($assignedMentees / count($instructors), 1) : 0;
 }
 ?>
 <!DOCTYPE html>
@@ -79,6 +86,8 @@ if (!$show_role_modal) {
             --danger-light: #fee2e2;
             --info: #0284c7;
             --info-light: #bae6fd;
+            --purple: #7c3aed;
+            --orange: #ea580c;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -153,6 +162,8 @@ if (!$show_role_modal) {
         .stat-icon.blue { background: var(--info-light); color: var(--info); }
         .stat-icon.green { background: var(--success-light); color: var(--success); }
         .stat-icon.gold { background: var(--gold-lighter); color: var(--gold-dark); }
+        .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+        .stat-icon.orange { background: #ffedd5; color: #ea580c; }
         .stat-info h4 {
             font-size: 20px;
             font-weight: 800;
@@ -705,22 +716,36 @@ if (!$show_role_modal) {
                     <div class="stat-card">
                         <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
                         <div class="stat-info">
-                            <h4><?php echo count($students); ?></h4>
+                            <h4><?php echo $totalStudents; ?></h4>
                             <p>Total Students</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon green"><i class="fas fa-users"></i></div>
                         <div class="stat-info">
-                            <h4><?php echo array_sum(array_map('count', $menteeAssignments)); ?></h4>
+                            <h4><?php echo $assignedMentees; ?></h4>
                             <p>Assigned Mentees</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon gold"><i class="fas fa-user-plus"></i></div>
                         <div class="stat-info">
-                            <h4><?php echo count($students) - array_sum(array_map('count', $menteeAssignments)); ?></h4>
+                            <h4><?php echo $unassignedStudents; ?></h4>
                             <p>Unassigned Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div class="stat-info">
+                            <h4><?php echo $instructorsWithMentees; ?></h4>
+                            <p>Instructors with Mentees</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-info">
+                            <h4><?php echo $avgMenteesPerInstructor; ?></h4>
+                            <p>Avg Mentees/Instructor</p>
                         </div>
                     </div>
                 </div>

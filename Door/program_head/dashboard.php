@@ -297,33 +297,71 @@ try {
 
             <!-- Content Grid -->
             <div class="content-grid">
-                <!-- Recent Evaluations Card -->
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <h3><i class="fas fa-clipboard-list"></i> Recent Evaluations</h3>
-                        <a href="pages/evaluations.php" class="view-all">View All</a>
+                <!-- Department Overview Card -->
+                <div class="content-card" style="background: linear-gradient(160deg, #B8860B 0%, #D4A843 50%, #F0D68A 100%);">
+                    <div class="content-card-header" style="background: rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <h3 style="color: white;"><i class="fas fa-building" style="color: white;"></i> Department Overview</h3>
+                        <a href="pages/departments.php" class="view-all" style="color: white; background: rgba(255,255,255,0.2);">View All</a>
                     </div>
-                    <div class="content-card-body">
-                        <table class="eval-table">
-                            <thead>
-                                <tr>
-                                    <th>Instructor</th>
-                                    <th>Course</th>
-                                    <th>Rating</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($recent_evaluations as $eval): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($eval['instructor_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($eval['course_name']); ?></td>
-                                    <td><span class="rating-badge <?php echo $eval['rating'] >= 4.7 ? 'excellent' : ($eval['rating'] >= 4.4 ? 'good' : 'average'); ?>"><?php echo number_format($eval['rating'], 1); ?></span></td>
-                                    <td><?php echo date('M j, Y', strtotime($eval['evaluation_date'])); ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                    <div class="content-card-body" style="background: rgba(255,255,255,0.95); border-radius: 0 0 20px 20px;">
+                        <?php
+                        // Fetch majors for display
+                        $majors = [];
+                        try {
+                            $stmt = $pdo->query("SELECT id, major_name, description, is_active FROM majors ORDER BY major_name");
+                            $majors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        } catch (PDOException $e) {
+                            $majors = [];
+                        }
+                        ?>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <?php if (empty($majors)): ?>
+                                <div style="text-align: center; padding: 20px; color: #888;">
+                                    <i class="fas fa-folder-open" style="font-size: 32px; margin-bottom: 8px; color: #ccc;"></i>
+                                    <p>No departments found</p>
+                                </div>
+                            <?php else: ?>
+                                <!-- Majors Card -->
+                                <div style="background: linear-gradient(135deg, #f8f7f4 0%, #f0ede6 100%); border-radius: 12px; padding: 16px; border: 1px solid #E8E4D9;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div style="flex: 1;">
+                                            <h4 style="font-size: 16px; font-weight: 800; color: #2D2D2D; margin-bottom: 4px;">Majors</h4>
+                                            <p style="font-size: 12px; color: #888;">Manage and organize department majors</p>
+                                            <div style="font-size: 20px; font-weight: 800; color: #B8860B; margin-top: 8px;"><?php echo count($majors); ?> Majors</div>
+                                        </div>
+                                        <a href="pages/departments.php" style="padding: 10px 20px; background: linear-gradient(135deg, #D4A843, #FFD700); color: white; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 8px rgba(212,168,67,0.3);">
+                                            <i class="fas fa-eye"></i> Quick View
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Prerequisites Card -->
+                                <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px; padding: 16px; border: 1px solid #93c5fd;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div style="flex: 1;">
+                                            <h4 style="font-size: 16px; font-weight: 800; color: #1e40af; margin-bottom: 4px;">Prerequisites</h4>
+                                            <p style="font-size: 12px; color: #64748b;">Create and manage prerequisite sets for subjects</p>
+                                        </div>
+                                        <a href="pages/departments.php?tab=prerequisites" style="padding: 10px 20px; background: linear-gradient(135deg, #3b82f6, #60a5fa); color: white; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 8px rgba(59,130,246,0.3);">
+                                            <i class="fas fa-eye"></i> Quick View
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Prospectus Card -->
+                                <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border-radius: 12px; padding: 16px; border: 1px solid #c4b5fd;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div style="flex: 1;">
+                                            <h4 style="font-size: 16px; font-weight: 800; color: #6d28d9; margin-bottom: 4px;">Prospectus</h4>
+                                            <p style="font-size: 12px; color: #64748b;">Manage course prospectus and curriculum</p>
+                                        </div>
+                                        <a href="pages/departments.php?tab=subjects" style="padding: 10px 20px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 8px rgba(139,92,246,0.3);">
+                                            <i class="fas fa-eye"></i> Quick View
+                                        </a>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 

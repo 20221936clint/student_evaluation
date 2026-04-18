@@ -118,7 +118,8 @@ if ($action === 'get_student_evaluation') {
 
         // Get all subjects for this major (prospectus)
         $stmt2 = $pdo->prepare("
-            SELECT s.*, ms.year_level, ms.semester, ms.is_prerequisite, ms.is_required
+            SELECT s.*, ms.year_level, ms.semester, ms.is_prerequisite, ms.is_required,
+                   s.prerequisite
             FROM major_subjects ms
             JOIN subjects s ON ms.subject_id = s.id
             WHERE ms.major_id = ?
@@ -232,7 +233,7 @@ if ($action === 'get_advisement') {
         // All prospectus subjects
         $stmt = $pdo->prepare("
             SELECT s.*, ms.year_level, ms.semester, ms.is_prerequisite, ms.is_required,
-                   ms.sort_order
+                   ms.sort_order, s.prerequisite
             FROM major_subjects ms
             JOIN subjects s ON ms.subject_id = s.id
             WHERE ms.major_id = ?

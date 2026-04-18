@@ -38,6 +38,8 @@ try {
         try { $pdo->exec("ALTER TABLE subjects ADD COLUMN default_year_level VARCHAR(20) DEFAULT '1st Year'"); $message[] = 'Added default_year_level'; } catch (Exception $e) {}
         try { $pdo->exec("ALTER TABLE subjects ADD COLUMN default_semester VARCHAR(20) DEFAULT '1st Semester'"); $message[] = 'Added default_semester'; } catch (Exception $e) {}
         try { $pdo->exec("ALTER TABLE subjects ADD COLUMN prerequisite_subject_code VARCHAR(255) DEFAULT NULL"); $message[] = 'Added prerequisite_subject_code'; } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE subjects ADD COLUMN prerequisite VARCHAR(50) DEFAULT NULL"); $message[] = 'Added prerequisite'; } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE subjects ADD COLUMN bridging_for VARCHAR(100) DEFAULT NULL"); $message[] = 'Added bridging_for'; } catch (Exception $e) {}
     }
     
     // Check if major_subjects table exists

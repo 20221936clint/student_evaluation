@@ -200,132 +200,627 @@ if (!$show_role_modal) {
         .stat-pill.gold { background: #fef3c7; color: #92400e; border-color: #fbbf24; }
 
         /* ══ PROSPECTUS SCREEN STYLES ══════════════════════════ */
-        .pro-wrap { font-family: 'Poppins', sans-serif; font-size: 13px; color: #1a1a1a; background: white; border-radius: 16px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .pro-wrap { font-family: 'Poppins', sans-serif; font-size: 15px; color: #1a1a1a; background: white; border-radius: 16px; border: 1px solid var(--border-light); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .pro-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; background: linear-gradient(to bottom, #fffdf5, #fff); border-bottom: 3px solid #8B6914; }
-        .pro-logo { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; border: 2px solid #8B6914; }
+        .pro-logo { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; border: 2px solid #8B6914; }
         .pro-title-block { text-align: center; flex: 1; padding: 0 16px; }
-        .pro-school { font-size: 16px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
-        .pro-address { font-size: 12px; color: #666; margin: 3px 0; }
-        .pro-institute { font-size: 13px; font-weight: 700; color: #8B6914; text-transform: uppercase; margin-top: 6px; }
-        .pro-degree { font-size: 12px; color: #444; margin: 3px 0; }
-        .pro-major { font-size: 13px; font-weight: 600; margin: 4px 0; }
-        .pro-label { display: inline-block; margin-top: 6px; padding: 3px 14px; border: 1.5px solid #8B6914; border-radius: 20px; font-size: 11px; font-weight: 700; color: #8B6914; letter-spacing: .5px; text-transform: uppercase; }
+        .pro-school { font-size: 20px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+        .pro-address { font-size: 14px; color: #666; margin: 3px 0; }
+        .pro-institute { font-size: 16px; font-weight: 700; color: #8B6914; text-transform: uppercase; margin-top: 6px; }
+        .pro-degree { font-size: 14px; color: #444; margin: 3px 0; }
+        .pro-major { font-size: 15px; font-weight: 600; margin: 4px 0; }
+        .pro-label { display: inline-block; margin-top: 6px; padding: 3px 14px; border: 1.5px solid #8B6914; border-radius: 20px; font-size: 13px; font-weight: 700; color: #8B6914; letter-spacing: .5px; text-transform: uppercase; }
         .pro-body { padding: 16px 20px 20px; }
         .pro-year-block { margin-bottom: 16px; border: 1px solid #e0dbd0; border-radius: 10px; overflow: hidden; }
-        .pro-year-header { background: linear-gradient(135deg, #8B6914, #B8860B); color: #fff; padding: 9px 16px; font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-        .pro-year-total { font-size: 11px; font-weight: 400; opacity: .85; }
+        .pro-year-header { background: linear-gradient(135deg, #8B6914, #B8860B); color: #fff; padding: 9px 16px; font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        .pro-year-total { font-size: 13px; font-weight: 400; opacity: .85; }
         .pro-sem-row { display: grid; grid-template-columns: 1fr 1fr; padding: 10px 12px 12px; gap: 10px; }
-        .pro-sem-label { font-size: 11px; font-weight: 700; color: #8B6914; text-align: center; padding: 5px 0; background: #f7f5ef; border: 1px solid #d4cfc5; border-radius: 6px 6px 0 0; text-transform: uppercase; letter-spacing: .3px; }
-        .pro-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .pro-th { background: #f0ece0; padding: 6px 8px; text-align: left; font-size: 11px; font-weight: 700; color: #8B6914; border: 1px solid #ccc; white-space: nowrap; }
-        .pro-table td { border: 1px solid #ddd; padding: 5px 8px; vertical-align: middle; }
+        .pro-sem-label { font-size: 13px; font-weight: 700; color: #333; text-align: center; padding: 5px 0; background: #fde68a; border: 1px solid #d4cfc5; border-radius: 6px 6px 0 0; text-transform: uppercase; letter-spacing: .3px; }
+        .pro-table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: auto; }
+        .pro-th { background: #f0ece0; padding: 6px 8px; text-align: left; font-size: 13px; font-weight: 700; color: #8B6914; border: 1px solid #ccc; white-space: nowrap; }
+        .pro-table td { border: 1px solid #ddd; padding: 5px 8px; vertical-align: middle; word-wrap: break-word; word-break: break-word; }
         .pro-grade-cell { text-align: center; background: #fafaf8; width: 28px; }
-        .pro-code { font-weight: 600; white-space: nowrap; font-size: 11px; }
-        .pro-units { text-align: center; font-weight: 500; }
-        .pro-prereq-col { color: #888; font-size: 11px; }
+        .pro-code { font-weight: 600; white-space: nowrap; font-size: 13px; }
+        .pro-units { text-align: center; font-weight: 500; white-space: nowrap; }
+        .pro-prereq-col { color: #888; font-size: 13px; white-space: nowrap; }
         .pro-prereq-row { background: #fff8f8; border-left: 3px solid #dc2626; }
         .pro-star { color: #dc2626; }
-        .pro-total-row td { background: #f0ece0; font-weight: 700; color: #8B6914; border-top: 2px solid #B8860B; font-size: 11px; }
+        .pro-total-row td { background: #f0ece0; font-weight: 700; color: #8B6914; border-top: 2px solid #B8860B; font-size: 13px; }
         .pro-empty { text-align: center; color: #aaa; font-style: italic; padding: 14px; }
-        .pro-grand-total { text-align: right; font-size: 13px; font-weight: 600; padding: 8px 16px; background: #f7f5ef; border: 1px solid #d4cfc5; border-radius: 8px; margin: 0 0 16px 0; }
+        .pro-grand-total { text-align: right; font-size: 15px; font-weight: 600; padding: 8px 16px; background: #f7f5ef; border: 1px solid #d4cfc5; border-radius: 8px; margin: 0 0 16px 0; }
         .pro-sig-block { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 16px 0 0; border-top: 2px solid #d4cfc5; }
         .pro-sig-col { text-align: center; }
         .pro-sig-line { border-bottom: 1.5px solid #333; margin-bottom: 6px; height: 28px; }
-        .pro-sig-label { font-size: 12px; font-weight: 600; color: #333; }
-        .pro-sig-sub { font-size: 11px; color: #888; margin-top: 3px; }
-        .pro-legend { font-size: 11px; color: #999; padding: 6px 0; }
+        .pro-sig-label { font-size: 14px; font-weight: 600; color: #333; }
+        .pro-sig-sub { font-size: 13px; color: #888; margin-top: 3px; }
+        .pro-legend { font-size: 13px; color: #999; padding: 6px 0; }
+        
+        /* Responsive table with action column */
+        @media screen and (max-width: 768px) {
+            .pro-sem-row { grid-template-columns: 1fr; gap: 12px; }
+            .pro-table { font-size: 10px; }
+            .pro-th, .pro-table td { padding: 4px 6px; }
+            .pro-code { font-size: 10px; }
+            .pro-th-crud, .pro-crud-col { width: 50px; min-width: 50px; }
+            .btn-crud { width: 22px; height: 22px; font-size: 10px; }
+        }
+        
+        /* Drag and drop styles */
+        .pro-table tbody tr[draggable="true"] { cursor: grab; will-change: auto; }
+        .pro-table tbody tr[draggable="true"]:hover { background: #fdfbf6; }
+        .pro-table tbody tr.drag-over-above { 
+            border-top: 3px solid #f59e0b !important;
+        }
+        .pro-table tbody tr.drag-over-below { 
+            border-bottom: 3px solid #f59e0b !important;
+        }
+        .pro-table tbody tr.dragging-row { 
+            opacity: 0.35; 
+            background: #fef9c3 !important; 
+        }
+        .pro-table tbody.drag-over-empty { background: #fef3c7; border-radius: 6px; }
+        .pro-table tbody.drag-over-empty tr { background: #fef3c7; }
+        .drag-handle { cursor: grab; color: #9ca3af; padding: 4px 8px; display: flex; align-items: center; justify-content: center; }
+        .drag-handle:hover { color: #f59e0b; background: rgba(245,158,11,0.08); border-radius: 4px; }
+        .drag-handle:active, .drag-handle.dragging { cursor: grabbing; color: #f59e0b; }
+        .drag-handle i { pointer-events: none; }
+        
+        /* Drop zone indicator for empty semesters */
+        .pro-table tbody.drag-over-empty td.pro-empty {
+            background: #fef3c7 !important;
+            color: #92400e !important;
+            font-style: normal !important;
+            border: 2px dashed #f59e0b !important;
+        }
+        .pro-table tbody.drag-over-empty td.pro-empty::after {
+            content: ' — Drop here to move subject';
+            font-weight: 600;
+        }
         .pro-bridging-block { margin-bottom: 16px; }
 
-        /* ══ PRINT STYLES ══════════════════════════════════════ */
-        @media print {
-            @page { size: A4 portrait; margin: 6mm 8mm; }
-            html, body { margin: 0; padding: 0; }
-            body > *:not(.main-content) { display: none !important; }
-            .sidebar, .topbar, .page-header, .tab-container,
-            #majorsTab, #subjectsTab > div:first-child,
-            .btn-add, button, .modal-overlay { display: none !important; }
-            .main-content { margin: 0 !important; padding: 0 !important; }
-            .dashboard-content { padding: 0 !important; }
-            .page-container { padding: 0 !important; }
-            .card { padding: 0 !important; box-shadow: none !important; border: none !important; margin: 0 !important; }
-            #subjectsTab { display: block !important; }
-            #prospectusContent { display: block !important; }
+        /* ══ PRINT STYLES — SINGLE-PAGE PROSPECTUS ══════════════════════ */
+@media print {
 
-            .pro-wrap {
-                border: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                width: 100% !important;
-                font-size: 7.5pt !important;
-            }
-            .pro-header {
-                padding: 8pt 10pt 7pt !important;
-                border-bottom: 2pt solid #8B6914 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .pro-logo { width: 85pt !important; height: 85pt !important; border: 1pt solid #8B6914 !important; border-radius: 4pt !important; }
-            .pro-school { font-size: 10pt !important; }
-            .pro-address { font-size: 7pt !important; }
-            .pro-institute { font-size: 8.5pt !important; }
-            .pro-degree { font-size: 7.5pt !important; }
-            .pro-major { font-size: 8pt !important; }
-            .pro-label { font-size: 7pt !important; padding: 2pt 8pt !important; border: 1pt solid #8B6914 !important; }
-            .pro-body { padding: 6pt 8pt 8pt !important; }
-            .pro-year-block { margin-bottom: 6pt !important; page-break-inside: avoid !important; border: 0.5pt solid #e0dbd0 !important; border-radius: 3pt !important; }
-            .pro-year-header {
-                padding: 4pt 8pt !important;
-                font-size: 8.5pt !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .pro-sem-row { padding: 5pt 6pt 6pt !important; gap: 6pt !important; }
-            .pro-sem-label {
-                font-size: 7pt !important;
-                padding: 3pt 0 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .pro-table { font-size: 7pt !important; }
-            .pro-th {
-                padding: 3pt 4pt !important;
-                font-size: 6.5pt !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .pro-table td { padding: 2.5pt 4pt !important; }
-            .pro-grade-cell { width: 18pt !important; }
-            .pro-prereq-row {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .pro-total-row td {
-                font-size: 7pt !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .pro-empty { padding: 6pt !important; font-size: 7pt !important; }
-            .pro-bridging-block { margin-bottom: 6pt !important; }
-            .pro-grand-total { font-size: 8pt !important; padding: 4pt 8pt !important; margin-bottom: 6pt !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .pro-sig-block { gap: 12pt !important; padding-top: 6pt !important; margin-top: 6pt !important; }
-            .pro-sig-line { height: 14pt !important; }
-            .pro-sig-label { font-size: 7pt !important; }
-            .pro-sig-sub { font-size: 6.5pt !important; }
-            .pro-legend { font-size: 6.5pt !important; margin-top: 4pt !important; }
-        }
+    /* ── Paper size config (change these to switch paper types) ── */
+    :root {
+        --print-paper: A4;           /* A4, Letter, Legal */
+    }
+
+    /* A4 → 210 × 297 mm */
+    /* Short Bond (Letter) → 216 × 279 mm */
+    /* Long Bond (Legal) → 216 × 356 mm */
+
+    /* ── Page setup ── */
+    @page {
+        size: A4 portrait;
+        margin: 6mm 6mm 6mm 6mm;
+    }
+
+    /* ── Reset everything ── */
+    *, *::before, *::after {
+        box-sizing: border-box !important;
+    }
+
+    html {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background: white !important;
+        overflow: visible !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ── Hide ALL UI except the prospectus ── */
+    body > *:not(.main-content),
+    .sidebar,
+    .topbar,
+    .page-header,
+    .tab-container,
+    #majorsTab,
+    #prerequisitesTab,
+    .prospectus-controls,
+    .prospectus-controls-right,
+    .btn-add,
+    .btn-edit-mode,
+    button,
+    .modal-overlay,
+    .toast,
+    .pro-crud-col,
+    .pro-th-crud,
+    .drag-handle,
+    .btn-crud,
+    #printProspectusBtn,
+    #editModeBtn {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* ── Show only the prospectus ── */
+    body * {
+        visibility: hidden !important;
+    }
+
+    #printableProspectus,
+    #printableProspectus * {
+        visibility: visible !important;
+    }
+
+    /* ── Layout reset for wrappers ── */
+    .main-content,
+    .dashboard-content,
+    .page-container,
+    .card,
+    #subjectsTab,
+    #prospectusContent {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        width: 100% !important;
+        max-width: none !important;
+        overflow: visible !important;
+    }
+
+    /* ── Prospectus root ── */
+    #printableProspectus {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 198mm !important;       /* A4 210mm - 6mm*2 margins */
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ══ DOCUMENT WRAPPER ═════════════════════════════════════════ */
+    .pro-wrap {
+        width: 198mm !important;
+        max-width: 198mm !important;
+        font-size: 7pt !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        background: white !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ══ HEADER ═══════════════════════════════════════════════════ */
+    .pro-header {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        padding: 2mm 2mm 1.5mm !important;
+        border-top: 2pt solid #8B6914 !important;
+        border-bottom: 1.5pt solid #8B6914 !important;
+        background: white !important;
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-logo {
+        width: 21mm !important;
+        height: 21mm !important;
+        min-width: 21mm !important;
+        min-height: 21mm !important;
+        object-fit: cover !important;
+        border: 1.5pt solid #8B6914 !important;
+        border-radius: 2pt !important;
+        flex-shrink: 0 !important;
+        display: block !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-title-block {
+        flex: 1 1 auto !important;
+        text-align: center !important;
+        padding: 0 4mm !important;
+    }
+
+    .pro-school {
+        font-size: 13pt !important;
+        font-weight: 700 !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.4pt !important;
+        line-height: 1.15 !important;
+        color: #111 !important;
+        margin: 0 0 1mm !important;
+    }
+
+    .pro-address {
+        font-size: 7.5pt !important;
+        color: #555 !important;
+        font-style: italic !important;
+        margin: 0 0 1.5mm !important;
+        font-family: 'Times New Roman', Times, serif !important;
+    }
+
+    .pro-institute {
+        font-size: 9.5pt !important;
+        font-weight: 700 !important;
+        color: #8B6914 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.3pt !important;
+        margin: 0 0 0.8mm !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-degree {
+        font-size: 8pt !important;
+        color: #333 !important;
+        margin: 0 0 0.8mm !important;
+        font-family: 'Times New Roman', Times, serif !important;
+    }
+
+    .pro-major {
+        font-size: 9pt !important;
+        font-weight: 700 !important;
+        color: #111 !important;
+        margin: 0 0 1mm !important;
+        font-family: 'Times New Roman', Times, serif !important;
+    }
+
+    .pro-label {
+        display: inline-block !important;
+        padding: 1.5pt 8pt !important;
+        border: 1pt solid #8B6914 !important;
+        border-radius: 10pt !important;
+        font-size: 7pt !important;
+        font-weight: 700 !important;
+        color: #8B6914 !important;
+        letter-spacing: 0.6pt !important;
+        text-transform: uppercase !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ══ BODY ═════════════════════════════════════════════════════ */
+    .pro-body {
+        width: 100% !important;
+        padding: 1mm 0 0 !important;
+        overflow: visible !important;
+    }
+
+    /* ══ YEAR BLOCKS ══════════════════════════════════════════════ */
+    .pro-year-block {
+        width: 100% !important;
+        margin-bottom: 1mm !important;
+        border: 0.5pt solid #bbb !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-year-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        padding: 1mm 2mm !important;
+        font-size: 7.5pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.3pt !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        background: #8B6914 !important;
+        color: white !important;
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-year-total {
+        font-size: 7pt !important;
+        font-weight: 400 !important;
+        opacity: 0.9 !important;
+    }
+
+    /* ── Two-column semester layout ── */
+    .pro-sem-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1mm !important;
+        padding: 1mm !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-sem-label {
+        width: 100% !important;
+        font-size: 6.5pt !important;
+        font-weight: 700 !important;
+        padding: 1pt 0 !important;
+        text-align: center !important;
+        background: #fde68a !important;
+        border: 0.5pt solid #d4cfc5 !important;
+        border-radius: 0 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.2pt !important;
+        margin-bottom: 0 !important;
+        color: #333 !important;
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ══ TABLES ═══════════════════════════════════════════════════ */
+    .pro-table {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 6.5pt !important;
+        table-layout: fixed !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: hidden !important;
+    }
+
+    .pro-th {
+        background: #f0ece0 !important;
+        padding: 0.8pt 1.5pt !important;
+        font-size: 6pt !important;
+        font-weight: 700 !important;
+        color: #7a5c10 !important;
+        border: 0.5pt solid #ccc !important;
+        text-align: left !important;
+        word-break: break-word !important;
+        line-height: 1.1 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-table td {
+        border: 0.5pt solid #ddd !important;
+        padding: 0.8pt 1.5pt !important;
+        line-height: 1.1 !important;
+        font-size: 7pt !important;
+        word-break: break-word !important;
+        vertical-align: middle !important;
+        overflow: hidden !important;
+    }
+
+    .pro-code {
+        font-size: 7pt !important;
+        font-weight: 700 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .pro-units {
+        font-size: 7.5pt !important;
+        text-align: center !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+    }
+
+    .pro-grade-cell {
+        width: 12mm !important;
+        max-width: 12mm !important;
+        text-align: center !important;
+        background: #fafaf8 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-prereq-col {
+        font-size: 6pt !important;
+        color: #777 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .pro-prereq-row {
+        background: #fff5f5 !important;
+        border-left: 1.5pt solid #dc2626 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-star {
+        color: #dc2626 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-total-row td {
+        background: #f0ece0 !important;
+        font-weight: 700 !important;
+        color: #8B6914 !important;
+        border-top: 1pt solid #B8860B !important;
+        font-size: 7pt !important;
+        padding: 1pt 2pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .pro-empty {
+        text-align: center !important;
+        color: #aaa !important;
+        font-style: italic !important;
+        padding: 2pt !important;
+        font-size: 6.5pt !important;
+    }
+
+    /* ══ BRIDGING BLOCK ═══════════════════════════════════════════ */
+    .pro-bridging-block {
+        width: 100% !important;
+        margin-bottom: 1.5mm !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* ══ GRAND TOTAL ══════════════════════════════════════════════ */
+    .pro-grand-total {
+        font-size: 8.5pt !important;
+        font-weight: 700 !important;
+        text-align: right !important;
+        padding: 1.5mm 3mm !important;
+        margin: 1.5mm 0 !important;
+        background: #f0ece0 !important;
+        border-top: 1pt solid #B8860B !important;
+        border-bottom: 1pt solid #B8860B !important;
+        color: #8B6914 !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ══ SIGNATURE BLOCK ══════════════════════════════════════════ */
+    .pro-sig-block {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8mm !important;
+        padding: 2mm 0 0 !important;
+        border-top: 1pt solid #aaa !important;
+        margin-top: 2mm !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .pro-sig-col {
+        text-align: center !important;
+    }
+
+    .pro-sig-line {
+        border-bottom: 1pt solid #333 !important;
+        height: 10mm !important;
+        margin-bottom: 1mm !important;
+    }
+
+    .pro-sig-label {
+        font-size: 7pt !important;
+        font-weight: 700 !important;
+        color: #222 !important;
+        line-height: 1.3 !important;
+        font-family: 'Times New Roman', Times, serif !important;
+    }
+
+    .pro-sig-sub {
+        font-size: 6.5pt !important;
+        color: #888 !important;
+        margin-top: 0.5mm !important;
+        font-style: italic !important;
+    }
+
+    /* ══ LEGEND ═══════════════════════════════════════════════════ */
+    .pro-legend {
+        font-size: 6pt !important;
+        color: #999 !important;
+        margin-top: 1mm !important;
+        padding: 0 !important;
+        font-style: italic !important;
+    }
+}
 
         /* Prospectus select/controls area */
         .prospectus-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
         .prospectus-controls-left h3 { font-size: 16px; font-weight: 700; color: var(--dark-text); margin: 0; }
         .prospectus-controls-left p { font-size: 13px; color: var(--light-text); margin: 4px 0 0; }
         .prospectus-controls-right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .btn-edit-mode { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; }
+        .btn-edit-mode:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35); }
+        .btn-edit-mode.active { background: linear-gradient(135deg, #4f46e5, #3730a3); }
+        .pro-crud-col { width: 60px; text-align: center; }
+        .btn-crud { width: 24px; height: 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; margin: 0 2px; }
+        .btn-crud-edit { background: #dbeafe; color: #1d4ed8; }
+        .btn-crud-edit:hover { background: #1d4ed8; color: white; }
+        .btn-crud-delete { background: #fee2e2; color: #dc2626; }
+        .btn-crud-delete:hover { background: #dc2626; color: white; }
+        .pro-th-crud { width: 60px; }
 
         /* Notification toast */
-        .toast { position: fixed; bottom: 24px; right: 24px; background: #1f1f1f; color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 99999; box-shadow: 0 8px 24px rgba(0,0,0,0.3); max-width: 360px; }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.success { border-left: 4px solid #22c55e; }
-        .toast.error { border-left: 4px solid #ef4444; }
-        .toast.info { border-left: 4px solid var(--gold); }
+        .toast { 
+            position: fixed; 
+            bottom: 24px; 
+            right: 24px; 
+            background: linear-gradient(135deg, #ffffff, #f8f9fa); 
+            color: #1f1f1f; 
+            padding: 16px 20px; 
+            border-radius: 16px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            transform: translateY(120px) scale(0.9); 
+            opacity: 0; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            z-index: 99999; 
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05); 
+            max-width: 380px; 
+            min-width: 280px;
+        }
+        .toast.show { 
+            transform: translateY(0) scale(1); 
+            opacity: 1; 
+        }
+        .toast-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .toast.success .toast-icon { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #16a34a; }
+        .toast.error .toast-icon { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
+        .toast.info .toast-icon { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 600; margin-bottom: 2px; font-size: 14px; }
+        .toast-message { font-size: 13px; color: #6b7280; }
+        .toast-close {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+        .toast-close:hover { background: #f3f4f6; color: #374151; }
+        .toast.success { border-left: none; border-top: 3px solid #22c55e; }
+        .toast.error { border-left: none; border-top: 3px solid #ef4444; }
+        .toast.info { border-left: none; border-top: 3px solid var(--gold); }
         .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -470,6 +965,12 @@ if (!$show_role_modal) {
                                     <option value="<?php echo $major['id']; ?>"><?php echo htmlspecialchars($major['display_name']); ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <button class="btn-edit-mode" id="editModeBtn" style="display:none;" onclick="toggleEditMode()">
+                                    <i class="fas fa-edit"></i> Edit Mode
+                                </button>
+                                <button class="btn-add" id="bridgingBtn" style="display:none;" onclick="showBridgingModal()">
+                                    <i class="fas fa-exchange-alt"></i> Bridging
+                                </button>
                                 <button class="btn-add" id="printProspectusBtn" style="display:none;" onclick="printProspectus()">
                                     <i class="fas fa-print"></i> Print
                                 </button>
@@ -491,7 +992,27 @@ if (!$show_role_modal) {
     </div>
 
     <!-- ══ TOAST ═══════════════════════════════════════════════════ -->
-    <div class="toast" id="toast"><span id="toastMsg"></span></div>
+    <div class="toast" id="toast">
+        <div class="toast-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle">Success</div>
+            <div class="toast-message" id="toastMsg"></div>
+        </div>
+        <button class="toast-close" onclick="closeToast()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- ══ BRIDGING SUBJECTS MODAL ══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="bridgingModal">
+        <div class="modal" style="max-width:800px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-exchange-alt"></i> Bridging Subjects</h3>
+                <button class="modal-close" onclick="closeBridgingModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="bridgingContent" style="max-height:60vh;overflow-y:auto;">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
 
     <!-- ══ MAJOR MODAL ══════════════════════════════════════════════ -->
     <div class="modal-overlay" id="majorModal">
@@ -587,14 +1108,14 @@ if (!$show_role_modal) {
                             <input type="number" class="form-input" id="subjectUnits" name="units" value="3" step="0.5" min="0" max="10">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Prerequisite Subject</label>
-                            <select class="form-select" id="subjectPrerequisite" name="prerequisite">
-                                <option value="">— None —</option>
-                                <?php foreach ($all_subjects as $subj): ?>
-                                <option value="<?php echo htmlspecialchars($subj['subject_code']); ?>"><?php echo htmlspecialchars($subj['subject_code']); ?> — <?php echo htmlspecialchars($subj['subject_name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <label class="form-label">Prerequisite</label>
+                            <input type="text" class="form-input" id="subjectPrerequisite" name="prerequisite" placeholder="e.g., ENG 1">
                         </div>
+                    </div>
+                    <div class="form-group" id="bridgingForGroup" style="margin-top:10px;display:none;">
+                        <label class="form-label"><i class="fas fa-user-graduate"></i> Bridging For (who is this for?)</label>
+                        <input type="text" class="form-input" id="subjectBridgingFor" name="bridging_for" placeholder="e.g., SHS NON-ABM, ALS GRADUATE">
+                        <p style="font-size:11px;color:var(--light-text);margin-top:4px;">Separate multiple with comma. E.g., "SHS NON-ABM, ALS GRADUATE"</p>
                     </div>
                 </div>
                 <div class="form-section">
@@ -798,7 +1319,7 @@ if (!$show_role_modal) {
 
     <!-- ══ EDIT SUBJECT IN PROSPECTUS MODAL ══════════════════════════ -->
     <div class="modal-overlay" id="editProspectusSubjectModal">
-        <div class="modal" style="max-width:480px;">
+        <div class="modal" style="max-width:520px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-edit"></i> Edit Prospectus Placement</h3>
                 <button class="modal-close" onclick="closeEditProspectusModal()"><i class="fas fa-times"></i></button>
@@ -810,6 +1331,10 @@ if (!$show_role_modal) {
                     <div class="form-group">
                         <label class="form-label">Subject</label>
                         <input type="text" class="form-input" id="editProspectusSubjectName" readonly style="background:var(--cream);">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Credit Units</label>
+                        <input type="number" class="form-input" id="editProspectusUnits" name="units" step="0.5" min="0" max="10" value="3" placeholder="Enter units">
                     </div>
                     <div class="form-grid">
                         <div class="form-group" style="margin-bottom:0;">
@@ -830,6 +1355,13 @@ if (!$show_role_modal) {
                             </select>
                         </div>
                     </div>
+                    <div class="form-group" style="margin-top:16px;">
+                        <label class="form-label">Available in Majors</label>
+                        <p style="font-size:11px;color:var(--light-text);margin-bottom:8px;">Check/uncheck to add or remove subject from majors:</p>
+                        <div id="editProspectusMajorsList" style="max-height:140px;overflow-y:auto;border:1.5px solid var(--border-light);border-radius:10px;padding:8px;background:white;">
+                            <!-- Majors checkboxes will be populated here -->
+                        </div>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-cancel" onclick="closeEditProspectusModal()">Cancel</button>
@@ -848,12 +1380,38 @@ if (!$show_role_modal) {
     let phSettings = <?php echo json_encode($ph_settings, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
 
     /* ══ TOAST NOTIFICATIONS ══════════════════════════════════════ */
-    function toast(msg, type = 'info', duration = 3000) {
+    function toast(msg, type = 'info', duration = 3000, customTitle = null) {
         const el = document.getElementById('toast');
-        document.getElementById('toastMsg').textContent = msg;
+        const titleEl = document.getElementById('toastTitle');
+        const msgEl = document.getElementById('toastMsg');
+        const iconEl = el.querySelector('.toast-icon');
+        
+        msgEl.textContent = msg;
+        
+        // Set title based on type or custom title
+        if (customTitle) {
+            titleEl.textContent = customTitle;
+        } else if (type === 'success') titleEl.textContent = 'Success';
+        else if (type === 'error') titleEl.textContent = 'Error';
+        else titleEl.textContent = 'Notice';
+        
+        // Set icon based on type
+        let iconClass = 'fa-info-circle';
+        if (type === 'success') iconClass = 'fa-check-circle';
+        else if (type === 'error') iconClass = 'fa-times-circle';
+        else if (type === 'info') iconClass = 'fa-info-circle';
+        
+        iconEl.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        
         el.className = `toast ${type} show`;
         clearTimeout(el._timer);
         el._timer = setTimeout(() => el.classList.remove('show'), duration);
+    }
+    
+    function closeToast() {
+        const el = document.getElementById('toast');
+        el.classList.remove('show');
+        clearTimeout(el._timer);
     }
 
     /* ══ TAB SWITCHER ═════════════════════════════════════════════ */
@@ -1069,6 +1627,14 @@ if (!$show_role_modal) {
         document.getElementById('subjectModal').classList.add('active');
         document.getElementById('subjectModalTitle').textContent = id ? 'Edit Subject' : 'Add Subject';
         document.getElementById('subjectId').value = id || 0;
+        
+        // Show/hide bridging_for field based on year level selection
+        const yearLevelSelect = document.getElementById('prospectusYearLevel');
+        const bridgingGroup = document.getElementById('bridgingForGroup');
+        yearLevelSelect.onchange = function() {
+            bridgingGroup.style.display = this.value === 'Bridging' ? 'block' : 'none';
+        };
+        
         if (id) {
             const s = subjectsData.find(s => s.id == id);
             if (s) {
@@ -1076,6 +1642,14 @@ if (!$show_role_modal) {
                 document.getElementById('subjectName').value         = s.subject_name;
                 document.getElementById('subjectUnits').value        = s.units;
                 document.getElementById('subjectPrerequisite').value = s.prerequisite || '';
+                const yr = s.default_year_level || s.year_level || '1st Year';
+                document.getElementById('prospectusYearLevel').value = yr;
+                if (yr === 'Bridging') {
+                    bridgingGroup.style.display = 'block';
+                    document.getElementById('subjectBridgingFor').value = s.bridging_for || '';
+                } else {
+                    bridgingGroup.style.display = 'none';
+                }
             }
         } else {
             document.getElementById('subjectForm').reset();
@@ -1094,6 +1668,15 @@ if (!$show_role_modal) {
         const fd = new FormData(document.getElementById('subjectForm'));
         fd.append('action', isEdit ? 'update_subject' : 'add_subject');
         if (isEdit) fd.append('id', subId);
+        
+        // Map form field names to expected PHP names
+        const yearLevel = document.getElementById('prospectusYearLevel').value || '1st Year';
+        const semester = document.getElementById('prospectusSemester').value || '1st Semester';
+        fd.append('default_year_level', yearLevel);
+        fd.append('default_semester', semester);
+        
+        const bridgingFor = document.getElementById('subjectBridgingFor').value || '';
+        if (bridgingFor) fd.append('bridging_for', bridgingFor);
 
         const selectedMajors = Array.from(document.querySelectorAll('.prospectus-major-check:checked')).map(cb => cb.value);
 
@@ -1117,6 +1700,11 @@ if (!$show_role_modal) {
                     });
                 }
                 if (document.getElementById('prerequisitesTab').style.display !== 'none') loadPrereqSets();
+                
+                // Reload bridging modal if open (to show newly added bridging subjects)
+                if (document.getElementById('bridgingModal').classList.contains('active')) {
+                    showBridgingModal();
+                }
             }
         });
     }
@@ -1422,55 +2010,56 @@ if (!$show_role_modal) {
 
     /* ══ PROSPECTUS RENDERING ═════════════════════════════════════ */
     function buildProspectusHeader(majorName) {
-        const schoolName = phSettings?.school_name || 'Northern Bukidnon State College';
-        const schoolAddress = phSettings?.school_address || 'Manolo Fortich, Bukidnon';
-        const instituteName = phSettings?.institute_name || 'Institute for Business Management';
-        const degreeName = phSettings?.degree_name || 'Bachelor of Science in Business Administration';
-        return `
-        <div class="pro-header">
-            <img src="../../../media/LOGO.jpg" alt="Logo" class="pro-logo">
-            <div class="pro-title-block">
-                <div class="pro-school">${escHtml(schoolName)}</div>
-                <div class="pro-address">${escHtml(schoolAddress)}</div>
-                <div class="pro-institute">${escHtml(instituteName)}</div>
-                <div class="pro-degree">${escHtml(degreeName)}</div>
-                <div class="pro-major">Major in <strong>${escHtml(majorName)}</strong></div>
-                <div class="pro-label">Student Evaluation Prospectus</div>
-            </div>
-            <img src="../../../media/nbsc_logo.png" alt="Logo" class="pro-logo">
-        </div>`;
-    }
+    const schoolName   = phSettings?.school_name    || 'Northern Bukidnon State College';
+    const schoolAddress = phSettings?.school_address || 'Manolo Fortich, Bukidnon';
+    const instituteName = phSettings?.institute_name || 'Institute for Business Management';
+    const degreeName   = phSettings?.degree_name    || 'Bachelor of Science in Business Administration';
 
-    function buildSemTable(subjects, semLabel, prereqMap = {}) {
+    return `
+    <div class="pro-header">
+        <img src="../../../media/LOGO.jpg" alt="School Logo" class="pro-logo">
+        <div class="pro-title-block">
+            <div class="pro-school">${escHtml(schoolName)}</div>
+            <div class="pro-address">${escHtml(schoolAddress)}</div>
+            <div style="border-top:1px solid #d4cfc5;margin:4px auto;width:80%;"></div>
+            <div class="pro-institute">${escHtml(instituteName)}</div>
+            <div class="pro-degree">${escHtml(degreeName)}</div>
+            <div class="pro-major">Major in <strong>${escHtml(majorName)}</strong></div>
+            <div class="pro-label">&#9733; Student Evaluation Prospectus &#9733;</div>
+        </div>
+        <img src="../../../media/nbsc_logo.png" alt="Institute Logo" class="pro-logo">
+    </div>`;
+}
+
+    function buildSemTable(subjects, semLabel, prereqMap = {}, yearLabel = '') {
         let rows = '', total = 0;
+        const isSem1 = semLabel.includes('1st');
+        const unitsLabel = isSem1 ? 'LEC' : 'UNITS';
+        const displayLabel = yearLabel ? (yearLabel.toUpperCase() + ' - ' + (isSem1 ? 'First Semester' : 'Second Semester')) : semLabel;
         if (!subjects || subjects.length === 0) {
-            rows = `<tr><td colspan="5" class="pro-empty">No subjects</td></tr>`;
+            rows = `<tr><td colspan="4" class="pro-empty">No subjects</td></tr>`;
         } else {
             subjects.forEach(s => {
                 const u = parseFloat(s.units) || 0;
                 total += u;
-                const prereqCode = prereqMap[s.id] || s.prerequisite || '—';
-                const prereqDisplay = prereqCode !== '—' ? '<span style="color:#dc2626;font-weight:600;">★ ' + escHtml(prereqCode) + '</span>' : '—';
                 rows += `<tr>
                     <td class="pro-grade-cell"></td>
                     <td class="pro-code">${escHtml(s.subject_code||'')}</td>
                     <td>${escHtml(s.subject_name||'')}</td>
                     <td class="pro-units">${u%1===0?u:u.toFixed(1)}</td>
-                    <td class="pro-prereq-col">${prereqDisplay}</td>
                 </tr>`;
             });
         }
         const t = total%1===0 ? total : total.toFixed(1);
-        rows += `<tr class="pro-total-row"><td colspan="3" style="text-align:right;padding-right:8px;">Total Units</td><td class="pro-units">${t}</td><td></td></tr>`;
+        rows += `<tr class="pro-total-row"><td colspan="3" style="text-align:right;padding-right:8px;">TOTAL</td><td class="pro-units">${t}</td></tr>`;
         return `<div>
-            <div class="pro-sem-label">${semLabel}</div>
+            <div class="pro-sem-label">${displayLabel}</div>
             <table class="pro-table">
                 <thead><tr>
-                    <th class="pro-th" style="width:24px;">Grade</th>
-                    <th class="pro-th" style="width:90px;">Code</th>
-                    <th class="pro-th">Subject Title</th>
-                    <th class="pro-th" style="width:40px;">Units</th>
-                    <th class="pro-th" style="width:75px;">Pre-Req</th>
+                    <th class="pro-th" style="width:28px;">Final Grade</th>
+                    <th class="pro-th" style="width:80px;">Course No.</th>
+                    <th class="pro-th">Description</th>
+                    <th class="pro-th" style="width:40px;">${unitsLabel}</th>
                 </tr></thead>
                 <tbody>${rows}</tbody>
             </table>
@@ -1501,8 +2090,8 @@ if (!$show_role_modal) {
                     <span class="pro-year-total">${tFmt} units</span>
                 </div>
                 <div class="pro-sem-row">
-                    ${buildSemTable(sem1,'1st Semester', prereqMap)}
-                    ${buildSemTable(sem2,'2nd Semester', prereqMap)}
+                    ${buildSemTable(sem1,'1st Semester', prereqMap, y)}
+                    ${buildSemTable(sem2,'2nd Semester', prereqMap, y)}
                 </div>
             </div>`;
         });
@@ -1519,18 +2108,18 @@ if (!$show_role_modal) {
                         <span class="pro-year-total">${bt%1===0?bt:bt.toFixed(1)} units</span>
                     </div>
                     <div style="padding:10px 12px 12px;">
-                        <table class="pro-table" style="max-width:540px;">
+                        <table class="pro-table" style="max-width:620px;">
                             <thead><tr>
                                 <th class="pro-th" style="width:24px;">Grade</th>
-                                <th class="pro-th" style="width:90px;">Code</th>
+                                <th class="pro-th" style="width:70px;">Code</th>
                                 <th class="pro-th">Subject Title</th>
                                 <th class="pro-th" style="width:40px;">Units</th>
-                                <th class="pro-th" style="width:75px;">Pre-Req</th>
+                                <th class="pro-th" style="width:100px;">Bridging For</th>
                             </tr></thead>
                             <tbody>
                                 ${bridging.map(s=>{
-                                    const prereqCode = prereqMap[s.id] || s.prerequisite || '—';
-                                    return `<tr><td class="pro-grade-cell"></td><td class="pro-code">${escHtml(s.subject_code||'')}</td><td>${escHtml(s.subject_name||'')}</td><td class="pro-units">${parseFloat(s.units)||0}</td><td class="pro-prereq-col">${prereqCode !== '—' ? '<span style="color:#dc2626;font-weight:600;">★ ' + prereqCode + '</span>' : '—'}</td></tr>`;
+                                    const bridgeFor = escHtml(s.bridging_for || '—');
+                                    return `<tr><td class="pro-grade-cell"></td><td class="pro-code">${escHtml(s.subject_code||'')}</td><td>${escHtml(s.subject_name||'')}</td><td class="pro-units">${parseFloat(s.units)||0}</td><td class="pro-prereq-col" style="font-size:9pt;">${bridgeFor}</td></tr>`;
                                 }).join('')}
                                 <tr class="pro-total-row"><td colspan="3" style="text-align:right;padding-right:8px;">Total Units</td><td class="pro-units">${bt%1===0?bt:bt.toFixed(1)}</td><td></td></tr>
                             </tbody>
@@ -1565,7 +2154,7 @@ if (!$show_role_modal) {
             yearBlocks += `
             <div class="pro-year-block">
                 <div class="pro-year-header"><span>${y}</span><span class="pro-year-total">0 units</span></div>
-                <div class="pro-sem-row">${buildSemTable([],'1st Semester')}${buildSemTable([],'2nd Semester')}</div>
+                <div class="pro-sem-row">${buildSemTable([],'1st Semester',{},y)}${buildSemTable([],'2nd Semester',{},y)}</div>
             </div>`;
         });
         document.getElementById('prospectusContent').innerHTML = `
@@ -1588,6 +2177,15 @@ if (!$show_role_modal) {
         const majorName = document.getElementById('prospectusMajorSelect').selectedOptions[0]?.text || '';
         const container = document.getElementById('prospectusContent');
         document.getElementById('printProspectusBtn').style.display = majorId ? 'flex' : 'none';
+        document.getElementById('editModeBtn').style.display = majorId ? 'flex' : 'none';
+        document.getElementById('bridgingBtn').style.display = majorId ? 'flex' : 'none';
+        
+        currentEditMajorId = majorId;
+        
+        if (editMode && majorId) {
+            loadProspectusWithCRUD();
+            return;
+        }
 
         if (!majorId) {
             container.innerHTML = `<div style="text-align:center;padding:60px 20px;background:var(--cream);border-radius:12px;border:1px solid var(--border-light);">
@@ -1633,77 +2231,694 @@ if (!$show_role_modal) {
         .catch(() => renderEmptyProspectus(majorName));
     }
 
-    /* ══ PRINT — SINGLE-PAGE FIT ══════════════════════════════════ */
     function printProspectus() {
-        const el = document.getElementById('printableProspectus');
-        if (!el) { toast('No prospectus loaded.', 'error'); return; }
+    const el = document.getElementById('printableProspectus');
+    if (!el) return;
 
-        /* Switch to subjects tab so prospectus is visible during print */
-        if (document.getElementById('subjectsTab').style.display === 'none') {
-            switchTab('subjects');
-        }
+    // Ensure the prospectus tab is visible
+    if (document.getElementById('subjectsTab').style.display === 'none') {
+        switchTab('subjects');
+    }
 
-        /* Count total subject rows to pick font scale */
-        const tdCount = el.querySelectorAll('.pro-table tbody tr').length;
-        /* Heuristic: base scale fits ~60 rows; each extra 10 rows shrinks 0.04em */
-        const scale = Math.max(5.5, 8 - Math.max(0, tdCount - 40) * 0.06);
+    window.print();
+}
 
-        const styleId = 'prospectus-print-override';
-        let existing = document.getElementById(styleId);
-        if (existing) existing.remove();
-
-        const style = document.createElement('style');
-        style.id = styleId;
-        style.textContent = `
-@media print {
-    @page { size: A4 portrait; margin: 5mm 6mm; }
-    html { font-size: ${scale}pt; }
-    body > * { display: none !important; }
-    body > .main-content { display: block !important; }
-    .sidebar, .topbar, .page-header, .tab-container,
-    #majorsTab, #prerequisitesTab,
-    #subjectsTab > .prospectus-controls,
-    button, .btn-add, .modal-overlay { display: none !important; }
-    .main-content, .dashboard-content, .page-container, .card { display: block !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; background: white !important; }
-    #subjectsTab, #prospectusContent { display: block !important; }
-
-    .pro-wrap { width: 100% !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; font-size: 1rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-header { padding: 5pt 6pt 4pt !important; border-bottom: 1.5pt solid #8B6914 !important; }
-    .pro-logo { width: 75pt !important; height: 75pt !important; border: 1pt solid #8B6914 !important; }
-    .pro-school { font-size: 1.2rem !important; }
-    .pro-address { font-size: .85rem !important; }
-    .pro-institute { font-size: 1rem !important; }
-    .pro-degree { font-size: .85rem !important; }
-    .pro-major { font-size: .9rem !important; }
-    .pro-label { font-size: .75rem !important; padding: 1pt 6pt !important; }
-    .pro-body { padding: 4pt 5pt 5pt !important; }
-    .pro-year-block { margin-bottom: 4pt !important; page-break-inside: avoid; border: 0.5pt solid #e0dbd0 !important; border-radius: 2pt !important; }
-    .pro-year-header { padding: 3pt 6pt !important; font-size: .9rem !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-sem-row { padding: 4pt 4pt 4pt !important; gap: 5pt !important; }
-    .pro-sem-label { font-size: .72rem !important; padding: 2pt 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-table { font-size: .78rem !important; }
-    .pro-th { padding: 2pt 3pt !important; font-size: .68rem !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-table td { padding: 2pt 3pt !important; }
-    .pro-grade-cell { width: 16pt !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-total-row td { font-size: .7rem !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-prereq-row { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-bridging-block { margin-bottom: 4pt !important; }
-    .pro-grand-total { font-size: .85rem !important; padding: 3pt 6pt !important; margin-bottom: 4pt !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .pro-sig-block { gap: 10pt !important; padding-top: 5pt !important; margin-top: 4pt !important; }
-    .pro-sig-line { height: 12pt !important; }
-    .pro-sig-label { font-size: .75rem !important; }
-    .pro-sig-sub { font-size: .68rem !important; }
-    .pro-legend { font-size: .68rem !important; margin-top: 2pt !important; }
-}`;
-        document.head.appendChild(style);
-        window.print();
-        window.addEventListener('afterprint', function onAP() {
-            document.getElementById(styleId)?.remove();
-            window.removeEventListener('afterprint', onAP);
-        }, { once: true });
+    /* ══ BRIDGING SUBJECTS MODAL ════════════════════════════════════════════ */
+    function showBridgingModal() {
+        const majorId = document.getElementById('prospectusMajorSelect').value;
+        if (!majorId) { toast('Please select a major first', 'error'); return; }
+        
+        const modal = document.getElementById('bridgingModal');
+        modal.classList.add('active');
+        
+        const container = document.getElementById('bridgingContent');
+        container.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        
+        const fd = new FormData();
+        fd.append('action', 'get_major_subjects');
+        fd.append('major_id', majorId);
+        
+        fetch('../../../data/major_process.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (!d.success || !d.subjects) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--light-text);">No subjects found</div>';
+                return;
+            }
+            
+            const bridging = d.subjects.filter(s => s.year_level === 'Bridging');
+            
+            if (bridging.length === 0) {
+                container.innerHTML = `
+                <div style="text-align:center;padding:40px;">
+                    <div style="font-size:48px;color:var(--gold-dark);margin-bottom:12px;opacity:0.3;"><i class="fas fa-exchange-alt"></i></div>
+                    <p style="font-weight:600;">No bridging subjects for this major</p>
+                    <p style="font-size:13px;color:var(--light-text);margin-bottom:16px;">Add subjects with "Bridging" year level to appear here</p>
+                    <button class="btn-add" style="margin:0 auto;" onclick="showSubjectModal(); document.getElementById('prospectusYearLevel').value='Bridging'; document.getElementById('bridgingForGroup').style.display='block';">
+                        <i class="fas fa-plus"></i> Add Bridging Subject
+                    </button>
+                </div>`;
+                return;
+            }
+            
+            let html = `
+            <div style="overflow-x:auto;">
+                <table class="pro-table" style="min-width:100%;">
+                    <thead>
+                        <tr>
+                            <th class="pro-th" style="width:28px;">Grade</th>
+                            <th class="pro-th" style="width:70px;">Code</th>
+                            <th class="pro-th">Subject Title</th>
+                            <th class="pro-th" style="width:40px;">Units</th>
+                            <th class="pro-th" style="width:90px;">Bridging For</th>
+                            <th class="pro-th" style="width:40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            bridging.forEach(s => {
+                const bridgingFor = escHtml(s.bridging_for || '—');
+                html += `
+                <tr>
+                    <td class="pro-grade-cell"></td>
+                    <td class="pro-code">${escHtml(s.subject_code || '')}</td>
+                    <td>${escHtml(s.subject_name || '')}</td>
+                    <td class="pro-units">${parseFloat(s.units) || 0}</td>
+                    <td class="pro-prereq-col">${bridgingFor}</td>
+                    <td style="text-align:center;">
+                        <button class="btn-crud btn-crud-edit" onclick="editBridgingSubject(${s.id})"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>`;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top:16px;text-align:center;">
+                <button class="btn-add" onclick="showSubjectModal(); document.getElementById('prospectusYearLevel').value='Bridging'; document.getElementById('bridgingForGroup').style.display='block';">
+                    <i class="fas fa-plus"></i> Add Bridging Subject
+                </button>
+            </div>`;
+            
+            container.innerHTML = html;
+        })
+        .catch(() => {
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--light-text);">Failed to load subjects</div>';
+        });
+    }
+    
+    function closeBridgingModal() {
+        document.getElementById('bridgingModal').classList.remove('active');
+    }
+    
+    function editBridgingSubject(subjectId) {
+        closeBridgingModal();
+        showSubjectModal(subjectId);
     }
 
     /* ══ HELPER ═══════════════════════════════════════════════════ */
+    let editMode = false;
+    let currentEditMajorId = 0;
+
+    function toggleEditMode() {
+        editMode = !editMode;
+        const btn = document.getElementById('editModeBtn');
+        btn.classList.toggle('active', editMode);
+        btn.innerHTML = editMode ? '<i class="fas fa-times"></i> Exit Edit' : '<i class="fas fa-edit"></i> Edit Mode';
+        
+        if (editMode && currentEditMajorId) {
+            loadProspectusWithCRUD();
+        } else {
+            loadProspectus();
+        }
+    }
+
+    function loadProspectusWithCRUD(showSpinner = true) {
+        const majorId = document.getElementById('prospectusMajorSelect').value;
+        if (!majorId) return;
+        
+        currentEditMajorId = majorId;
+        
+        // Only show the loading spinner when explicitly requested (initial load, major switch, etc.)
+        // Skip spinner for background refreshes like after drag-and-drop reorder
+        if (showSpinner) {
+            document.getElementById('prospectusContent').innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:32px;color:var(--gold-dark);"></i><p style="margin-top:12px;color:var(--light-text);">Loading prospectus…</p></div>';
+        }
+
+        const fd = new FormData();
+        fd.append('action','get_major_subjects'); fd.append('major_id',majorId);
+        
+        fetch('../../../data/major_process.php', { method:'POST', body:fd })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success || !data.subjects || data.subjects.length === 0) {
+                renderEmptyProspectusWithCRUD(document.getElementById('prospectusMajorSelect').selectedOptions[0]?.text || '');
+            } else {
+                const majorName = document.getElementById('prospectusMajorSelect').selectedOptions[0]?.text || '';
+                renderProspectusWithCRUD(data.subjects, majorName);
+                // Initialize drag and drop after rendering
+                setTimeout(initDragAndDrop, 200);
+            }
+        })
+        .catch(() => renderEmptyProspectusWithCRUD(document.getElementById('prospectusMajorSelect').selectedOptions[0]?.text || ''));
+    }
+
+    function buildSemTableWithCRUD(subjects, semLabel, yearLabel = '') {
+        let rows = '', total = 0;
+        const isSem1 = semLabel.includes('1st');
+        const displayLabel = yearLabel ? (yearLabel.toUpperCase() + ' - ' + (isSem1 ? 'First Semester' : 'Second Semester')) : semLabel;
+        if (!subjects || subjects.length === 0) {
+            rows = `<tr><td colspan="7" class="pro-empty">No subjects</td></tr>`;
+        } else {
+            subjects.forEach(s => {
+                const u = parseFloat(s.units) || 0;
+                total += u;
+                const prereqCode = s.prerequisite || '—';
+                const prereqDisplay = prereqCode !== '—' ? '<span style="color:#dc2626;font-weight:600;">★ ' + escHtml(prereqCode) + '</span>' : '—';
+                rows += `<tr draggable="true" data-major-subject-id="${s.major_subject_id}" data-sort-order="${s.sort_order || 0}" data-year-level="${escHtml(s.year_level||'')}" data-semester="${escHtml(s.semester||'')}">
+                    <td class="pro-grade-cell"><span class="drag-handle"><i class="fas fa-grip-vertical"></i></span></td>
+                    <td class="pro-code">${escHtml(s.subject_code||'')}</td>
+                    <td>${escHtml(s.subject_name||'')}</td>
+                    <td class="pro-units">${u%1===0?u:u.toFixed(1)}</td>
+                    <td class="pro-prereq-col">${prereqDisplay}</td>
+                    <td class="pro-crud-col">
+                        <button class="btn-crud btn-crud-edit" onclick="editProspectusSubject(${s.major_subject_id}, '${escHtml(s.subject_code||'')}', '${escHtml(s.subject_name||'')}', '${escHtml(s.year_level||'')}', '${escHtml(s.semester||'')}', '${escHtml(s.units||'')}', ${s.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-crud btn-crud-delete" onclick="deleteProspectusSubject(${s.major_subject_id}, '${escHtml(s.subject_code||'')}', ${s.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+        const t = total%1===0 ? total : total.toFixed(1);
+        rows += `<tr class="pro-total-row"><td colspan="3" style="text-align:right;padding-right:8px;">Total Units</td><td class="pro-units">${t}</td><td></td><td></td><td></td></tr>`;
+        return `<div>
+            <div class="pro-sem-label">${displayLabel}</div>
+            <table class="pro-table">
+                <thead><tr>
+                    <th class="pro-th" style="width:30px;"></th>
+                    <th class="pro-th" style="width:80px;">Code</th>
+                    <th class="pro-th">Subject Title</th>
+                    <th class="pro-th" style="width:40px;">Units</th>
+                    <th class="pro-th" style="width:75px;">Pre-Req</th>
+                    <th class="pro-th pro-th-crud" style="width:60px;">Action</th>
+                </tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+    }
+
+    function renderProspectusWithCRUD(subjects, majorName) {
+        const yearOrder = ['1st Year','2nd Year','3rd Year','4th Year'];
+        const grouped = {};
+        subjects.forEach(s => {
+            const y = s.year_level || '1st Year';
+            if (!grouped[y]) grouped[y] = [];
+            grouped[y].push(s);
+        });
+
+        let yearBlocks = '', grandTotal = 0;
+        yearOrder.forEach(y => {
+            const all  = grouped[y] || [];
+            const sem1 = all.filter(s => !s.semester || s.semester.includes('1st'));
+            const sem2 = all.filter(s =>  s.semester && s.semester.includes('2nd'));
+            const t = all.reduce((a,s)=>a+(parseFloat(s.units)||0),0);
+            grandTotal += t;
+            const tFmt = t%1===0?t:t.toFixed(1);
+            yearBlocks += `
+            <div class="pro-year-block">
+                <div class="pro-year-header">
+                    <span><i class="fas fa-calendar-alt" style="margin-right:6px;font-size:11px;"></i>${y}</span>
+                    <span class="pro-year-total">${tFmt} units</span>
+                </div>
+                <div class="pro-sem-row">
+                    ${buildSemTableWithCRUD(sem1,'1st Semester',y)}
+                    ${buildSemTableWithCRUD(sem2,'2nd Semester',y)}
+                </div>
+            </div>`;
+        });
+
+        const bridging = subjects.filter(s => s.year_level === 'Bridging');
+        let bridgeHtml = '';
+if (bridging.length > 0) {
+            const bt = bridging.reduce((a,s)=>a+(parseFloat(s.units)||0),0);
+            bridgeHtml = `
+            <div class="pro-bridging-block">
+                <div class="pro-year-block">
+                    <div class="pro-year-header" style="background: linear-gradient(135deg, #8B6914, #B8860B);">
+                        <span><i class="fas fa-exchange-alt" style="margin-right:6px;font-size:11px;"></i>Bridging Subjects</span>
+                        <span class="pro-year-total">${bt%1===0?bt:bt.toFixed(1)} units</span>
+                    </div>
+                    <div style="padding:10px 12px 12px;">
+                        <table class="pro-table" style="max-width:540px;">
+                            <thead><tr>
+                                <th class="pro-th" style="width:30px;"></th>
+                                <th class="pro-th" style="width:80px;">Code</th>
+                                <th class="pro-th">Subject Title</th>
+                                <th class="pro-th" style="width:40px;">Units</th>
+                                <th class="pro-th" style="width:75px;">Pre-Req</th>
+                                <th class="pro-th pro-th-crud" style="width:60px;">Action</th>
+                            </tr></thead>
+                            <tbody>
+                                ${bridging.map(s=>{
+                                    const prereqCode = s.prerequisite || '—';
+                                    return `<tr draggable="true" data-major-subject-id="${s.major_subject_id}" data-sort-order="${s.sort_order || 0}" data-year-level="${escHtml(s.year_level||'')}" data-semester="${escHtml(s.semester||'')}">
+                                        <td class="pro-grade-cell"><span class="drag-handle"><i class="fas fa-grip-vertical"></i></span></td>
+                                        <td class="pro-code">${escHtml(s.subject_code||'')}</td>
+                                        <td>${escHtml(s.subject_name||'')}</td>
+                                        <td class="pro-units">${parseFloat(s.units)||0}</td>
+                                        <td class="pro-prereq-col">${prereqCode !== '—' ? '<span style="color:#dc2626;font-weight:600;">★ ' + prereqCode + '</span>' : '—'}</td>
+                                        <td class="pro-crud-col">
+                                            <button class="btn-crud btn-crud-edit" onclick="editProspectusSubject(${s.major_subject_id}, '${escHtml(s.subject_code||'')}', '${escHtml(s.subject_name||'')}', '${escHtml(s.year_level||'')}', '${escHtml(s.semester||'')}', '${escHtml(s.units||'')}', ${s.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-crud btn-crud-delete" onclick="deleteProspectusSubject(${s.major_subject_id}, '${escHtml(s.subject_code||'')}', ${s.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>`;
+                                }).join('')}
+                                <tr class="pro-total-row"><td colspan="3" style="text-align:right;padding-right:8px;">Total Units</td><td class="pro-units">${bt%1===0?bt:bt.toFixed(1)}</td><td></td><td></td><td></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        const gt = grandTotal%1===0?grandTotal:grandTotal.toFixed(1);
+        document.getElementById('prospectusContent').innerHTML = `
+        <div class="pro-wrap" id="printableProspectus">
+            ${buildProspectusHeader(majorName)}
+            <div class="pro-body">
+                ${yearBlocks}
+                ${bridgeHtml}
+                <div class="pro-grand-total">Grand Total: <strong>${gt} units</strong></div>
+                <div class="pro-sig-block">
+                    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-label">Student's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
+                    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-label">Adviser's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
+                    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-label">Program Head's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
+                </div>
+                <div class="pro-legend"><span class="pro-star">★</span> = Prerequisite subject &nbsp;·&nbsp; <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fef2f2;border-left:3px solid #dc2626;vertical-align:middle;"></span> = prerequisite row</div>
+            </div>
+        </div>`;
+    }
+
+    function renderEmptyProspectusWithCRUD(majorName) {
+        const yearOrder = ['1st Year','2nd Year','3rd Year','4th Year'];
+        let yearBlocks = '';
+        yearOrder.forEach(y => {
+            yearBlocks += `
+            <div class="pro-year-block">
+                <div class="pro-year-header"><span>${y}</span><span class="pro-year-total">0 units</span></div>
+                <div class="pro-sem-row">${buildSemTableWithCRUD([],'1st Semester',y)}${buildSemTableWithCRUD([],'2nd Semester',y)}</div>
+            </div>`;
+        });
+        document.getElementById('prospectusContent').innerHTML = `
+        <div class="pro-wrap" id="printableProspectus">
+            ${buildProspectusHeader(majorName)}
+            <div class="pro-body">
+                ${yearBlocks}
+                <div class="pro-grand-total">Grand Total: <strong>0 units</strong></div>
+                <div class="pro-sig-block">
+                    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-label">Student's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
+                    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-label">Adviser's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
+                    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-label">Program Head's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function editProspectusSubject(majorSubjectId, subjectCode, subjectName, yearLevel, semester, units, subjectId) {
+        document.getElementById('editProspectusMajorId').value = currentEditMajorId;
+        document.getElementById('editProspectusSubjectId').value = majorSubjectId;
+        document.getElementById('editProspectusSubjectName').value = subjectCode + ' — ' + subjectName;
+        document.getElementById('editProspectusUnits').value = units || '3';
+        document.getElementById('editProspectusYearLevel').value = yearLevel || '1st Year';
+        document.getElementById('editProspectusSemester').value = semester || '1st Semester';
+        
+        // Load majors that have this subject
+        loadSubjectMajors(subjectId || subjectCode);
+        
+        document.getElementById('editProspectusSubjectModal').classList.add('active');
+    }
+
+    function loadSubjectMajors(subjectCodeOrId) {
+        const container = document.getElementById('editProspectusMajorsList');
+        container.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        
+        const fd = new FormData();
+        fd.append('action', 'get_subject_majors');
+        fd.append('subject_identifier', subjectCodeOrId);
+        
+        fetch('../../../data/major_process.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success && d.majors) {
+                let html = '';
+                d.majors.forEach(m => {
+                    const isChecked = m.has_subject ? 'checked' : '';
+                    html += `<label style="display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--cream)'" onmouseout="this.style.background='transparent'">
+                        <input type="checkbox" class="prospectus-major-toggle" data-major-id="${m.id}" ${isChecked} style="width:16px;height:16px;accent-color:var(--gold-dark);" onchange="toggleSubjectMajor(this, ${m.id})">
+                        <span style="font-size:13px;">${m.display_name}</span>
+                        <span style="font-size:11px;color:${m.has_subject ? '#22c55e' : '#9ca3af'};">${m.has_subject ? '✓ In prospectus' : '— Not in prospectus'}</span>
+                    </label>`;
+                });
+                container.innerHTML = html || '<p style="font-size:12px;color:var(--light-text);padding:8px;font-style:italic;">No majors available.</p>';
+            } else {
+                container.innerHTML = '<p style="font-size:12px;color:var(--light-text);padding:8px;font-style:italic;">Unable to load majors.</p>';
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<p style="font-size:12px;color:var(--light-text);padding:8px;font-style:italic;">Error loading majors.</p>';
+        });
+    }
+
+    function toggleSubjectMajor(checkbox, majorId) {
+        const subjectCode = document.getElementById('editProspectusSubjectName').value.split(' — ')[0];
+        
+        const fd = new FormData();
+        if (checkbox.checked) {
+            fd.append('action', 'add_major_subject');
+            fd.append('major_id', majorId);
+            fd.append('subject_identifier', subjectCode);
+            fd.append('year_level', document.getElementById('editProspectusYearLevel').value || '1st Year');
+            fd.append('semester', document.getElementById('editProspectusSemester').value || '1st Semester');
+        } else {
+            fd.append('action', 'remove_subject_from_major');
+            fd.append('major_id', majorId);
+            fd.append('subject_identifier', subjectCode);
+        }
+        
+        fetch('../../../data/major_process.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            toast(d.message, d.success ? 'success' : 'error');
+            if (d.success) {
+                // Refresh the list
+                loadSubjectMajors(subjectCode);
+            }
+        })
+        .catch(() => toast('Failed to update subject in major', 'error'));
+    }
+
+    function saveProspectusEdit(e) {
+        e.preventDefault();
+        const fd = new FormData(document.getElementById('editProspectusForm'));
+        fd.append('action', 'update_major_subject_placement');
+        fetch('../../../data/major_process.php', { method:'POST', body:fd })
+        .then(r => r.json())
+        .then(d => {
+            toast(d.message, d.success ? 'success' : 'error');
+            if (d.success) {
+                document.getElementById('editProspectusSubjectModal').classList.remove('active');
+                if (editMode) {
+                    loadProspectusWithCRUD();
+                } else {
+                    loadProspectus();
+                }
+            }
+        });
+    }
+
+    function deleteProspectusSubject(majorSubjectId, subjectCode, subjectId) {
+        if (!confirm('Permanently delete "' + subjectCode + '" from the database? This will also remove it from all other majors that use this subject.')) return;
+        const fd = new FormData();
+        fd.append('action', 'delete_subject_permanently');
+        fd.append('major_subject_id', majorSubjectId);
+        fd.append('subject_id', subjectId);
+        fetch('../../../data/major_process.php', { method:'POST', body:fd })
+        .then(r => r.json())
+        .then(d => {
+            toast(d.message, d.success ? 'success' : 'error');
+            if (d.success) {
+                if (editMode) {
+                    loadProspectusWithCRUD();
+                } else {
+                    loadProspectus();
+                }
+            }
+        });
+    }
+
+    /* ══ DRAG AND DROP FOR SUBJECT REORDERING ═══════════════════════ */
+    let draggedRow = null;
+    let draggedMajorSubjectId = null;
+    let dragSourceYearLevel = '';
+    let dragSourceSemester = '';
+    let lastDragOverRow = null;
+
+    function getTableSemesterInfo(tableEl) {
+        const semLabelEl = tableEl?.previousElementSibling;
+        const semLabel = semLabelEl?.textContent?.trim() || '';
+        
+        const yearBlock = tableEl.closest('.pro-year-block');
+        let yearLevel = '1st Year';
+        if (yearBlock) {
+            const yearHeader = yearBlock.querySelector('.pro-year-header span');
+            if (yearHeader) {
+                const txt = yearHeader.textContent.trim();
+                if (txt.includes('1st Year')) yearLevel = '1st Year';
+                else if (txt.includes('2nd Year')) yearLevel = '2nd Year';
+                else if (txt.includes('3rd Year')) yearLevel = '3rd Year';
+                else if (txt.includes('4th Year')) yearLevel = '4th Year';
+                else if (txt.includes('Bridging')) yearLevel = 'Bridging';
+            }
+        }
+        
+        let semester = '1st Semester';
+        if (semLabel.includes('2nd')) semester = '2nd Semester';
+        
+        return { yearLevel, semester };
+    }
+
+    function clearAllDragIndicators() {
+        document.querySelectorAll('.pro-table tbody tr.drag-over-above').forEach(r => r.classList.remove('drag-over-above'));
+        document.querySelectorAll('.pro-table tbody tr.drag-over-below').forEach(r => r.classList.remove('drag-over-below'));
+        document.querySelectorAll('.pro-table tbody.drag-over-empty').forEach(tb => tb.classList.remove('drag-over-empty'));
+        lastDragOverRow = null;
+    }
+
+    function initDragAndDrop() {
+        document.querySelectorAll('.pro-table tbody').forEach(tbody => {
+            tbody.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                const rows = tbody.querySelectorAll('tr[draggable="true"]');
+                if (rows.length === 0) {
+                    tbody.classList.add('drag-over-empty');
+                }
+            });
+            tbody.addEventListener('dragleave', (e) => {
+                if (!tbody.contains(e.relatedTarget)) {
+                    tbody.classList.remove('drag-over-empty');
+                }
+            });
+            tbody.addEventListener('drop', (e) => {
+                e.preventDefault();
+                tbody.classList.remove('drag-over-empty');
+                if (!draggedRow) return;
+                const rows = tbody.querySelectorAll('tr[draggable="true"]');
+                if (rows.length === 0) {
+                    const tableEl = tbody.closest('.pro-table');
+                    const info = getTableSemesterInfo(tableEl);
+                    moveSubjectToSemester(draggedMajorSubjectId, info.yearLevel, info.semester);
+                }
+            });
+        });
+        
+        document.querySelectorAll('.pro-table tbody tr[draggable="true"]').forEach(row => {
+            row.addEventListener('dragstart', handleDragStart);
+            row.addEventListener('dragend', handleDragEnd);
+            row.addEventListener('dragover', handleDragOver);
+            row.addEventListener('dragleave', handleDragLeave);
+            row.addEventListener('drop', handleDrop);
+        });
+    }
+
+    function handleDragStart(e) {
+        const row = e.target.closest('tr');
+        if (!row || row.classList.contains('pro-total-row')) {
+            e.preventDefault();
+            return;
+        }
+        
+        draggedRow = row;
+        draggedMajorSubjectId = row.dataset.majorSubjectId;
+        dragSourceYearLevel = row.dataset.yearLevel || '1st Year';
+        dragSourceSemester = row.dataset.semester || '1st Semester';
+        
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedMajorSubjectId);
+
+        // Create a clean drag image clone to avoid glitchy default ghost
+        const clone = row.cloneNode(true);
+        clone.style.cssText = 'position:absolute;top:-9999px;left:-9999px;background:#fffdf5;opacity:0.85;border:1px solid #d4a843;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;width:' + row.offsetWidth + 'px;';
+        document.body.appendChild(clone);
+        e.dataTransfer.setDragImage(clone, 20, row.offsetHeight / 2);
+        
+        // Clean up clone after a tick
+        requestAnimationFrame(() => {
+            row.classList.add('dragging-row');
+            row.querySelector('.drag-handle')?.classList.add('dragging');
+            setTimeout(() => { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 0);
+        });
+    }
+
+    function handleDragEnd(e) {
+        if (draggedRow) {
+            draggedRow.classList.remove('dragging-row');
+            draggedRow.querySelector('.drag-handle')?.classList.remove('dragging');
+        }
+        clearAllDragIndicators();
+        draggedRow = null;
+        draggedMajorSubjectId = null;
+        dragSourceYearLevel = '';
+        dragSourceSemester = '';
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const row = e.target.closest('tr');
+        if (!row || row.classList.contains('pro-total-row') || row === draggedRow) return;
+        
+        // Only update indicator if the target row changed (prevents constant repainting)
+        if (lastDragOverRow === row) {
+            // Still update above/below based on mouse position
+            const rect = row.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            const isAbove = e.clientY < midY;
+            if (isAbove && !row.classList.contains('drag-over-above')) {
+                row.classList.remove('drag-over-below');
+                row.classList.add('drag-over-above');
+            } else if (!isAbove && !row.classList.contains('drag-over-below')) {
+                row.classList.remove('drag-over-above');
+                row.classList.add('drag-over-below');
+            }
+            return;
+        }
+        
+        // Clear previous indicators
+        clearAllDragIndicators();
+        lastDragOverRow = row;
+        
+        // Determine if dropping above or below
+        const rect = row.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (e.clientY < midY) {
+            row.classList.add('drag-over-above');
+        } else {
+            row.classList.add('drag-over-below');
+        }
+    }
+
+    function handleDragLeave(e) {
+        const row = e.target.closest('tr');
+        if (row && !row.contains(e.relatedTarget)) {
+            row.classList.remove('drag-over-above');
+            row.classList.remove('drag-over-below');
+            if (lastDragOverRow === row) lastDragOverRow = null;
+        }
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const row = e.target.closest('tr');
+        if (!row || row.classList.contains('pro-total-row') || row === draggedRow || !draggedRow) return;
+        
+        const targetMajorSubjectId = row.dataset.majorSubjectId;
+        const tableEl = row.closest('.pro-table');
+        const targetInfo = getTableSemesterInfo(tableEl);
+        const draggedSortOrder = parseInt(draggedRow.dataset.sortOrder) || 0;
+        const targetSortOrder = parseInt(row.dataset.sortOrder) || 0;
+        
+        // Perform DOM move immediately for instant visual feedback (no flicker)
+        const tbody = row.parentNode;
+        if (row.classList.contains('drag-over-above')) {
+            tbody.insertBefore(draggedRow, row);
+        } else {
+            tbody.insertBefore(draggedRow, row.nextSibling);
+        }
+        
+        // Reset visual state immediately
+        draggedRow.classList.remove('dragging-row');
+        draggedRow.querySelector('.drag-handle')?.classList.remove('dragging');
+        clearAllDragIndicators();
+        
+        // Then persist to server in background
+        moveSubjectToPosition(
+            draggedMajorSubjectId, 
+            targetMajorSubjectId, 
+            draggedSortOrder, 
+            targetSortOrder,
+            targetInfo.yearLevel,
+            targetInfo.semester
+        );
+    }
+
+    function moveSubjectToPosition(draggedId, targetId, draggedOrder, targetOrder, targetYear, targetSem) {
+        const fd = new FormData();
+        fd.append('action', 'move_subject_position');
+        fd.append('dragged_id', draggedId);
+        fd.append('target_id', targetId);
+        fd.append('dragged_order', draggedOrder);
+        fd.append('target_order', targetOrder);
+        fd.append('target_year', targetYear);
+        fd.append('target_sem', targetSem);
+        
+        fetch('../../../data/major_process.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                toast(d.message, 'success');
+                // Silently reload to sync sort orders from server WITHOUT showing spinner
+                loadProspectusWithCRUD(false);
+            } else {
+                toast(d.message, 'error');
+                loadProspectusWithCRUD(false);
+            }
+        })
+        .catch(() => { toast('Failed to move subject', 'error'); loadProspectusWithCRUD(false); });
+    }
+
+    function moveSubjectToSemester(majorSubjectId, targetYear, targetSem) {
+        const fd = new FormData();
+        fd.append('action', 'move_subject_position');
+        fd.append('dragged_id', majorSubjectId);
+        fd.append('target_id', '0');
+        fd.append('dragged_order', '0');
+        fd.append('target_order', '999');
+        fd.append('target_year', targetYear);
+        fd.append('target_sem', targetSem);
+        
+        fetch('../../../data/major_process.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            toast(d.message, d.success ? 'success' : 'error');
+            if (d.success) {
+                // Silently reload without spinner after drag-and-drop move
+                loadProspectusWithCRUD(false);
+            }
+        })
+        .catch(() => toast('Failed to move subject', 'error'));
+    }
+
+    function updateSubjectOrder(firstId, firstOrder, secondId, secondOrder) {
+        const fd = new FormData();
+        fd.append('action', 'reorder_subjects');
+        fd.append('first_id', firstId);
+        fd.append('first_order', firstOrder);
+        fd.append('second_id', secondId);
+        fd.append('second_order', secondOrder);
+        
+        fetch('../../../data/major_process.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            toast(d.message, d.success ? 'success' : 'error');
+            if (d.success) {
+                // Silently reload without spinner after reorder
+                loadProspectusWithCRUD(false);
+            }
+        })
+        .catch(() => toast('Failed to reorder subjects', 'error'));
+    }
+
     function escHtml(str) {
         if (!str) return '';
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

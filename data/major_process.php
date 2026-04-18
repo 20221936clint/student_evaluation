@@ -42,6 +42,12 @@ switch ($action) {
     case 'remove_major_subject':
         removeMajorSubject();
         break;
+    case 'delete_subject_permanently':
+        deleteSubjectPermanently();
+        break;
+    case 'update_major_subject_placement':
+        updateMajorSubjectPlacement();
+        break;
     case 'update_major_subject':
         updateMajorSubject();
         break;
@@ -59,6 +65,18 @@ switch ($action) {
         break;
     case 'delete_prereq_set':
         deletePrereqSet();
+        break;
+    case 'reorder_subjects':
+        reorderSubjects();
+        break;
+    case 'move_subject_position':
+        moveSubjectPosition();
+        break;
+    case 'get_subject_majors':
+        getSubjectMajors();
+        break;
+    case 'remove_subject_from_major':
+        removeSubjectFromMajor();
         break;
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
@@ -338,6 +356,7 @@ function addSubject() {
     $year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
     $semester = isset($_POST['default_semester']) ? trim($_POST['default_semester']) : '1st Semester';
     $prerequisite = isset($_POST['prerequisite']) ? trim($_POST['prerequisite']) : '';
+    $bridging_for = isset($_POST['bridging_for']) ? trim($_POST['bridging_for']) : '';
     
     if (empty($subject_code) || empty($subject_name)) {
         echo json_encode(['success' => false, 'message' => 'Subject code and name are required']);
@@ -353,8 +372,8 @@ function addSubject() {
             return;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO subjects (subject_code, subject_name, units, default_year_level, semester, prerequisite) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$subject_code, $subject_name, $units, $year_level, $semester, $prerequisite]);
+        $stmt = $pdo->prepare("INSERT INTO subjects (subject_code, subject_name, units, default_year_level, semester, prerequisite, bridging_for) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$subject_code, $subject_name, $units, $year_level, $semester, $prerequisite, $bridging_for]);
         $subject_id = $pdo->lastInsertId();
         echo json_encode(['success' => true, 'message' => 'Subject added successfully', 'subject_id' => $subject_id]);
     } catch (PDOException $e) {
@@ -375,6 +394,7 @@ function updateSubject() {
     $year_level = isset($_POST['default_year_level']) ? trim($_POST['default_year_level']) : '1st Year';
     $semester = isset($_POST['default_semester']) ? trim($_POST['default_semester']) : '1st Semester';
     $prerequisite = isset($_POST['prerequisite']) ? trim($_POST['prerequisite']) : '';
+    $bridging_for = isset($_POST['bridging_for']) ? trim($_POST['bridging_for']) : '';
     
     if ($id <= 0 || empty($subject_code) || empty($subject_name)) {
         echo json_encode(['success' => false, 'message' => 'Invalid subject ID or missing required fields']);
@@ -382,8 +402,8 @@ function updateSubject() {
     }
     
     try {
-        $stmt = $pdo->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, units = ?, default_year_level = ?, semester = ?, prerequisite = ? WHERE id = ?");
-        $stmt->execute([$subject_code, $subject_name, $units, $year_level, $semester, $prerequisite, $id]);
+        $stmt = $pdo->prepare("UPDATE subjects SET subject_code = ?, subject_name = ?, units = ?, default_year_level = ?, semester = ?, prerequisite = ?, bridging_for = ? WHERE id = ?");
+        $stmt->execute([$subject_code, $subject_name, $units, $year_level, $semester, $prerequisite, $bridging_for, $id]);
         echo json_encode(['success' => true, 'message' => 'Subject updated successfully']);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -419,7 +439,7 @@ function getMajorSubjects() {
     
     try {
         $stmt = $pdo->prepare("
-            SELECT s.*, ms.year_level, ms.semester, ms.is_required, ms.is_prerequisite, ms.sort_order
+            SELECT s.*, ms.id as major_subject_id, ms.year_level, ms.semester, ms.is_required, ms.is_prerequisite, ms.sort_order
             FROM subjects s
             INNER JOIN major_subjects ms ON s.id = ms.subject_id
             WHERE ms.major_id = ?
@@ -445,15 +465,47 @@ function addMajorSubject() {
     global $pdo;
     $major_id = isset($_POST['major_id']) ? intval($_POST['major_id']) : 0;
     $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : 0;
+    $subject_identifier = isset($_POST['subject_identifier']) ? trim($_POST['subject_identifier']) : '';
     $year_level = isset($_POST['year_level']) ? trim($_POST['year_level']) : '';
     $semester = isset($_POST['semester']) ? trim($_POST['semester']) : '';
     $is_required = isset($_POST['is_required']) ? boolval($_POST['is_required']) : true;
     $is_prerequisite = isset($_POST['is_prerequisite']) ? boolval($_POST['is_prerequisite']) : false;
     
-    if ($major_id <= 0 || $subject_id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'Invalid major or subject ID']);
+    if ($major_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid major ID']);
         return;
     }
+    
+    // If subject_id not provided, find by subject_identifier (subject_code)
+    if ($subject_id <= 0 && !empty($subject_identifier)) {
+        if (is_numeric($subject_identifier)) {
+            $subject_id = intval($subject_identifier);
+        } else {
+            try {
+                $stmt = $pdo->prepare("SELECT id FROM subjects WHERE subject_code = ?");
+                $stmt->execute([$subject_identifier]);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($result) {
+                    $subject_id = intval($result['id']);
+                }
+            } catch (PDOException $e) {}
+        }
+    }
+    
+    if ($subject_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid subject ID']);
+        return;
+    }
+    
+    // Check if subject already exists in this major
+    try {
+        $stmt = $pdo->prepare("SELECT id FROM major_subjects WHERE major_id = ? AND subject_id = ?");
+        $stmt->execute([$major_id, $subject_id]);
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'Subject already exists in this major']);
+            return;
+        }
+    } catch (PDOException $e) {}
     
     // If year_level or semester not provided, get from subject defaults
     try {
@@ -472,9 +524,20 @@ function addMajorSubject() {
         $semester = $semester ?: '1st Semester';
     }
     
+    // Get the next sort_order for this major
+    $sort_order = 1;
     try {
-        $stmt = $pdo->prepare("INSERT INTO major_subjects (major_id, subject_id, year_level, semester, is_required, is_prerequisite) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$major_id, $subject_id, $year_level, $semester, $is_required, $is_prerequisite]);
+        $stmt = $pdo->prepare("SELECT MAX(sort_order) as max_order FROM major_subjects WHERE major_id = ?");
+        $stmt->execute([$major_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result && $result['max_order']) {
+            $sort_order = intval($result['max_order']) + 1;
+        }
+    } catch (PDOException $e) {}
+    
+    try {
+        $stmt = $pdo->prepare("INSERT INTO major_subjects (major_id, subject_id, year_level, semester, is_required, is_prerequisite, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$major_id, $subject_id, $year_level, $semester, $is_required, $is_prerequisite, $sort_order]);
         echo json_encode(['success' => true, 'message' => 'Subject added to major successfully']);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -483,8 +546,61 @@ function addMajorSubject() {
 
 function removeMajorSubject() {
     global $pdo;
+    $major_subject_id = isset($_POST['major_subject_id']) ? intval($_POST['major_subject_id']) : 0;
+    
+    if ($major_subject_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid subject ID']);
+        return;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("DELETE FROM major_subjects WHERE id = ?");
+        $stmt->execute([$major_subject_id]);
+        echo json_encode(['success' => true, 'message' => 'Subject removed from prospectus successfully']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function deleteSubjectPermanently() {
+    global $pdo;
+    $major_subject_id = isset($_POST['major_subject_id']) ? intval($_POST['major_subject_id']) : 0;
+    $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : 0;
+    
+    if ($subject_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid subject ID']);
+        return;
+    }
+    
+    try {
+        // First remove from this major
+        $stmt = $pdo->prepare("DELETE FROM major_subjects WHERE id = ?");
+        $stmt->execute([$major_subject_id]);
+        
+        // Check if subject is used by any other major
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM major_subjects WHERE subject_id = ?");
+        $stmt->execute([$subject_id]);
+        $otherUsages = intval($stmt->fetchColumn());
+        
+        // Only delete from subjects table if no other major uses it
+        if ($otherUsages === 0) {
+            $stmt = $pdo->prepare("DELETE FROM subjects WHERE id = ?");
+            $stmt->execute([$subject_id]);
+        }
+        
+        echo json_encode(['success' => true, 'message' => 'Subject permanently deleted']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function updateMajorSubjectPlacement() {
+    global $pdo;
     $major_id = isset($_POST['major_id']) ? intval($_POST['major_id']) : 0;
     $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : 0;
+    $year_level = isset($_POST['year_level']) ? trim($_POST['year_level']) : '1st Year';
+    $semester = isset($_POST['semester']) ? trim($_POST['semester']) : '1st Semester';
+    $units = isset($_POST['units']) ? floatval($_POST['units']) : 0;
     
     if ($major_id <= 0 || $subject_id <= 0) {
         echo json_encode(['success' => false, 'message' => 'Invalid major or subject ID']);
@@ -492,9 +608,23 @@ function removeMajorSubject() {
     }
     
     try {
-        $stmt = $pdo->prepare("DELETE FROM major_subjects WHERE major_id = ? AND subject_id = ?");
-        $stmt->execute([$major_id, $subject_id]);
-        echo json_encode(['success' => true, 'message' => 'Subject removed from major successfully']);
+        // Update major_subjects placement
+        $stmt = $pdo->prepare("UPDATE major_subjects SET year_level = ?, semester = ? WHERE major_id = ? AND id = ?");
+        $stmt->execute([$year_level, $semester, $major_id, $subject_id]);
+        
+        // If units changed, update the subject's units value
+        if ($units > 0) {
+            // First get the subject_id from major_subjects to update the subjects table
+            $stmt = $pdo->prepare("SELECT subject_id FROM major_subjects WHERE id = ?");
+            $stmt->execute([$subject_id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                $stmt = $pdo->prepare("UPDATE subjects SET units = ? WHERE id = ?");
+                $stmt->execute([$units, $row['subject_id']]);
+            }
+        }
+        
+        echo json_encode(['success' => true, 'message' => 'Subject placement updated successfully']);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
@@ -538,6 +668,151 @@ function updateMajorSubjectFlag() {
         $stmt = $pdo->prepare("UPDATE major_subjects SET is_prerequisite = ? WHERE major_id = ? AND subject_id = ?");
         $stmt->execute([$is_prerequisite, $major_id, $subject_id]);
         echo json_encode(['success' => true, 'message' => $is_prerequisite ? 'Subject marked as prerequisite' : 'Prerequisite status removed']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function reorderSubjects() {
+    global $pdo;
+    $first_id = isset($_POST['first_id']) ? intval($_POST['first_id']) : 0;
+    $first_order = isset($_POST['first_order']) ? intval($_POST['first_order']) : 0;
+    $second_id = isset($_POST['second_id']) ? intval($_POST['second_id']) : 0;
+    $second_order = isset($_POST['second_order']) ? intval($_POST['second_order']) : 0;
+    
+    if ($first_id <= 0 || $second_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid subject IDs']);
+        return;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("UPDATE major_subjects SET sort_order = ? WHERE id = ?");
+        $stmt->execute([$second_order, $first_id]);
+        $stmt->execute([$first_order, $second_id]);
+        echo json_encode(['success' => true, 'message' => 'Subjects reordered successfully']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function moveSubjectPosition() {
+    global $pdo;
+    $dragged_id = isset($_POST['dragged_id']) ? intval($_POST['dragged_id']) : 0;
+    $target_id = isset($_POST['target_id']) ? intval($_POST['target_id']) : 0;
+    $dragged_order = isset($_POST['dragged_order']) ? intval($_POST['dragged_order']) : 0;
+    $target_order = isset($_POST['target_order']) ? intval($_POST['target_order']) : 0;
+    $target_year = isset($_POST['target_year']) ? trim($_POST['target_year']) : '1st Year';
+    $target_sem = isset($_POST['target_sem']) ? trim($_POST['target_sem']) : '1st Semester';
+    
+    if ($dragged_id <= 0 || $target_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid subject IDs']);
+        return;
+    }
+    
+    try {
+        // Move dragged subject to target position - swap sort orders and update year/semester
+        $stmt = $pdo->prepare("UPDATE major_subjects SET sort_order = ?, year_level = ?, semester = ? WHERE id = ?");
+        $stmt->execute([$target_order, $target_year, $target_sem, $dragged_id]);
+        
+        // Update target to dragged's old position
+        $stmt = $pdo->prepare("UPDATE major_subjects SET sort_order = ? WHERE id = ?");
+        $stmt->execute([$dragged_order, $target_id]);
+        
+        echo json_encode(['success' => true, 'message' => 'Subject moved successfully']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function getSubjectMajors() {
+    global $pdo;
+    $subject_identifier = isset($_POST['subject_identifier']) ? trim($_POST['subject_identifier']) : '';
+    
+    if (empty($subject_identifier)) {
+        echo json_encode(['success' => false, 'message' => 'Subject identifier required']);
+        return;
+    }
+    
+    // Check if identifier is numeric (subject ID) or string (subject code)
+    $subject_id = 0;
+    if (is_numeric($subject_identifier)) {
+        $subject_id = intval($subject_identifier);
+    } else {
+        // Find subject by code
+        try {
+            $stmt = $pdo->prepare("SELECT id FROM subjects WHERE subject_code = ?");
+            $stmt->execute([$subject_identifier]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($result) {
+                $subject_id = intval($result['id']);
+            }
+        } catch (PDOException $e) {}
+    }
+    
+    if ($subject_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Subject not found']);
+        return;
+    }
+    
+    try {
+        // Get all majors
+        $stmt = $pdo->query("SELECT id, display_name FROM majors ORDER BY display_name");
+        $allMajors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Get majors that have this subject
+        $stmt = $pdo->prepare("SELECT DISTINCT major_id FROM major_subjects WHERE subject_id = ?");
+        $stmt->execute([$subject_id]);
+        $majorsWithSubject = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        $result = [];
+        foreach ($allMajors as $m) {
+            $result[] = [
+                'id' => $m['id'],
+                'display_name' => $m['display_name'],
+                'has_subject' => in_array($m['id'], $majorsWithSubject)
+            ];
+        }
+        
+        echo json_encode(['success' => true, 'majors' => $result]);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+function removeSubjectFromMajor() {
+    global $pdo;
+    $major_id = isset($_POST['major_id']) ? intval($_POST['major_id']) : 0;
+    $subject_identifier = isset($_POST['subject_identifier']) ? trim($_POST['subject_identifier']) : '';
+    
+    if ($major_id <= 0 || empty($subject_identifier)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
+        return;
+    }
+    
+    // Find subject ID
+    $subject_id = 0;
+    if (is_numeric($subject_identifier)) {
+        $subject_id = intval($subject_identifier);
+    } else {
+        try {
+            $stmt = $pdo->prepare("SELECT id FROM subjects WHERE subject_code = ?");
+            $stmt->execute([$subject_identifier]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($result) {
+                $subject_id = intval($result['id']);
+            }
+        } catch (PDOException $e) {}
+    }
+    
+    if ($subject_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Subject not found']);
+        return;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("DELETE FROM major_subjects WHERE major_id = ? AND subject_id = ?");
+        $stmt->execute([$major_id, $subject_id]);
+        echo json_encode(['success' => true, 'message' => 'Subject removed from major']);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }

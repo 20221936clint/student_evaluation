@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 require_once 'config.php';
 
-$results = ['subjects_added' => 0, 'majors_subjects_added' => 0, 'message' => ''];
+$results = ['subjects_added' => 0, 'majors_subjects_added' => 0, 'bridging_added' => 0, 'message' => ''];
 
 try {
     // Check if subjects table has data
@@ -49,6 +49,51 @@ try {
         foreach ($majorSubjects as $ms) {
             $stmt->execute($ms);
             $results['majors_subjects_added']++;
+        }
+    }
+    
+    // Add bridging subjects (15 units) - check if they exist
+    $bridgingSubjects = [
+        ['ACCTG 1', 'FUNDAMENTALS OF ACCOUNTING', 'Introduction to basic accounting principles, concepts, and practices. Covers the accounting cycle, journals, ledgers, and financial statements.', 3.0, 'fas fa-calculator', '#16a34a', 'SHS NON ABM'],
+        ['MKTG 1', 'PRINCIPLES OF MARKETING', 'Fundamental concepts of marketing including market analysis, product development, pricing, promotion, and distribution strategies.', 3.0, 'fas fa-bullhorn', '#3b82f6', 'SHS NON ABM'],
+        ['MNGT 1', 'PRINCIPLES OF MANAGEMENT', 'Basic management principles covering planning, organizing, leading, and controlling. Includes organizational structure and management functions.', 3.0, 'fas fa-briefcase', '#f59e0b', 'SHS NON ABM'],
+        ['ENG 1', 'STUDY AND THINKING SKILLS', 'Development of academic reading, writing, and critical thinking skills for college success.', 3.0, 'fas fa-book-open', '#8b5cf6', NULL],
+        ['MATH 1', 'COLLEGE ALGEBRA', 'Fundamental algebraic operations, equations, inequalities, functions, and graphs. Prepares students for higher mathematics courses.', 3.0, 'fas fa-function', '#ec4899', NULL]
+    ];
+    
+    // First, add bridging_for column if it doesn't exist
+    try {
+        $pdo->exec("ALTER TABLE subjects ADD COLUMN bridging_for VARCHAR(100) DEFAULT NULL");
+    } catch (Exception $e) {}
+    
+    $stmtCheck = $pdo->prepare("SELECT id FROM subjects WHERE subject_code = ?");
+    $stmtInsert = $pdo->prepare("INSERT INTO subjects (subject_code, subject_name, description, units, icon_class, color, bridging_for) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $bridgingIds = [];
+    
+    foreach ($bridgingSubjects as $bs) {
+        $stmtCheck->execute([$bs[0]]);
+        $existing = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$existing) {
+            $stmtInsert->execute([$bs[0], $bs[1], $bs[2], $bs[3], $bs[4], $bs[5], $bs[6]]);
+            $bridgingIds[$bs[0]] = $pdo->lastInsertId();
+            $results['bridging_added']++;
+        } else {
+            $bridgingIds[$bs[0]] = $existing['id'];
+        }
+    }
+    
+    // Add bridging subjects to major_subjects with year_level = 'Bridging'
+    if (!empty($bridgingIds)) {
+        $stmtCheckMajor = $pdo->prepare("SELECT id FROM major_subjects WHERE major_id = ? AND subject_id = ?");
+        $stmtInsertMajor = $pdo->prepare("INSERT INTO major_subjects (major_id, subject_id, year_level, semester, is_required, is_prerequisite, sort_order) VALUES (?, ?, 'Bridging', '1st Semester', TRUE, FALSE, 0)");
+        
+        foreach ($bridgingIds as $code => $sid) {
+            $stmtCheckMajor->execute([1, $sid]);
+            if (!$stmtCheckMajor->fetch(PDO::FETCH_ASSOC)) {
+                $stmtInsertMajor->execute([1, $sid]);
+                $results['bridging_added']++;
+            }
         }
     }
     

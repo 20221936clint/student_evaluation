@@ -1233,19 +1233,41 @@ function closeEval() { document.getElementById('evalOverlay').classList.remove('
           <div style="padding:10px 12px 12px;">
             <table class="pro-table">
               <thead><tr>
+                <th class="pro-th" style="width:54px;">Grade</th>
+                <th class="pro-th pro-th-status" style="width:36px;">Status</th>
                 <th class="pro-th">Code</th>
                 <th class="pro-th">Subject Title</th>
-                <th class="pro-th">Units</th>
+                <th class="pro-th" style="width:32px;">Units</th>
                 <th class="pro-th">Bridging For</th>
               </tr></thead>
               <tbody>
-                ${bridging?bridging.map(sub=>`<tr>
-                  <td class="pro-code">${esc(sub.subject_code)}</td>
-                  <td>${esc(sub.subject_name)}</td>
-                  <td class="pro-units">${parseFloat(sub.units)||0}</td>
-                  <td>${esc(sub.bridging_for||'—')}</td>
-                </tr>`).join(''):''}
-                <tr class="pro-total-row"><td colspan="2" style="text-align:right;">Total</td><td class="pro-units">${fmt(bridging?bridging.reduce((a,s2)=>a+(parseFloat(s2.units)||0),0):0)}</td><td></td></tr>
+                ${bridging?bridging.map(sub=>{
+                  const raw=gradeMap[sub.id]!=null?gradeMap[sub.id]:null;
+                  const status=raw!=null?gradeStatus(roundGrade(raw)):(sub.grade_status||'not_taken');
+                  return `<tr>
+                    <td>
+                      <div class="grade-cell-wrap">
+                        <div class="grade-row">
+                          <input type="number" class="grade-inp ${raw!=null?gClass(status):''}" id="g-${sub.id}"
+                            value="${raw!=null?parseFloat(raw).toFixed(2):''}"
+                            min="1" max="5" step="0.01" placeholder="—"
+                            onchange="onGradeChange(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}')">
+                          <span class="grade-print" style="display:none;">${raw!=null?parseFloat(raw).toFixed(2):'—'}</span>
+                          <button class="save-btn" id="sbtn-${sub.id}"
+                            onclick="saveGrade(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}')"
+                            title="Save grade"><i class="fas fa-save"></i></button>
+                        </div>
+                        <div class="grade-hint" id="gl-${sub.id}">${sub.grade_label||''}</div>
+                      </div>
+                    </td>
+                    <td class="pro-td-status"><span class="${pillClass(status)}" id="pill-${sub.id}">${statusText(status)}</span></td>
+                    <td class="pro-code">${esc(sub.subject_code)}</td>
+                    <td>${esc(sub.subject_name)}</td>
+                    <td class="pro-units">${parseFloat(sub.units)||0}</td>
+                    <td>${esc(sub.bridging_for||'—')}</td>
+                  </tr>`;
+                }).join(''):''}
+                <tr class="pro-total-row"><td colspan="2" style="text-align:right;padding-right:8px;">Total</td><td class="pro-units">${fmt(bridging?bridging.reduce((a,s2)=>a+(parseFloat(s2.units)||0),0):0)}</td><td colspan="3"></td></tr>
               </tbody>
             </table>
           </div>

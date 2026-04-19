@@ -124,7 +124,7 @@ if ($action === 'get_student_evaluation') {
             FROM major_subjects ms
             JOIN subjects s ON ms.subject_id = s.id
             WHERE ms.major_id = ?
-            ORDER BY ms.year_level, ms.semester, ms.sort_order, s.subject_name
+            ORDER BY ms.sort_order, ms.year_level, ms.semester
         ");
         $stmt2->execute([$major_id]);
         $prospectus = $stmt2->fetchAll(PDO::FETCH_ASSOC);
@@ -162,12 +162,31 @@ if ($action === 'get_student_evaluation') {
         // GWA
         $gwaData = compute_gwa(array_filter($subjects_with_grades, fn($s) => $s['grade_rounded'] !== null));
 
+        // Get prerequisite sets map (subject_id → prereq set code)
+        $prereqMap = [];
+        try {
+            $stmtSets = $pdo->query("SELECT ps.target_subject_id, ps.code, pss.subject_id 
+                                    FROM prerequisite_sets ps 
+                                    LEFT JOIN prerequisite_set_subjects pss ON ps.id = pss.set_id
+                                    ORDER BY ps.id");
+            while ($row = $stmtSets->fetch(PDO::FETCH_ASSOC)) {
+                if ($row['target_subject_id']) {
+                    $prereqMap[$row['target_subject_id']] = $row['code'];
+                }
+                if ($row['subject_id']) {
+                    $prereqMap[$row['subject_id']] = $row['code'];
+                }
+            }
+        } catch (PDOException $e) {}
+
         echo json_encode([
             'success' => true,
             'student' => $student,
             'subjects' => $subjects_with_grades,
             'gwa_data' => $gwaData,
             'academic_year' => $academic_year,
+            'prereq_map' => $prereqMap,
+            'ph_settings' => $ph_settings ?? []
         ]);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);

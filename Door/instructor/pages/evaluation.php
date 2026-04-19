@@ -1009,9 +1009,10 @@ function closeEval() { document.getElementById('evalOverlay').classList.remove('
 /* ═══════════════════════════════════════════════════════════
    RENDER PROSPECTUS (mirrors department page structure)
 ═══════════════════════════════════════════════════════════ */
-function renderProspectus(data) {
+ function renderProspectus(data) {
   const s=data.student; const subjects=data.subjects||[];
   const gwaData=data.gwa_data||{}; const ay=data.academic_year||currentAY;
+  const prereqSetsMap = data.prereq_map || {};
 
   loadedSubjects=subjects;
 
@@ -1019,7 +1020,10 @@ function renderProspectus(data) {
   subjects.forEach(sub => { if(sub.grade_rounded!=null) gradeMap[sub.id]=parseFloat(sub.grade_rounded); });
 
   // Build prereq unlock map
-  const prereqMap=buildPrereqUnlockMap(subjects,gradeMap,prereqSetsData,s.major_id);
+  const prereqUnlockMap=buildPrereqUnlockMap(subjects,gradeMap,prereqSetsData,s.major_id);
+  
+  // Pass prereqSetsMap to buildGradeTable
+  window.currentPrereqSetsMap = prereqSetsMap;
 
   const full=`${s.first_name}${s.middle_name?' '+s.middle_name:''} ${s.last_name}${s.suffix?' '+s.suffix:''}`.trim();
 
@@ -1083,11 +1087,11 @@ function renderProspectus(data) {
       <div class="pro-sem-row">
         <div>
           <div class="pro-sem-label">${year.toUpperCase()} — First Semester</div>
-          ${buildGradeTable(sem1,s,ay,prereqMap)}
-        </div>
-        <div>
-          <div class="pro-sem-label">${year.toUpperCase()} — Second Semester</div>
-          ${buildGradeTable(sem2,s,ay,prereqMap)}
+       ${buildGradeTable(sem1,s,ay,prereqUnlockMap)}
+     </div>
+     <div>
+       <div class="pro-sem-label">${year.toUpperCase()} — Second Semester</div>
+       ${buildGradeTable(sem2,s,ay,prereqUnlockMap)}
         </div>
       </div>
     </div>`;
@@ -1106,7 +1110,7 @@ function renderProspectus(data) {
           <span class="pro-year-total">${fmt(bt)} units</span>
         </div>
         <div style="padding:8px 10px 10px;">
-          ${buildGradeTable(bridging,s,ay,prereqMap)}
+          ${buildGradeTable(bridging,s,ay,prereqUnlockMap)}
         </div>
       </div>
     </div>`;
@@ -1141,7 +1145,7 @@ function renderProspectus(data) {
 /* ═══════════════════════════════════════════════════════════
    BUILD GRADE TABLE (mirrors department pro-table exactly)
 ═══════════════════════════════════════════════════════════ */
-function buildGradeTable(subjects, student, ay, prereqMap) {
+ function buildGradeTable(subjects, student, ay, prereqUnlockMap) {
   if(!subjects?.length) return `<table class="pro-table">
     <thead><tr>
       <th class="pro-th" style="width:54px;">Grade</th>
@@ -1160,7 +1164,7 @@ function buildGradeTable(subjects, student, ay, prereqMap) {
     const status=raw!=null?gradeStatus(roundGrade(raw)):(sub.grade_status||'not_taken');
     const inpCls=raw!=null?gClass(status):'';
     const prereqCode=(sub.display_prerequisite||sub.prerequisite||'').trim();
-    const pi=prereqMap?(prereqMap[sub.id]||{unlocked:true}):{unlocked:true};
+    const pi=prereqUnlockMap?(prereqUnlockMap[sub.id]||{unlocked:true}):{unlocked:true};
     const isLocked=!pi.unlocked;
     total+=parseFloat(sub.units)||0;
 
@@ -1203,10 +1207,13 @@ function buildGradeTable(subjects, student, ay, prereqMap) {
       </td>
       <td style="font-size:10px;">${esc(sub.subject_name)}</td>
       <td class="pro-units">${parseFloat(sub.units)||0}</td>
-      <td class="pro-prereq-col">
-        ${prereqCode?`<span class="pro-star">★ </span>${esc(prereqCode)}`:'—'}
-        ${isPrereqSetTarget&&!prereqCode?'<span class="prereq-chain-info"><i class="fas fa-sitemap" style="font-size:7px;"></i> Set</span>':''}
-      </td>
+       <td class="pro-prereq-col">
+         ${window.currentPrereqSetsMap && window.currentPrereqSetsMap[sub.id] 
+           ? `<span class="pro-star">★ </span>${esc(window.currentPrereqSetsMap[sub.id])}` 
+           : (prereqCode ? `<span class="pro-star">★ </span>${esc(prereqCode)}` : '—')}
+         ${isPrereqSetTarget&&!prereqCode&&!window.currentPrereqSetsMap[sub.id]
+           ?'<span class="prereq-chain-info"><i class="fas fa-sitemap" style="font-size:7px;"></i> Set</span>':''}
+       </td>
     </tr>`;
   });
 
@@ -1287,11 +1294,11 @@ function saveGrade(sid,studentId,majorId,sem,year,ay) {
 /* ═══════════════════════════════════════════════════════════
    REFRESH LOCK STATES after each grade save
 ═══════════════════════════════════════════════════════════ */
-function refreshLockStates() {
+ function refreshLockStates() {
   if(!loadedSubjects.length) return;
-  const prereqMap=buildPrereqUnlockMap(loadedSubjects,gradeMap,prereqSetsData,currentStudent?.major_id);
+  const prereqUnlockMap=buildPrereqUnlockMap(loadedSubjects,gradeMap,prereqSetsData,currentStudent?.major_id);
   loadedSubjects.forEach(sub=>{
-    const pi=prereqMap[sub.id]||{unlocked:true};
+    const pi=prereqUnlockMap[sub.id]||{unlocked:true};
     const row=document.getElementById('row-'+sub.id); if(!row) return;
     const inp=document.getElementById('g-'+sub.id);
     const sbtn=document.getElementById('sbtn-'+sub.id);

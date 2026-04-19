@@ -39,7 +39,7 @@ if (!$show_role_modal) { require_once '../../../data/config.php'; }
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;}
-.page-wrap{padding:28px;animation:fadeInUp .5s ease forwards;}
+.page-wrap{padding:3px 1px 4px;animation:fadeInUp .5s ease forwards;}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
 
 /* ═══════════════════════════════════════════════════════════
@@ -140,6 +140,9 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
    transition:all .25s ease;display:flex;align-items:center;gap:6px;
  }
  .hero-search-btn:hover{background:#b8922f;transform:translateY(-1px);box-shadow:0 4px 12px rgba(184,134,11,0.35);}
+ .year-btn{padding:8px 14px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.8);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;}
+ .year-btn:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.4);color:#fff;}
+ .year-btn.active{background:#fff;color:#b8922f;border-color:#fff;font-weight:700;}
 .ay-badge{
   padding:8px 14px;background:var(--cream2);border-radius:var(--radius-sm);
   border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--gold-d);
@@ -747,7 +750,7 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
     <div class="page-wrap">
 
       <!-- HERO BANNER -->
-      <div class="hero-banner" style="background: linear-gradient(135deg, #d4a843 0%, #b8922f 40%, #a38023 100%); border-radius: 20px; padding: 28px 32px; margin-bottom: 24px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+      <div class="hero-banner" style="background: linear-gradient(135deg, #d4a843 0%, #b8922f 40%, #a38023 100%); border-radius: 20px; padding: 28px 32px; margin-bottom: 24px; position: relative; overflow: hidden; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
         <div style="position:relative;z-index:1;">
           <div class="hero-eyebrow" style="display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff;margin-bottom:8px;">
             <span style="width:24px;height:2px;background:#fff;border-radius:2px;"></span> Instructor Portal | A.Y. 2025-2026
@@ -755,10 +758,17 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
           <h1 class="hero-title" style="font-family:'Playfair Display',serif;font-size:32px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px;"><em style="color:#2d1f07;font-style:normal;">My Mentees</em></h1>
           <p class="hero-sub" style="font-size:13px;color:rgba(255,255,255,.85);max-width:300px;">Select a student to open their evaluation prospectus</p>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:relative;z-index:1;">
-          <div class="hero-search">
+        <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-end;position:relative;z-index:1;">
+          <div class="hero-search" style="min-width:220px;">
             <i class="fas fa-search"></i>
             <input type="text" id="menteeSearch" placeholder="Search by name, ID, major…" oninput="filterMentees()">
+          </div>
+          <div class="year-filter-btns" style="display:flex;gap:6px;">
+            <button class="year-btn active" data-year="all" onclick="filterMenteeYear('all')">All</button>
+            <button class="year-btn" data-year="1" onclick="filterMenteeYear('1')">1st Year</button>
+            <button class="year-btn" data-year="2" onclick="filterMenteeYear('2')">2nd Year</button>
+            <button class="year-btn" data-year="3" onclick="filterMenteeYear('3')">3rd Year</button>
+            <button class="year-btn" data-year="4" onclick="filterMenteeYear('4')">4th Year</button>
           </div>
         </div>
       </div>
@@ -1044,9 +1054,11 @@ function loadMentees() {
       const gFrom=m.avatar_gradient_from||'#3b82f6';
       const gTo=m.avatar_gradient_to||'#60a5fa';
 
+      const yrNum = (m.year_level || '0').replace(/[^0-9]/g, '');
       html+=`<div class="mentee-card"
           onclick='openEval(${JSON.stringify(m).replace(/'/g,"&#39;")})'
-          data-name="${esc(full.toLowerCase())}">
+          data-name="${esc(full.toLowerCase())}"
+          data-year="${yrNum || '0'}">
         <div class="mc-top">
           <div class="mc-avatar" style="background:linear-gradient(135deg,${esc(gFrom)},${esc(gTo)});">${esc(init)}</div>
           <div>
@@ -1079,6 +1091,31 @@ function filterMentees() {
   document.querySelectorAll('.mentee-card').forEach(c=>{
     c.style.display=c.dataset.name.includes(q)?'':'none';
   });
+}
+
+let currentYearFilter = 'all';
+function filterMenteeYear(y) {
+  currentYearFilter = y;
+  document.querySelectorAll('.year-btn').forEach(b=>b.classList.toggle('active',b.dataset.year===y));
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById('menteeSearch').value.toLowerCase();
+  const cards = document.querySelectorAll('.mentee-card');
+  if(cards.length === 0) return;
+  cards.forEach(c=>{
+    const name = c.dataset.name || '';
+    const yl = c.dataset.year || '0';
+    const filterYear = currentYearFilter;
+    const matchesSearch = name.includes(q);
+    const matchesYear = filterYear === 'all' || yl === filterYear;
+    c.style.display = (matchesSearch && matchesYear) ? '' : 'none';
+  });
+}
+
+function filterMentees() {
+  applyFilters();
 }
 
 /* ═══════════════════════════════════════════════════════════

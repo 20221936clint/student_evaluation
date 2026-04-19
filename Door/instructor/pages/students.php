@@ -100,7 +100,7 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--i
    LAYOUT SHELL
 ══════════════════════════════════════════ */
 .page-shell {
-    padding: 28px 28px 48px;
+    padding: 3px 1px 4px;
     max-width: 1600px;
 }
 

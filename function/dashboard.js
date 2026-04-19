@@ -28,6 +28,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 sidebar.classList.remove('open');
             }
         });
+        
+        // Adjust topbar position on resize
+        window.addEventListener('resize', function() {
+            var topbar = document.querySelector('.topbar');
+            if (topbar) {
+                if (window.innerWidth <= 992) {
+                    topbar.style.left = '0';
+                } else {
+                    topbar.style.left = '260px';
+                }
+            }
+        });
+        
+        // Initial topbar adjustment
+        var topbar = document.querySelector('.topbar');
+        if (topbar && window.innerWidth <= 992) {
+            topbar.style.left = '0';
+        }
     }
     
     // Active nav item highlighting based on current page

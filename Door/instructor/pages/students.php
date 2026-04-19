@@ -109,15 +109,15 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--i
 ══════════════════════════════════════════ */
 .hero-banner {
     background: linear-gradient(135deg, #d4a843 0%, #b8922f 40%, #a38023 100%);
-    border-radius: 24px;
-    padding: 36px 40px;
-    margin-bottom: 28px;
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
     position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 .hero-banner::before {
@@ -129,48 +129,48 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--i
 .hero-banner::after {
     content: '';
     position: absolute;
-    right: -60px; top: -60px;
-    width: 280px; height: 280px;
+    right: -40px; top: -40px;
+    width: 200px; height: 200px;
     border-radius: 50%;
     border: 2px solid rgba(255,255,255,.15);
     pointer-events: none;
 }
 .hero-eyebrow {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
     text-transform: uppercase; color: #fff;
-    margin-bottom: 10px;
-}
-.hero-eyebrow span { width: 32px; height: 2px; background: #fff; border-radius: 2px; }
-.hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 38px; font-weight: 800;
-    color: #fff;
-    line-height: 1.1;
     margin-bottom: 8px;
 }
+.hero-eyebrow span { width: 24px; height: 2px; background: #fff; border-radius: 2px; }
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
 .hero-title em { color: #2d1f07; font-style: normal; }
-.hero-sub { font-size: 14px; color: rgba(255,255,255,.85); max-width: 360px; }
+.hero-sub { font-size: 13px; color: rgba(255,255,255,.85); max-width: 300px; }
 .hero-kpis {
-    display: flex; gap: 20px; flex-wrap: wrap;
+    display: flex; gap: 16px; flex-wrap: wrap;
     position: relative; z-index: 1;
 }
 .hero-kpi {
     background: rgba(255,255,255,.15);
     border: 1px solid rgba(255,255,255,.25);
     backdrop-filter: blur(8px);
-    border-radius: 16px;
-    padding: 18px 24px;
+    border-radius: 14px;
+    padding: 14px 20px;
     text-align: center;
-    min-width: 110px;
+    min-width: 90px;
 }
 .hero-kpi-num {
     font-family: 'Playfair Display', serif;
-    font-size: 36px; font-weight: 800;
+    font-size: 28px; font-weight: 800;
     color: #fff;
     line-height: 1;
 }
-.hero-kpi-label { font-size: 11px; color: rgba(255,255,255,.9); margin-top: 4px; font-weight: 500; }
+.hero-kpi-label { font-size: 10px; color: rgba(255,255,255,.9); margin-top: 4px; font-weight: 500; }
 
 /* ══════════════════════════════════════════
    TWO-COLUMN LAYOUT
@@ -735,7 +735,7 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--i
 
 <!-- ══ MAIN CONTENT ═════════════════════════════════════════════ -->
 <div class="main-content">
-    <header class="topbar">
+    <header class="topbar" style="left: 260px !important;">
         <div class="topbar-left">
             <button class="topbar-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
             <div>
@@ -750,14 +750,15 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--i
     </header>
 
     <main class="dashboard-content">
+    <div style="position: fixed; top: 0; left: 260px; right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
     <div class="page-shell">
 
         <!-- ── HERO BANNER ─────────────────────────────────────── -->
         <div class="hero-banner">
             <div style="position:relative;z-index:1;">
-                <div class="hero-eyebrow"><span></span> Gold Instructor Portal</div>
-                <h1 class="hero-title">Your <em>Mentees</em></h1>
-                <p class="hero-sub">Manage, track, and assign tasks to your student mentees all in one place.</p>
+                <div class="hero-eyebrow"><span></span> Instructor Portal | A.Y. 2025-2026</div>
+                <h1 class="hero-title"><em>My Mentees</em></h1>
+                <p class="hero-sub">Select a student to open their evaluation prospectus</p>
             </div>
             <div class="hero-kpis">
                 <div class="hero-kpi">
@@ -785,7 +786,7 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--i
                 <div class="toolbar">
                     <div class="search-wrap">
                         <i class="fas fa-search"></i>
-                        <input type="text" class="search-inp" id="searchInput" placeholder="Search name, ID, email…">
+                        <input type="text" class="search-inp" id="searchInput" placeholder="Search by name, ID, major…">
                     </div>
                     <select class="filter-sel" id="majorFilter">
                         <option value="">All Majors</option>

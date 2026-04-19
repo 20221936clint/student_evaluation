@@ -168,7 +168,7 @@ if ($pdo) {
     <div class="main-content" style="position: relative;">
         <div style="position: fixed; top: 0; left: var(--sidebar-width); right: 0; bottom: 0; background-image: url('../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
         <!-- Topbar -->
-        <header class="topbar">
+        <header class="topbar" style="left: 260px !important;">
             <div class="topbar-left">
                 <button class="topbar-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>

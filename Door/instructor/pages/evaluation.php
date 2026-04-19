@@ -105,7 +105,41 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 }
 .search-wrap:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,134,11,.15);}
 .search-wrap i{color:var(--muted);font-size:13px;}
-.search-wrap input{border:none;background:transparent;font-family:'Poppins',sans-serif;font-size:13px;color:var(--dark);flex:1;outline:none;}
+ .search-wrap input{border:none;background:transparent;font-family:'Poppins',sans-serif;font-size:13px;color:var(--dark);flex:1;outline:none;}
+ .search-wrap input::placeholder{color:rgba(255,255,255,.7);}
+ .hero-eyebrow{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;margin-bottom:10px;}
+ .hero-eyebrow span{width:32px;height:2px;background:#fff;border-radius:2px;}
+ .hero-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:8px;}
+ .hero-title em{color:#2d1f07;font-style:normal;}
+ .hero-sub{font-size:14px;color:rgba(255,255,255,.85);max-width:360px;}
+ 
+ /* Enhanced Search Bar for Hero */
+ .hero-search{
+   display:flex;align-items:center;gap:8px;
+   padding:10px 14px;
+   background:rgba(255,255,255,0.18);
+   border:1.5px solid rgba(255,255,255,0.25);
+   border-radius:12px;
+   backdrop-filter:blur(8px);
+   transition:all .3s ease;
+   min-width:180px;
+ }
+ .hero-search:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.4);}
+ .hero-search:focus-within{background:rgba(255,255,255,0.3);border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,0.25);}
+ .hero-search i{color:rgba(255,255,255,0.8);font-size:13px;}
+ .hero-search input{
+   border:none;background:transparent;
+   font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;
+   color:#fff;flex:1;outline:none;
+   width:120px;
+ }
+ .hero-search input::placeholder{color:rgba(255,255,255,0.7);}
+ .hero-search-btn{
+   padding:8px 14px;background:var(--gold);color:#fff;border:none;
+   border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
+   transition:all .25s ease;display:flex;align-items:center;gap:6px;
+ }
+ .hero-search-btn:hover{background:#b8922f;transform:translateY(-1px);box-shadow:0 4px 12px rgba(184,134,11,0.35);}
 .ay-badge{
   padding:8px 14px;background:var(--cream2);border-radius:var(--radius-sm);
   border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--gold-d);
@@ -694,7 +728,7 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 </aside>
 
 <div class="main-content">
-  <header class="topbar">
+  <header class="topbar" style="left: 260px !important;">
     <div class="topbar-left">
       <button class="topbar-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
       <div>
@@ -709,20 +743,23 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
   </header>
 
   <main class="dashboard-content">
+    <div style="position: fixed; top: 0; left: 260px; right: 0; bottom: 0; background-image: url('../../../media/LOGO.jpg'); background-size: 70%; background-position: center; background-repeat: no-repeat; opacity: 0.08; pointer-events: none; z-index: 0;"></div>
     <div class="page-wrap">
 
-      <!-- TOOLBAR -->
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;flex-wrap:wrap;gap:14px;">
-        <div>
-          <h1 style="font-size:22px;font-weight:700;color:var(--dark);font-family:'Playfair Display',serif;">My Mentees</h1>
-          <p style="font-size:12px;color:var(--muted);margin-top:4px;">Select a student to open their evaluation prospectus</p>
+      <!-- HERO BANNER -->
+      <div class="hero-banner" style="background: linear-gradient(135deg, #d4a843 0%, #b8922f 40%, #a38023 100%); border-radius: 20px; padding: 28px 32px; margin-bottom: 24px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        <div style="position:relative;z-index:1;">
+          <div class="hero-eyebrow" style="display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff;margin-bottom:8px;">
+            <span style="width:24px;height:2px;background:#fff;border-radius:2px;"></span> Instructor Portal | A.Y. 2025-2026
+          </div>
+          <h1 class="hero-title" style="font-family:'Playfair Display',serif;font-size:32px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px;"><em style="color:#2d1f07;font-style:normal;">My Mentees</em></h1>
+          <p class="hero-sub" style="font-size:13px;color:rgba(255,255,255,.85);max-width:300px;">Select a student to open their evaluation prospectus</p>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div class="search-wrap">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:relative;z-index:1;">
+          <div class="hero-search">
             <i class="fas fa-search"></i>
             <input type="text" id="menteeSearch" placeholder="Search by name, ID, major…" oninput="filterMentees()">
           </div>
-          <div class="ay-badge"><i class="fas fa-calendar-alt" style="margin-right:5px;font-size:11px;"></i>A.Y. 2025-2026</div>
         </div>
       </div>
 

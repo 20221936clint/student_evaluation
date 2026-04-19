@@ -454,10 +454,11 @@ html, body, .dashboard-page, .main-content {
     padding: 0 32px;
     position: fixed;
     top: 0;
-    left: 0;
+    left: 260px !important;
     right: 0;
     z-index: 1000;
     border-bottom: 3px solid var(--gold-primary);
+    transition: left var(--transition-speed) ease;
 }
 
 .topbar-left {
@@ -1121,6 +1122,10 @@ html, body, .dashboard-page, .main-content {
     
     .main-content {
         margin-left: 0;
+    }
+    
+    .topbar {
+        left: 0 !important;
     }
     
     .topbar-toggle {

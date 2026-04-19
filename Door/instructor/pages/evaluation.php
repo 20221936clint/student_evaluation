@@ -1418,6 +1418,9 @@ function saveGrade(sid,studentId,majorId,sem,year,ay) {
       const rounded=d.grade_rounded; const status=d.status;
       inp.value=parseFloat(rounded).toFixed(2);
       inp.className='grade-inp '+gClass(status); inp.style.boxShadow='';
+      // Also update grade-print span for print view
+      const printSpan=inp.nextElementSibling;
+      if(printSpan&&printSpan.classList.contains('grade-print')){printSpan.textContent=parseFloat(rounded).toFixed(2);printSpan.style.display='inline-block';}
       let gl=document.getElementById('gl-'+sid);
       if(!gl)gl=document.getElementById('bgl-'+sid);
       if(gl)gl.textContent=d.label||gradeLabel(rounded);

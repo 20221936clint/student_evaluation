@@ -199,6 +199,9 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 .row-locked td{background:#fffbeb !important;}
 .row-locked .grade-inp{pointer-events:none;background:var(--amber-l);border-color:var(--amber-b);opacity:.8;}
 .row-locked .save-btn{pointer-events:none;opacity:.35;}
+.row-finalized td{background:#f0fdf4 !important;}
+.row-finalized .grade-inp{pointer-events:none;background:#dcfce7;border-color:#86efac;opacity:.9;}
+.row-finalized .save-btn{pointer-events:none;opacity:.35;}
 .lock-badge{display:inline-flex;align-items:center;gap:3px;font-size:8px;padding:2px 5px;background:var(--amber-l);color:#92400e;border-radius:4px;border:1px solid var(--amber-b);white-space:nowrap;}
 .row-prereqblocked td{background:#fff8f0 !important;opacity:.9;}
 .prereq-chain-info{display:inline-flex;align-items:center;gap:3px;font-size:8.5px;padding:2px 6px;background:var(--red-l);color:#991b1b;border-radius:4px;border:1px solid var(--red-b);white-space:nowrap;margin-top:2px;}
@@ -304,6 +307,7 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 
 /* FOCUS BAR - Legacy (kept for compatibility) */
 .sem-finalized-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:linear-gradient(145deg,rgba(22,163,74,.15),rgba(22,163,74,.1));border:1.5px solid var(--green-b);border-radius:20px;color:#166534;font-size:11px;font-weight:700;margin-bottom:8px;box-shadow:0 2px 8px rgba(22,163,74,.15);}
+.sem-finalized-badge-inline{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:linear-gradient(145deg,rgba(22,163,74,.2),rgba(22,163,74,.15));border:1px solid var(--green-b);border-radius:12px;color:#166534;font-size:10px;font-weight:600;margin-left:8px;vertical-align:middle;}
 
 /* COMBINED FOCUS + GWA BAR - Clean Organized Layout */
 .eval-combined-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#1a1a2e 100%);border-radius:var(--radius);margin-bottom:18px;border:1px solid rgba(184,134,11,.12);box-shadow:0 6px 24px rgba(0,0,0,.25);position:sticky;top:0;z-index:100;}
@@ -442,11 +446,12 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
   .pro-code { font-size: 6pt !important; font-weight: 700 !important; white-space: nowrap !important; }
   .pro-units { font-size: 6pt !important; text-align: center !important; white-space: nowrap; }
   .pro-prereq-col { font-size: 5.5pt !important; white-space: nowrap; }
-  .grade-inp, .save-btn, .grade-hint, .lock-badge, .prereq-chain-info, .sem-finalized-badge, .finalized-lock-overlay, .btn-finalize { display: none !important; }
+  .grade-inp, .save-btn, .grade-hint, .lock-badge, .prereq-chain-info, .sem-finalized-badge, .sem-finalized-badge-inline, .finalized-lock-overlay, .btn-finalize { display: none !important; }
   .grade-print { display: inline-block !important; font-size: 6pt !important; font-weight: 700 !important; }
   .pro-td-status, .pro-th-status { display: none !important; }
   .gpill { font-size: 5pt !important; padding: 0.3pt 1pt !important; }
   .row-locked td { background: #fffbeb !important; }
+  .row-finalized td { background: white !important; }
   .pro-total-row td { background: #f0ece0 !important; font-weight: 700 !important; color: #8B6914 !important; border-top: 0.5pt solid #B8860B !important; font-size: 6pt !important; }
   .pro-empty { font-size: 5pt !important; }
   .pro-bridging-block { margin-bottom: 1mm !important; page-break-inside: avoid !important; }
@@ -1474,6 +1479,10 @@ function renderProspectus(data) {
     const sem2 = all.filter(s2 => s2.semester&&s2.semester.includes('2nd'));
     const t = all.reduce((a,s2)=>a+(parseFloat(s2.units)||0),0);
     grandTotal += t;
+    
+    const isSem1Finalized = finalizedMap[`${year}|1st Semester`];
+    const isSem2Finalized = finalizedMap[`${year}|2nd Semester`];
+    
     yearBlocks += `<div class="pro-year-block" data-year="${year}">
       <div class="pro-year-hdr">
         <span><i class="fas fa-calendar-alt" style="margin-right:6px;font-size:11px;"></i>${year}</span>
@@ -1481,12 +1490,12 @@ function renderProspectus(data) {
       </div>
       <div class="pro-sem-row">
         <div class="pro-sem-col" data-sem="1st Semester">
-          <div class="pro-sem-label">${year.toUpperCase()} — First Semester</div>
-          ${buildGradeTable(sem1,s,ay,prereqUnlockMap)}
+          <div class="pro-sem-label">${year.toUpperCase()} — First Semester ${isSem1Finalized ? '<span class="sem-finalized-badge-inline"><i class="fas fa-check-circle"></i> Finalized</span>' : ''}</div>
+          ${buildGradeTable(sem1,s,ay,prereqUnlockMap, isSem1Finalized)}
         </div>
         <div class="pro-sem-col" data-sem="2nd Semester">
-          <div class="pro-sem-label">${year.toUpperCase()} — Second Semester</div>
-          ${buildGradeTable(sem2,s,ay,prereqUnlockMap)}
+          <div class="pro-sem-label">${year.toUpperCase()} — Second Semester ${isSem2Finalized ? '<span class="sem-finalized-badge-inline"><i class="fas fa-check-circle"></i> Finalized</span>' : ''}</div>
+          ${buildGradeTable(sem2,s,ay,prereqUnlockMap, isSem2Finalized)}
         </div>
       </div>
     </div>`;
@@ -1576,7 +1585,7 @@ function renderProspectus(data) {
 /* ═══════════════════════════════════════════════════════════
    BUILD GRADE TABLE
 ═══════════════════════════════════════════════════════════ */
-function buildGradeTable(subjects, student, ay, prereqUnlockMap) {
+function buildGradeTable(subjects, student, ay, prereqUnlockMap, isFinalized = false) {
   if(!subjects?.length) return `<table class="pro-table">
     <thead><tr>
       <th class="pro-th" style="width:54px;">Grade</th><th class="pro-th pro-th-status" style="width:36px;">Status</th>
@@ -1593,21 +1602,26 @@ function buildGradeTable(subjects, student, ay, prereqUnlockMap) {
     const inpCls = raw != null ? gClass(status) : '';
     const prereqCode = (sub.display_prerequisite||sub.prerequisite||'').trim();
     const pi = prereqUnlockMap ? (prereqUnlockMap[sub.id]||{unlocked:true}) : {unlocked:true};
-    const isLocked = !pi.unlocked;
+    const isPrereqLocked = !pi.unlocked;
+    const isFinalizedLocked = isFinalized;
+    const shouldDisable = isPrereqLocked || isFinalizedLocked;
     total += parseFloat(sub.units)||0;
 
     let lockDesc = '';
-    if(isLocked) {
+    if(isPrereqLocked) {
       const parts = [];
       if(pi.directLocked && pi.directPrereqSubj) parts.push(`Pass ${esc(pi.directPrereqCode)}`);
       if(pi.setLocked && pi.setBlockedBy?.length) pi.setBlockedBy.forEach(b => parts.push(`Pass ${esc(b.subject_code)}`));
       lockDesc = parts.join(', ');
+    } else if(isFinalizedLocked) {
+      lockDesc = '';
     }
     const isPrereqSetTarget = Array.isArray(prereqSetsData) && prereqSetsData.some(set =>
       set.major_id == currentStudent?.major_id && parseInt(set.target_subject_id) === parseInt(sub.id)
     );
+    const rowClass = isFinalized ? 'row-finalized' : (shouldDisable ? 'row-locked' : '');
 
-    rows += `<tr id="row-${sub.id}" class="${isLocked?'row-locked':''}">
+    rows += `<tr id="row-${sub.id}" class="${rowClass}">
       <td>
         <div class="grade-cell-wrap">
           <div class="grade-row">
@@ -1616,14 +1630,14 @@ function buildGradeTable(subjects, student, ay, prereqUnlockMap) {
               min="1" max="5" step="0.01" placeholder="—"
               onchange="onGradeChange(${sub.id},${student.id},${student.major_id},'${esc(sub.semester)}','${esc(sub.year_level)}','${esc(ay)}')"
               onkeydown="if(event.key==='Enter'){event.preventDefault();saveGrade(${sub.id},${student.id},${student.major_id},'${esc(sub.semester)}','${esc(sub.year_level)}','${esc(ay)}');}"
-              ${isLocked?'disabled title="'+lockDesc+'"':'title="1.00 to 5.00 · Enter to save"'}>
+              ${shouldDisable?'disabled title="'+lockDesc+'"':'title="1.00 to 5.00 · Enter to save"'}>
             <span class="grade-print" style="display:none;">${raw!=null?parseFloat(raw).toFixed(2):'—'}</span>
             <button class="save-btn" id="sbtn-${sub.id}"
               onclick="saveGrade(${sub.id},${student.id},${student.major_id},'${esc(sub.semester)}','${esc(sub.year_level)}','${esc(ay)}')"
-              ${isLocked?'disabled':''} title="Save grade"><i class="fas fa-save"></i></button>
+              ${shouldDisable?'disabled':''} title="Save grade"><i class="fas fa-save"></i></button>
           </div>
           <div class="grade-hint" id="gl-${sub.id}">${sub.grade_label||''}</div>
-          ${isLocked?`<span class="lock-badge"><i class="fas fa-lock" style="font-size:7px;"></i>${lockDesc||'Locked'}</span>`:''}
+          ${shouldDisable && !isFinalizedLocked ? `<span class="lock-badge"><i class="fas fa-lock" style="font-size:7px;"></i>${lockDesc||'Locked'}</span>` : ''}
         </div>
       </td>
       <td class="pro-td-status"><span class="${pillClass(status)}" id="pill-${sub.id}">${statusText(status)}</span></td>

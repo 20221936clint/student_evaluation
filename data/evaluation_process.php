@@ -921,7 +921,7 @@ if ($action === 'verify_password') {
     }
     
     try {
-        $stmt = $pdo->prepare("SELECT id, password FROM users WHERE id = ? AND role = 'instructor' LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id, password FROM instructors WHERE id = ? LIMIT 1");
         $stmt->execute([$instructor_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         

@@ -954,16 +954,26 @@ function onFocusChange() {
 
 function showAlreadyEvaluatedModal(year, sem) {
   const modalHtml = `
-    <div class="modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:15000;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div class="modal-overlay" id="alreadyEvaluatedOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:15000;display:flex;align-items:center;justify-content:center;padding:20px;">
       <div style="background:linear-gradient(145deg,#fff,#fafaf8);border-radius:16px;padding:24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;">
         <div style="width:60px;height:60px;margin:0 auto 16px;background:linear-gradient(135deg,var(--amber-l),var(--amber));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:#92400e;"><i class="fas fa-exclamation-triangle"></i></div>
         <h3 style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:8px;">Already Evaluated</h3>
         <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5;">
           <strong>${year} — ${sem}</strong> has already been evaluated and finalized.<br>Do you want to view the grades or continue anyway?
         </p>
-        <div style="display:flex;gap:10px;justify-content:center;">
+        <div id="evalModalButtons" style="display:flex;gap:10px;justify-content:center;">
           <button onclick="closeAlreadyEvaluatedModal()" style="padding:10px 20px;border:1px solid var(--border);border-radius:10px;background:var(--cream);color:var(--mid);font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>
           <button onclick="confirmViewEvaluated('${year}','${sem}')" style="padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold-l),var(--gold-d));color:#fff;font-size:13px;font-weight:600;cursor:pointer;">View Grades</button>
+          <button onclick="showEditPasswordPrompt('${year}','${sem}')" style="padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--green),#15803d);color:#fff;font-size:13px;font-weight:600;cursor:pointer;"><i class="fas fa-edit"></i> Edit Grades</button>
+        </div>
+        <div id="evalPasswordPrompt" style="display:none;margin-top:16px;text-align:left;">
+          <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Enter your password to confirm edit mode:</p>
+          <input type="password" id="evalEditPassword" placeholder="Your password" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:10px;box-sizing:border-box;">
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button onclick="cancelEditPasswordPrompt('${year}','${sem}')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--cream);color:var(--mid);font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+            <button onclick="confirmEditWithPassword('${year}','${sem}')" style="padding:8px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--green),#15803d);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">Confirm</button>
+          </div>
+          <p id="evalPasswordError" style="font-size:11px;color:#dc2626;margin-top:8px;display:none;"></p>
         </div>
       </div>
     </div>
@@ -973,6 +983,87 @@ function showAlreadyEvaluatedModal(year, sem) {
   modalDiv.id = 'alreadyEvaluatedModal';
   modalDiv.innerHTML = modalHtml;
   document.body.appendChild(modalDiv);
+}
+
+function showEditPasswordPrompt(year, sem) {
+  document.getElementById('evalModalButtons').style.display = 'none';
+  document.getElementById('evalPasswordPrompt').style.display = 'block';
+  document.getElementById('evalEditPassword').value = '';
+  document.getElementById('evalPasswordError').style.display = 'none';
+  setTimeout(() => document.getElementById('evalEditPassword').focus(), 100);
+}
+
+function cancelEditPasswordPrompt(year, sem) {
+  document.getElementById('evalModalButtons').style.display = 'flex';
+  document.getElementById('evalPasswordPrompt').style.display = 'none';
+  document.getElementById('evalPasswordError').style.display = 'none';
+}
+
+function confirmEditWithPassword(year, sem) {
+  const password = document.getElementById('evalEditPassword').value.trim();
+  const errorEl = document.getElementById('evalPasswordError');
+  
+  if (!password) {
+    errorEl.textContent = 'Please enter your password';
+    errorEl.style.display = 'block';
+    return;
+  }
+  
+  const fd = new FormData();
+  fd.append('action', 'verify_password');
+  fd.append('password', password);
+  
+  fetch(EVAL_PROC, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        closeAlreadyEvaluatedModal();
+        allowEditFinalized(year, sem);
+      } else {
+        errorEl.textContent = data.message || 'Invalid password';
+        errorEl.style.display = 'block';
+      }
+    })
+    .catch(() => {
+      errorEl.textContent = 'Error verifying password';
+      errorEl.style.display = 'block';
+    });
+}
+
+function allowEditFinalized(year, sem) {
+  const fkey = `${year}|${sem}`;
+  delete finalizedMap[fkey];
+  
+  const semCols = document.querySelectorAll(`.pro-sem-col[data-sem="${sem}"]`);
+  semCols.forEach(col => {
+    const yearBlock = col.closest('.pro-year-block');
+    if (yearBlock && yearBlock.dataset.year === year) {
+      const badge = col.querySelector('.sem-finalized-badge-inline');
+      if (badge) badge.remove();
+      
+      col.querySelectorAll('tr').forEach(row => {
+        row.classList.remove('row-finalized');
+        const inp = row.querySelector('.grade-inp');
+        const sbtn = row.querySelector('.save-btn');
+        if (inp) {
+          inp.disabled = false;
+          inp.style.pointerEvents = 'auto';
+          inp.style.background = '';
+          inp.style.borderColor = '';
+          inp.style.opacity = '';
+          inp.title = '1.00 to 5.00 · Enter to save';
+        }
+        if (sbtn) {
+          sbtn.disabled = false;
+          sbtn.style.pointerEvents = 'auto';
+          sbtn.style.opacity = '';
+        }
+      });
+    }
+  });
+  
+  toast(`${year} — ${sem} edit mode enabled`, 'success', 3000);
+  applyFocusVisuals();
 }
 
 function closeAlreadyEvaluatedModal() {

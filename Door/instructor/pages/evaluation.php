@@ -404,6 +404,34 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 .rgc-cond{background:var(--amber-l);color:#92400e;border:1px solid var(--amber-b);}
 .rgc-none{background:var(--cream2);color:var(--muted);border:1px solid var(--border);}
 
+/* GRADES VIEW MODAL */
+.grades-modal-overlay{position:fixed;inset:0;background:rgba(5,5,15,.85);z-index:10001;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.grades-modal-overlay.open{display:flex;}
+.grades-modal{background:var(--white);border-radius:20px;width:100%;max-width:900px;max-height:92vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.5);animation:modal-in .45s cubic-bezier(.23,1,.32,1);position:relative;}
+.gm-header{background:linear-gradient(145deg,var(--gold-d) 0%,#a87120 50%,#c9a84c 100%);padding:22px 28px 20px;color:#fff;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:16px;}
+.gm-header::before{content:'';position:absolute;top:-40px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none;}
+.gm-close{position:absolute;top:14px;right:14px;width:36px;height:36px;background:rgba(255,255,255,.18);border:none;border-radius:10px;cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.gm-close:hover{background:rgba(255,255,255,.3);transform:rotate(90deg);}
+.gm-title-block{flex:1;}
+.gm-semester-title{font-size:16px;font-weight:800;font-family:'Playfair Display',serif;margin-bottom:4px;}
+.gm-student-name{font-size:12px;opacity:.9;}
+.gm-body{padding:20px 24px;}
+.gm-table-wrap{overflow-x:auto;border:1.5px solid var(--border);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.gm-table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px;}
+.gm-th{background:linear-gradient(180deg,#fffdf6,#fef9ed);padding:10px 12px;text-align:left;font-weight:700;color:var(--gold-d);border-bottom:2px solid var(--gold-d);white-space:nowrap;}
+.gm-td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.gm-tr:hover td{background:#fef9ed;}
+.gm-code{font-weight:700;color:var(--dark);font-size:11px;}
+.gm-subject{font-size:12px;color:var(--mid);max-width:280px;line-height:1.3;}
+.gm-units{text-align:center;font-weight:600;color:var(--dark);}
+.gm-grade{text-align:center;font-weight:800;font-size:14px;font-family:'Playfair Display',serif;}
+.gm-grade.pass{color:var(--green);}
+.gm-grade.fail{color:var(--red);}
+.gm-grade.cond{color:var(--amber);}
+.gm-empty-td{text-align:center;padding:28px;color:var(--muted);font-style:italic;}
+.gm-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;background:var(--cream);border-top:1px solid var(--border);}
+.gm-hint{font-size:11px;color:var(--muted);background:var(--white);padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-right:auto;}
+
 /* ENROLLMENT LIST CHECKBOX CARDS */
 .rm-enroll-card{padding:10px 12px 10px 36px;border-radius:10px;border:1px solid var(--border);background:var(--cream);transition:all .2s;cursor:pointer;display:block;position:relative;}
 .rm-enroll-card:hover{background:var(--green-l);border-color:var(--green-b);}
@@ -598,6 +626,40 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
   <div class="result-modal" id="resultModalInner">
     <button class="rm-close" onclick="closeResultModal()"><i class="fas fa-times"></i></button>
     <div id="resultModalContent"></div>
+  </div>
+</div>
+
+<!-- GRADES VIEW MODAL -->
+<div class="grades-modal-overlay" id="gradesModal">
+  <div class="grades-modal">
+    <button class="gm-close" onclick="closeGradesModal()"><i class="fas fa-times"></i></button>
+    <div class="gm-header">
+      <div class="gm-title-block">
+        <div class="gm-semester-title" id="gmSemesterTitle">—</div>
+        <div class="gm-student-name" id="gmStudentName">—</div>
+      </div>
+    </div>
+    <div class="gm-body">
+      <div class="gm-table-wrap">
+        <table class="gm-table">
+          <thead>
+            <tr>
+              <th class="gm-th">Subject Code</th>
+              <th class="gm-th">Subject Name</th>
+              <th class="gm-th" style="text-align:center;">Units</th>
+              <th class="gm-th" style="text-align:center;">Grade</th>
+            </tr>
+          </thead>
+          <tbody id="gmTableBody"></tbody>
+        </table>
+      </div>
+      <div id="gmEmptyState" class="gm-empty-td" style="display:none;">No grades recorded for this period</div>
+    </div>
+    <div class="gm-footer">
+      <div class="gm-hint" id="gmHint"></div>
+      <button class="btn-gold" onclick="printGradesTable()"><i class="fas fa-print"></i> Print</button>
+      <button class="btn-modal-close" onclick="closeGradesModal()"><i class="fas fa-times"></i> Close</button>
+    </div>
   </div>
 </div>
 
@@ -1073,21 +1135,7 @@ function closeAlreadyEvaluatedModal() {
 
 function confirmViewEvaluated(year, sem) {
   closeAlreadyEvaluatedModal();
-  applyFocusVisuals();
-  requestAnimationFrame(() => {
-    let target = null;
-    document.querySelectorAll('.pro-year-block[data-year="'+year+'"]').forEach(block => {
-      block.querySelectorAll('.pro-sem-col').forEach(col => {
-        if(col.dataset.sem === sem) target = col;
-      });
-    });
-    if(target) {
-      target.scrollIntoView({behavior:'smooth', block:'start'});
-      target.style.outline = '2.5px solid var(--gold-l)';
-      target.style.outlineOffset = '3px';
-      setTimeout(() => { target.style.outline = ''; target.style.outlineOffset = ''; }, 1400);
-    }
-  });
+  openGradesModal(year, sem);
 }
 
 function clearFocus() {
@@ -1416,6 +1464,164 @@ function showResultModal(subjects, yearLabel, semLabel) {
 function closeResultModal() {
   document.getElementById('resultModal').classList.remove('open');
   clearFocus();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GRADES VIEW MODAL
+═══════════════════════════════════════════════════════════ */
+function openGradesModal(year, sem) {
+  // Filter subjects for the selected year and semester
+  const semNum = sem.includes('1st') ? 1 : 2;
+  const filteredSubjects = loadedSubjects.filter(s => {
+    const sYear = (s.year_level||'').trim();
+    const sSem  = (s.semester||'').toLowerCase();
+    const matchYear = sYear === year;
+    const matchSem  = sSem.includes(sem.includes('1st') ? '1st' : '2nd');
+    return matchYear && matchSem;
+  });
+
+  // Build student name
+  const m = currentStudent;
+  const fullName = `${m.first_name}${m.middle_name?' '+m.middle_name:''} ${m.last_name}${m.suffix?' '+m.suffix:''}`.trim();
+
+  // Update modal header
+  document.getElementById('gmSemesterTitle').textContent = `${year} — ${sem} · A.Y. ${currentAY}`;
+  document.getElementById('gmStudentName').textContent = fullName;
+
+  // Build table rows
+  const tbody = document.getElementById('gmTableBody');
+  const emptyState = document.getElementById('gmEmptyState');
+  
+  if(filteredSubjects.length === 0) {
+    tbody.innerHTML = '';
+    emptyState.style.display = 'block';
+  } else {
+    emptyState.style.display = 'none';
+    let totalUnits = 0;
+    let gwaSum = 0;
+    let gradedCount = 0;
+
+    tbody.innerHTML = filteredSubjects.map(s => {
+      const units = parseFloat(s.units) || 0;
+      totalUnits += units;
+      const rawGrade = gradeMap[s.id];
+      let gradeDisplay = '—';
+      let gradeClass = '';
+      
+      if(rawGrade != null) {
+        const rounded = roundGrade(parseFloat(rawGrade));
+        gwaSum += rounded * units;
+        gradedCount++;
+        gradeDisplay = rounded.toFixed(2);
+        if(rounded <= 3.00) gradeClass = 'pass';
+        else if(rounded === 4.00) gradeClass = 'cond';
+        else gradeClass = 'fail';
+      }
+
+      return `
+        <tr class="gm-tr">
+          <td class="gm-td gm-code">${esc(s.subject_code)}</td>
+          <td class="gm-td gm-subject">${esc(s.subject_name)}</td>
+          <td class="gm-td gm-units">${units}</td>
+          <td class="gm-td gm-grade ${gradeClass}">${gradeDisplay}</td>
+        </tr>
+      `;
+    }).join('');
+
+    // Compute GWA for this semester
+    if(gradedCount > 0 && totalUnits > 0) {
+      const gwa = gwaSum / totalUnits;
+      document.getElementById('gmHint').innerHTML = `
+        <i class="fas fa-chart-line" style="margin-right:4px;color:var(--gold-d);"></i>
+        <strong>${gradedCount}</strong> of <strong>${filteredSubjects.length}</strong> subjects graded &nbsp;·&nbsp; 
+        <strong>${totalUnits}</strong> units &nbsp;·&nbsp; 
+        Semester GWA: <strong style="color:var(--gold-d);font-size:13px;">${gwa.toFixed(2)}</strong>
+      `;
+    } else {
+      document.getElementById('gmHint').innerHTML = `
+        <span style="color:var(--muted);"><strong>${gradedCount}</strong> of <strong>${filteredSubjects.length}</strong> subjects graded &nbsp;·&nbsp; <strong>${totalUnits}</strong> total units</span>
+      `;
+    }
+  }
+
+  document.getElementById('gradesModal').classList.add('open');
+}
+
+function closeGradesModal() {
+  document.getElementById('gradesModal').classList.remove('open');
+}
+
+function printGradesTable() {
+  // Get modal data
+  const title = document.getElementById('gmSemesterTitle').textContent;
+  const studentName = document.getElementById('gmStudentName').textContent;
+  const table = document.querySelector('.gm-table');
+  
+  if(!table) return;
+  
+  // Create a print window
+  const printWindow = window.open('', '_blank', 'width=800,height=600');
+  
+  // Clone table
+  const tableClone = table.cloneNode(true);
+  
+  // Build HTML content (no inline script to avoid parser issues)
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Grades - ${title}</title>
+      <style>
+        @page { size: A4 portrait; margin: 15mm; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: white; color: #1a1a1a; }
+        .print-header { text-align: center; margin-bottom: 20px; border-bottom: 3px solid #B8860B; padding-bottom: 15px; }
+        .print-header h1 { font-size: 22px; margin: 0; font-weight: 800; color: #1a1a1a; }
+        .print-header .school-name { font-size: 14px; color: #666; margin: 5px 0; }
+        .print-header .student-info { font-size: 12px; color: #7a7a7a; margin-top: 8px; }
+        .print-semester { font-size: 16px; font-weight: 700; color: #B8860B; margin: 15px 0 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px; }
+        th { background: linear-gradient(180deg, #fffdf6, #fef9ed); padding: 8px 10px; text-align: left; font-weight: 700; color: #B8860B; border-bottom: 2px solid #B8860B; border: 1px solid #ddd; }
+        td { padding: 6px 10px; border: 1px solid #ddd; vertical-align: middle; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #fef9ed; }
+        .code { font-weight: 700; color: #1a1a1a; font-size: 10px; }
+        .subject { color: #4b4b4b; }
+        .units { text-align: center; font-weight: 600; }
+        .grade { text-align: center; font-weight: 800; font-size: 13px; }
+        .grade.pass { color: #16a34a; }
+        .grade.fail { color: #dc2626; }
+        .grade.cond { color: #d97706; }
+        .print-footer { margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; display: flex; justify-content: space-between; font-size: 10px; color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="print-header">
+        <h1>Northern Bukidnon State College</h1>
+        <div class="school-name">Institute for Business Management</div>
+        <div class="student-info">
+          <strong>Student:</strong> ${studentName}<br>
+          <strong>Semester:</strong> ${title}
+        </div>
+      </div>
+      
+      <div class="print-semester">${title}</div>
+      
+      ${tableClone.outerHTML}
+      
+      <div class="print-footer">
+        <div><strong>Generated:</strong> ${new Date().toLocaleString()}</div>
+        <div><strong>Instructor:</strong> <?php echo htmlspecialchars($user_name); ?></div>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+  }, 300);
 }
 
 /* ═══════════════════════════════════════════════════════════

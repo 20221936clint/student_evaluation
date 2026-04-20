@@ -168,12 +168,13 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 .pro-total-row td{background:#f0ece0;font-weight:700;color:var(--gold-d);border-top:2px solid var(--gold);font-size:10px;}
 .pro-empty{text-align:center;color:#aaa;font-style:italic;padding:10px;font-size:10px;}
 .pro-grand-total{text-align:right;font-size:12px;font-weight:700;padding:7px 14px;background:#f7f5ef;border:1px solid var(--border);border-radius:7px;margin:0 0 12px;}
-.pro-sig-block{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:14px 0 0;border-top:2px solid var(--border);}
+.pro-sig-block{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:20px 0 0;border-top:2px solid var(--border);margin-top:20px;}
 .pro-sig-col{text-align:center;}
-.pro-sig-line{border-bottom:1.5px solid #333;margin-bottom:5px;height:24px;}
-.pro-sig-lbl{font-size:10px;font-weight:600;color:#333;}
-.pro-sig-sub{font-size:9px;color:#888;margin-top:2px;}
-.pro-legend{font-size:9.5px;color:#999;padding:6px 0;margin-top:6px;}
+.pro-sig-line{border-bottom:1.5px solid var(--dark);height:28px;margin-bottom:8px;}
+.pro-sig-lbl{font-size:11px;font-weight:700;color:var(--dark);margin-bottom:12px;}
+.pro-sig-name{font-size:20px;font-weight:600;color:var(--dark);margin-top:10px;margin-bottom:-30px;}
+.pro-sig-date{font-size:10px;color:#888;}
+.pro-legend{font-size:9.5px;color:#999;padding:6px 0;margin-top:1px;}
 .pro-star{color:var(--red);font-weight:700;}
 .pro-bridging-block{margin-bottom:12px;}
 
@@ -484,11 +485,13 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
   .pro-empty { font-size: 5pt !important; }
   .pro-bridging-block { margin-bottom: 1mm !important; page-break-inside: avoid !important; }
   .pro-grand-total { font-size: 7pt !important; font-weight: 700 !important; text-align: right !important; padding: 1mm 2mm !important; margin: 1mm 0 !important; background: #f0ece0 !important; border-top: 0.5pt solid #B8860B !important; color: #8B6914 !important; }
-  .pro-sig-block { display: grid !important; grid-template-columns: repeat(3,1fr) !important; gap: 5mm !important; padding: 1mm 0 0 !important; border-top: 0.5pt solid #aaa !important; margin-top: 1mm !important; page-break-inside: avoid !important; }
-  .pro-sig-line { border-bottom: 0.5pt solid #333 !important; height: 6mm !important; margin-bottom: 0.5mm !important; }
-  .pro-sig-lbl { font-size: 6pt !important; font-weight: 700 !important; }
-  .pro-sig-sub { font-size: 5.5pt !important; color: #888 !important; }
-  .pro-legend { font-size: 5pt !important; color: #999 !important; margin-top: 0.5mm !important; }
+  .pro-sig-block { display: grid !important; grid-template-columns: repeat(3,1fr) !important; gap: 5mm !important; padding: 3mm 2mm !important; border-top: 0.5pt solid #aaa !important; margin-top: 2mm !important; page-break-inside: avoid !important; }
+  .pro-sig-col { text-align: center !important; }
+  .pro-sig-line { border-bottom: 0.5pt solid #333 !important; height: 5mm !important; margin-bottom: 1mm !important; }
+  .pro-sig-lbl { font-size: 7pt !important; font-weight: 700 !important; color: #333 !important; margin-bottom: 2mm !important; }
+  .pro-sig-name { font-size: 10pt !important; font-weight: 600 !important; color: #333 !important; margin-top: 1mm !important; margin-bottom: -5mm !important; }
+  .pro-sig-date { font-size: 7pt !important; color: #666 !important; }
+  .pro-legend { font-size: 6pt !important; color: #999 !important; margin-top: 1mm !important; }
 }
 </style>
 </head>
@@ -1717,6 +1720,8 @@ function renderProspectus(data) {
   const gwaData = data.gwa_data||{}; const ay = data.academic_year||currentAY;
   const prereqSetsMap = data.prereq_map||{};
   const finalizedSessions = data.finalized_sessions||{};
+  const advisorName = data.advisor_name || '';
+  const programHeadName = data.program_head_name || '';
 
   loadedSubjects = subjects;
   subjects.forEach(sub => { if(sub.grade_rounded != null) gradeMap[sub.id] = parseFloat(sub.grade_rounded); });
@@ -1733,7 +1738,7 @@ function renderProspectus(data) {
   const prereqUnlockMap = buildPrereqUnlockMap(subjects, gradeMap, prereqSetsData, s.major_id);
   window.currentPrereqSetsMap = prereqSetsMap;
 
-  const full = `${s.first_name}${s.middle_name?' '+s.middle_name:''} ${s.last_name}${s.suffix?' '+s.suffix:''}`.trim();
+  const full = `${s.first_name}${s.middle_name && s.middle_name[0]?' '+s.middle_name[0]+'.':''} ${s.last_name}${s.suffix?' '+s.suffix:''}`.trim();
   const studentStanding = s.year_level||'1st Year - 1st Semester';
   const semMatch = studentStanding.match(/(\d+)(st|nd|rd|th)\s*Year.*?(\d+)(st|nd|rd|th)\s*Sem/i);
   const currentSem = semMatch ? (semMatch[3]=='1'?'1st':'2nd')+' Semester' : '1st Semester';
@@ -1798,10 +1803,25 @@ function renderProspectus(data) {
     </div>`;
   });
 
-  const sigHtml = `<div class="pro-sig-block">
-    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-lbl">Student's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
-    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-lbl">Adviser's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
-    <div class="pro-sig-col"><div class="pro-sig-line"></div><div class="pro-sig-lbl">Program Head's Signature over Printed Name</div><div class="pro-sig-sub">Date: ___________________</div></div>
+const sigHtml = `<div class="pro-sig-block">
+    <div class="pro-sig-col">
+      <div class="pro-sig-name">${esc(full)}</div>
+      <div class="pro-sig-line"></div>
+      <div class="pro-sig-lbl">Student's Signature</div>
+      <div class="pro-sig-date">Date: ___________________</div>
+    </div>
+    <div class="pro-sig-col">
+      <div class="pro-sig-name">${esc(advisorName)}</div>
+      <div class="pro-sig-line"></div>
+      <div class="pro-sig-lbl">Adviser's Signature</div>
+      <div class="pro-sig-date">Date: ___________________</div>
+    </div>
+    <div class="pro-sig-col">
+      <div class="pro-sig-name">${esc(programHeadName)}</div>
+      <div class="pro-sig-line"></div>
+      <div class="pro-sig-lbl">Program Head's Signature</div>
+      <div class="pro-sig-date">Date: ___________________</div>
+    </div>
   </div>
   <div class="pro-legend">
     <span style="display:inline-block;width:10px;height:10px;background:var(--amber-l);border-left:3px solid var(--amber);border-radius:2px;vertical-align:middle;"></span>

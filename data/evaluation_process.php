@@ -505,6 +505,34 @@ if ($action === 'get_student_evaluation') {
             }
         } catch (PDOException $e) {}
 
+        // Get advisor (instructor) name
+        $advisorName = '';
+        try {
+            $stmtAdv = $pdo->prepare("SELECT first_name, middle_name, last_name, suffix FROM instructors WHERE id = ?");
+            $stmtAdv->execute([$instructor_id]);
+            $advRow = $stmtAdv->fetch(PDO::FETCH_ASSOC);
+            if ($advRow) {
+                $advisorName = trim($advRow['first_name'] . ($advRow['middle_name'] ? ' ' . substr($advRow['middle_name'], 0, 1) . '.' : '') . ' ' . $advRow['last_name'] . ($advRow['suffix'] ? ' ' . $advRow['suffix'] : ''));
+            }
+        } catch (PDOException $e) {}
+
+        // Get program head name from instructors table (program head is promoted from instructors)
+        $programHeadName = '';
+        try {
+            $stmtPH = $pdo->query("
+                SELECT i.first_name, i.middle_name, i.last_name, i.suffix 
+                FROM instructors i 
+                LEFT JOIN admin_promotions ap ON i.id = ap.instructor_id 
+                WHERE ap.promoted_to = 'program_head' 
+                ORDER BY ap.promotion_date DESC 
+                LIMIT 1
+            ");
+            $phRow = $stmtPH->fetch(PDO::FETCH_ASSOC);
+            if ($phRow) {
+                $programHeadName = trim($phRow['first_name'] . ($phRow['middle_name'] ? ' ' . substr($phRow['middle_name'], 0, 1) . '.' : '') . ' ' . $phRow['last_name'] . ($phRow['suffix'] ? ' ' . $phRow['suffix'] : ''));
+            }
+        } catch (PDOException $e) {}
+
         echo json_encode([
             'success'            => true,
             'student'          => $student,
@@ -515,6 +543,8 @@ if ($action === 'get_student_evaluation') {
             'prereq_map'      => $prereqMap,
             'ph_settings'     => load_ph_settings($pdo),
             'finalized_sessions' => $finalizedSessions,
+            'advisor_name'     => $advisorName,
+            'program_head_name' => $programHeadName,
         ]);
 
     } catch (PDOException $e) {

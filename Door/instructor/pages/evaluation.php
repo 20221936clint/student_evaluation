@@ -992,17 +992,15 @@ function onFocusChange() {
     return;
   }
 
-  // ★ AUTO-SCROLL to focused year/semester block
-  if(!focusYear) return;
+  // ★ AUTO-SCROLL only when BOTH Year AND Semester are selected
+  if(!focusYear || !focusSem) return;
   requestAnimationFrame(() => {
     let target = null;
-    if(focusSem) {
-      document.querySelectorAll('.pro-year-block[data-year="'+focusYear+'"]').forEach(block => {
-        block.querySelectorAll('.pro-sem-col').forEach(col => {
-          if(col.dataset.sem === focusSem) target = col;
-        });
+    document.querySelectorAll('.pro-year-block[data-year="'+focusYear+'"]').forEach(block => {
+      block.querySelectorAll('.pro-sem-col').forEach(col => {
+        if(col.dataset.sem === focusSem) target = col;
       });
-    }
+    });
     if(!target) target = document.querySelector('.pro-year-block[data-year="'+focusYear+'"]');
     if(target) {
       target.scrollIntoView({behavior:'smooth', block:'start'});

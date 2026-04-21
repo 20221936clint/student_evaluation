@@ -408,38 +408,31 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 /* GRADES VIEW MODAL */
 .grades-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10001;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
 .grades-modal-overlay.open{display:flex;}
-.grades-modal{background:var(--white);border-radius:var(--radius);width:100%;max-width:720px;max-height:85vh;box-shadow:var(--shadow-lg);animation:modal-in .4s ease;position:relative;border:1px solid rgba(184,134,11,.2);}
-.gm-header{background:linear-gradient(145deg,var(--gold-d) 0%,#a87120 50%,#c9a84c 100%);padding:18px 24px;color:#fff;position:relative;display:flex;align-items:center;justify-content:space-between;}
-.gm-header::before{content:'';position:absolute;top:-40px;right:-50px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none;}
-.gm-close{width:32px;height:32px;background:rgba(255,255,255,.2);border:none;border-radius:8px;cursor:pointer;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .25s;}
-.gm-close:hover{background:rgba(255,255,255,.35);transform:rotate(90deg);}
-.gm-title-block{flex:1;}
-.gm-semester-title{font-size:14px;font-weight:800;font-family:'Playfair Display',serif;}
-.gm-student-name{font-size:11px;opacity:.9;margin-top:2px;}
-.gm-body{padding:14px 18px;max-height:calc(85vh - 140px);overflow-y:auto;}
-.gm-body::-webkit-scrollbar{width:4px;}
+.grades-modal{background:#fff;border-radius:14px;width:100%;max-width:680px;max-height:80vh;box-shadow:0 20px 50px rgba(0,0,0,.25);position:relative;border:1px solid rgba(184,134,11,.2);padding:0;animation:modal-in .25s ease;}
+.gm-header{background:linear-gradient(145deg,var(--gold-d),#a87120);padding:12px 18px;color:#fff;}
+.gm-body{padding:12px 14px;max-height:calc(80vh - 60px);overflow-y:auto;}
+.gm-body::-webkit-scrollbar{width:3px;}
 .gm-body::-webkit-scrollbar-track{background:var(--cream);}
 .gm-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-.gm-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;}
-.gm-table{width:100%;border-collapse:collapse;font-size:11px;}
-.gm-th{background:var(--gold-d);color:#fff;padding:10px 12px;text-align:left;font-weight:700;border-bottom:2px solid var(--gold);white-space:nowrap;}
-.gm-td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
-.gm-tr:hover td{background:#fef9ed;}
-.gm-code{font-weight:700;color:var(--dark);font-size:10px;}
-.gm-subject{font-size:11px;color:var(--mid);}
+.gm-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:6px;}
+.gm-table{width:100%;border-collapse:collapse;font-size:10px;}
+.gm-th{background:var(--gold-d);color:#fff;padding:6px 8px;text-align:left;font-weight:700;border-bottom:2px solid var(--gold);white-space:nowrap;}
+.gm-td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.gm-code{font-weight:700;color:var(--dark);font-size:9px;}
+.gm-subject{font-size:10px;color:var(--mid);}
 .gm-units{text-align:center;font-weight:600;color:var(--dark);}
-.gm-grade{text-align:center;font-weight:800;font-size:13px;font-family:'Playfair Display',serif;}
+.gm-grade{text-align:center;font-weight:800;font-size:12px;}
 .gm-grade.pass{color:var(--green);}
 .gm-grade.fail{color:var(--red);}
 .gm-grade.cond{color:var(--amber);}
-.gm-empty-td{text-align:center;padding:20px;color:var(--muted);font-style:italic;}
-.gm-school-header{padding:14px 18px;background:var(--cream);border-bottom:2px solid var(--gold);margin-bottom:12px;text-align:center;}
-.gm-student-info{padding:10px 14px;background:linear-gradient(135deg,#fff,#fafaf8);border-radius:10px;margin-bottom:12px;border:1px solid rgba(184,134,11,.2);box-shadow:0 2px 10px rgba(184,134,11,.1);}
-.gm-summary{padding:12px 16px;background:linear-gradient(145deg,var(--gold-d),#a87120);border-radius:12px;margin-top:14px;box-shadow:0 4px 12px rgba(184,134,11,.3);}
-.gm-summary span{font-size:11px;font-weight:600;color:#fff;}
-.gm-sig-block{margin-top:16px;padding-top:14px;border-top:2px solid var(--border);}
-.gm-footer{display:flex;justify-content:flex-end;gap:10px;padding:12px 20px;background:var(--cream);border-top:1px solid var(--border);}
-.gm-hint{font-size:10px;color:var(--muted);margin-right:auto;}
+.gm-empty-td{text-align:center;padding:15px;color:var(--muted);font-style:italic;}
+.gm-school-header{padding:10px 12px;background:var(--cream);border-bottom:2px solid var(--gold);margin-bottom:10px;text-align:center;}
+.gm-student-info{padding:8px 10px;background:#fff;border:1px solid rgba(184,134,11,.15);border-radius:6px;margin-bottom:10px;}
+.gm-summary{padding:8px 12px;background:linear-gradient(145deg,var(--gold-d),#a87120);border-radius:8px;margin-top:10px;}
+.gm-summary span{font-size:10px;font-weight:600;color:#fff;}
+.gm-sig-block{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.gm-footer{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;background:var(--cream);border-top:1px solid var(--border);}
+.gm-hint{font-size:9px;color:var(--muted);margin-right:auto;}
 
 /* ENROLLMENT LIST CHECKBOX CARDS */
 .rm-enroll-card{padding:10px 12px 10px 36px;border-radius:10px;border:1px solid var(--border);background:var(--cream);transition:all .2s;cursor:pointer;display:block;position:relative;}
@@ -448,13 +441,24 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 .rm-enroll-card input[type=checkbox]{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;cursor:pointer;accent-color:var(--green);}
 .rm-blocked-card{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--cream2);opacity:.55;position:relative;}
 
-/* PRINT */
-@media print {
-  @page { size: A4 portrait; margin: 5mm; }
-  body > * { display: none !important; }
-  #printTarget { display: block !important; }
-  html, body { margin: 0 !important; padding: 0 !important; width: 100% !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  #printTarget { width: 100% !important; max-width: 210mm !important; margin: 0 !important; position: static !important; }
+ /* PRINT */
+ @media print {
+   @page { size: A4 portrait; margin: 8mm; }
+   body > * { display: none !important; }
+   #printTarget, #gradesPrintTarget { 
+     display: block !important; 
+     visibility: visible !important; 
+     position: static !important;
+     left: 0 !important;
+     top: 0 !important;
+     width: 100% !important;
+     height: auto !important;
+     background: white !important;
+   }
+   #gradesPrintTarget { display: block !important; }
+   #gradesPrintTarget * { visibility: visible !important; opacity: 1 !important; }
+   html, body { margin: 0 !important; padding: 0 !important; width: 100% !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+   #printTarget, #gradesPrintTarget { width: 100% !important; max-width: 200mm !important; margin: 0 auto !important; position: static !important; }
   .pro-wrap { width: 100% !important; max-width: 200mm !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; background: white !important; font-size: 7pt !important; font-family: 'Times New Roman', Times, serif !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .pro-hdr { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 3mm 3mm 2mm !important; border-top: 2.5pt solid #8B6914 !important; border-bottom: 1.5pt solid #8B6914 !important; background: white !important; width: 100% !important; }
   .pro-logo { width: 22mm !important; height: 22mm !important; border: 1.5pt solid #8B6914 !important; border-radius: 2pt !important; flex-shrink: 0 !important; }
@@ -499,8 +503,60 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
   .pro-sig-lbl { font-size: 7pt !important; font-weight: 700 !important; color: #333 !important; margin-bottom: 2mm !important; }
   .pro-sig-name { font-size: 10pt !important; font-weight: 600 !important; color: #333 !important; margin-top: 1mm !important; margin-bottom: -5mm !important; }
   .pro-sig-date { font-size: 7pt !important; color: #666 !important; }
-  .pro-legend { font-size: 6pt !important; color: #999 !important; margin-top: 1mm !important; }
-}
+   .pro-legend { font-size: 6pt !important; color: #999 !important; margin-top: 1mm !important; }
+   
+   /* GRADES MODAL PRINT STYLES */
+   body > * { display: none !important; }
+   #gradesPrintTarget { display: block !important; }
+   #gradesPrintTarget * { display: block !important; visibility: visible !important; }
+   #gradesPrintTarget .grades-modal { 
+     width: 100% !important; 
+     max-width: 190mm !important; 
+     margin: 0 auto !important; 
+     padding: 0 !important; 
+     box-shadow: none !important; 
+     border: none !important; 
+     background: white !important;
+     position: static !important;
+     transform: none !important;
+     overflow: visible !important;
+   }
+   #gradesPrintTarget .gm-body {
+     max-height: none !important;
+     overflow: visible !important;
+     padding: 5mm !important;
+   }
+   #gradesPrintTarget .gm-school-header,
+   #gradesPrintTarget .gm-student-info,
+   #gradesPrintTarget .gm-table-wrap,
+   #gradesPrintTarget .gm-summary,
+   #gradesPrintTarget .gm-sig-block {
+     display: block !important;
+     visibility: visible !important;
+   }
+   #gradesPrintTarget .gm-footer,
+   #gradesPrintTarget .gm-hint,
+   #gradesPrintTarget .btn-modal-close {
+     display: none !important;
+   }
+   #gradesPrintTarget .gm-table {
+     width: 100% !important;
+     font-size: 10pt !important;
+     page-break-inside: avoid !important;
+   }
+   #gradesPrintTarget .gm-th {
+     background: #8B6914 !important;
+     color: white !important;
+     -webkit-print-color-adjust: exact !important;
+     print-color-adjust: exact !important;
+   }
+   #gradesPrintTarget .gm-summary {
+     background: #8B6914 !important;
+     color: white !important;
+     -webkit-print-color-adjust: exact !important;
+     print-color-adjust: exact !important;
+   }
+ }
 </style>
 </head>
 <body>
@@ -641,16 +697,14 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 </div>
 
 <!-- GRADES VIEW MODAL -->
+<!-- GRADES VIEW MODAL -->
 <div class="grades-modal-overlay" id="gradesModal">
   <div class="grades-modal">
-    <button class="gm-close" onclick="closeGradesModal()"><i class="fas fa-times"></i></button>
-    <div class="gm-header">
-      <div class="gm-title-block">
-        <div class="gm-semester-title" id="gmSemesterTitle">—</div>
-        <div class="gm-student-name" id="gmStudentName">—</div>
-      </div>
+    <div style="background:linear-gradient(145deg,var(--gold-d),#a87120);padding:14px 20px;color:#fff;border-radius:14px 14px 0 0;margin:-20px -20px 0 -20px;text-align:center;">
+      <div style="font-size:15px;font-weight:700;font-family:'Playfair Display',serif;" id="gmSemesterTitle">—</div>
+      <div style="font-size:12px;opacity:.9;margin-top:2px;" id="gmStudentName">—</div>
     </div>
-    <div class="gm-body">
+    <div class="gm-body" style="padding-top:0;">
       <div class="gm-school-header" id="gmSchoolHeader" style="display:none;padding:14px 18px;background:var(--cream);border-bottom:2px solid var(--gold);margin-bottom:12px;text-align:center;">
         <img src="../../../media/LOGO.jpg" style="width:50px;height:50px;object-fit:contain;border-radius:10px;border:2px solid var(--gold-d);margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;" alt="Logo">
         <div style="font-size:10px;color:var(--gold-d);font-weight:700;text-transform:uppercase;letter-spacing:.5px;" id="gmSchoolName"></div>
@@ -690,28 +744,30 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
       <div class="gm-sig-block" id="gmSigBlock" style="display:none;margin-top:16px;padding-top:14px;border-top:2px solid var(--border);">
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;text-align:center;">
           <div style="font-size:10px;">
+            <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:-5mm;" id="gmSigAdvisor"></div>
             <div style="border-bottom:1.5px solid var(--dark);height:24px;margin-bottom:6px;"></div>
             <div style="font-weight:700;color:var(--gold-d);margin-bottom:4px;">Adviser's Signature</div>
-            <div style="font-weight:600;color:var(--dark);margin-bottom:4px;" id="gmSigAdvisor"></div>
             <div style="font-size:9px;color:var(--muted);">Date: ___________________</div>
           </div>
           <div style="font-size:10px;">
+            <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:-5mm;" id="gmSigPH"></div>
             <div style="border-bottom:1.5px solid var(--dark);height:24px;margin-bottom:6px;"></div>
             <div style="font-weight:700;color:var(--gold-d);margin-bottom:4px;">Program Head's Signature</div>
-            <div style="font-weight:600;color:var(--dark);margin-bottom:4px;" id="gmSigPH"></div>
             <div style="font-size:9px;color:var(--muted);">Date: ___________________</div>
           </div>
         </div>
       </div>
     </div>
-    <div class="gm-footer">
-      <div class="gm-hint" id="gmHint"></div>
-      <button class="btn-modal-close" onclick="closeGradesModal()"><i class="fas fa-times"></i> Close</button>
-    </div>
+     <div class="gm-footer">
+       <div class="gm-hint" id="gmHint"></div>
+       <button class="btn btn-gold" onclick="printGradesModal()"><i class="fas fa-print"></i> Print</button>
+       <button class="btn-modal-close" onclick="closeGradesModal()"><i class="fas fa-times"></i> Close</button>
+     </div>
   </div>
 </div>
 
-<div id="printTarget" style="display:none;"></div>
+ <div id="printTarget" style="display:none;"></div>
+ <div id="gradesPrintTarget" style="display:none;"></div>
 
 <div class="toast" id="toast">
   <div class="toast-icon" id="toastIcon"><i class="fas fa-check"></i></div>
@@ -1534,21 +1590,27 @@ function openGradesModal(year, sem) {
   const advisorNameModal = window.advisorName || '';
   const programHeadNameModal = window.programHeadName || '';
 
-  // Update modal header
-  document.getElementById('gmSemesterTitle').textContent = `${year} — ${sem} · A.Y. ${currentAY}`;
-  document.getElementById('gmStudentName').textContent = fullName;
-  
-  // Show school header
-  const schoolHeader = document.getElementById('gmSchoolHeader');
-  if(phSettings.school_name) {
-    schoolHeader.style.display = 'block';
-    document.getElementById('gmSchoolName').textContent = phSettings.school_name || '';
-    document.getElementById('gmSchoolAddress').textContent = phSettings.school_address || '';
-    document.getElementById('gmInstitute').textContent = phSettings.institute_name || '';
-    document.getElementById('gmDegree').textContent = phSettings.degree_name || '';
-  } else {
-    schoolHeader.style.display = 'none';
-  }
+   // Update modal header
+   document.getElementById('gmSemesterTitle').textContent = `${year} — ${sem} · A.Y. ${currentAY}`;
+   document.getElementById('gmStudentName').textContent = fullName;
+   
+   // Show school header with major
+   const schoolHeader = document.getElementById('gmSchoolHeader');
+   schoolHeader.style.display = 'block';
+   document.getElementById('gmSchoolName').textContent = phSettings.school_name || '';
+   document.getElementById('gmSchoolAddress').textContent = phSettings.school_address || '';
+   document.getElementById('gmInstitute').textContent = phSettings.institute_name || '';
+   document.getElementById('gmDegree').textContent = `Major in ${m.major_name || '—'}`;
+   
+   // Update student info block
+   const studentInfo = document.getElementById('gmStudentInfo');
+   studentInfo.style.display = 'block';
+   
+   document.getElementById('gmInfoStudent').textContent = fullName;
+   document.getElementById('gmInfoStudentID').textContent = m.student_number || m.student_id || '—';
+   document.getElementById('gmInfoPeriod').textContent = `${year} — ${sem} · A.Y. ${currentAY}`;
+   document.getElementById('gmInfoYearLevel').textContent = year;
+   document.getElementById('gmInfoSemester').textContent = sem;
 
   // Build table rows
   const tbody = document.getElementById('gmTableBody');
@@ -1625,26 +1687,7 @@ function openGradesModal(year, sem) {
       `;
     }
     
-    // Show student info
-    const studentInfo = document.getElementById('gmStudentInfo');
-    if(m) {
-      studentInfo.style.display = 'block';
-      document.getElementById('gmInfoStudent').textContent = fullName;
-      // Try multiple possible field names for student ID
-      const studentID = m.student_id || m.student_number || m.id || '-';
-      document.getElementById('gmInfoStudentID').textContent = studentID;
-      // Parse year level - extract just "1st Year", "2nd Year", etc.
-      const yearLevel = m.year_level || '';
-      const yearMatch = yearLevel.match(/(\d+)(st|nd|rd|th)\s*Year/i);
-      const yearDisplay = yearMatch ? yearMatch[0] : (yearLevel || '-');
-      document.getElementById('gmInfoYearLevel').textContent = yearDisplay;
-      // Semester based on selection
-      document.getElementById('gmInfoSemester').textContent = sem;
-      // Display period like "1st Year — 1st Semester · A.Y. 2025-2026"
-      document.getElementById('gmInfoPeriod').textContent = `${yearDisplay} — ${sem} · A.Y. ${currentAY}`;
-    } else {
-      studentInfo.style.display = 'none';
-    }
+     // Student info was already set earlier with correct table year/semester
   }
 
   document.getElementById('gradesModal').classList.add('open');
@@ -1655,76 +1698,114 @@ function closeGradesModal() {
 }
 
 function printGradesTable() {
-  // Get modal data
   const title = document.getElementById('gmSemesterTitle').textContent;
   const studentName = document.getElementById('gmStudentName').textContent;
+  const advisorName = window.advisorName || 'Adviser';
+  const programHeadName = window.programHeadName || 'Program Head';
   const table = document.querySelector('.gm-table');
+  const schoolName = phSettings.school_name || 'Northern Bukidnon State College';
+  const schoolAddress = phSettings.school_address || 'Manolo Fortich, Bukidnon';
+  const instituteName = phSettings.institute_name || 'Institute for Business Management';
+  const degreeName = phSettings.degree_name || 'Bachelor of Science in Business Administration';
+  const logoUrl = '../../../media/LOGO.jpg';
   
   if(!table) return;
   
-  // Create a print window
-  const printWindow = window.open('', '_blank', 'width=800,height=600');
-  
-  // Clone table
   const tableClone = table.cloneNode(true);
   
-  // Build HTML content (no inline script to avoid parser issues)
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Grades - ${title}</title>
-      <style>
-        @page { size: A4 portrait; margin: 15mm; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: white; color: #1a1a1a; }
-        .print-header { text-align: center; margin-bottom: 20px; border-bottom: 3px solid #B8860B; padding-bottom: 15px; }
-        .print-header h1 { font-size: 22px; margin: 0; font-weight: 800; color: #1a1a1a; }
-        .print-header .school-name { font-size: 14px; color: #666; margin: 5px 0; }
-        .print-header .student-info { font-size: 12px; color: #7a7a7a; margin-top: 8px; }
-        .print-semester { font-size: 16px; font-weight: 700; color: #B8860B; margin: 15px 0 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px; }
-        th { background: linear-gradient(180deg, #fffdf6, #fef9ed); padding: 8px 10px; text-align: left; font-weight: 700; color: #B8860B; border-bottom: 2px solid #B8860B; border: 1px solid #ddd; }
-        td { padding: 6px 10px; border: 1px solid #ddd; vertical-align: middle; }
-        tr:nth-child(even) { background: #f9f9f9; }
-        tr:hover { background: #fef9ed; }
-        .code { font-weight: 700; color: #1a1a1a; font-size: 10px; }
-        .subject { color: #4b4b4b; }
-        .units { text-align: center; font-weight: 600; }
-        .grade { text-align: center; font-weight: 800; font-size: 13px; }
-        .grade.pass { color: #16a34a; }
-        .grade.fail { color: #dc2626; }
-        .grade.cond { color: #d97706; }
-        .print-footer { margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; display: flex; justify-content: space-between; font-size: 10px; color: #666; }
-      </style>
-    </head>
-    <body>
-      <div class="print-header">
-        <h1>Northern Bukidnon State College</h1>
-        <div class="school-name">Institute for Business Management</div>
-        <div class="student-info">
-          <strong>Student:</strong> ${studentName}<br>
-          <strong>Semester:</strong> ${title}
+  // Build cleaner print HTML (similar to view grade container)
+  const printHTML = `
+    <div style="width:180mm;margin:0 auto;padding:12mm;font-family:'Poppins',Arial,sans-serif;font-size:10px;color:#1a1a1a;background:#fff;">
+      <!-- Header (Gold Gradient Style) -->
+      <div style="background:linear-gradient(145deg,#B8860B,#8B6914);padding:10mm 14mm;color:#fff;border-radius:10px 10px 0 0;margin:-12mm -12mm 10mm -12mm;">
+        <div style="display:flex;align-items:center;gap:10mm;">
+          <img src="${logoUrl}" style="width:40mm;height:40mm;object-fit:contain;border:2px solid #fff;border-radius:8px;background:#fff;">
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:800;">${title}</div>
+            <div style="font-size:11px;opacity:0.9;margin-top:2px;">${studentName}</div>
+            <div style="font-size:9px;opacity:0.85;margin-top:4px;">
+              <div style="font-weight:700;text-transform:uppercase;">${schoolName}</div>
+              <div>${schoolAddress}</div>
+              <div>${instituteName}</div>
+              <div>${degreeName}</div>
+            </div>
+          </div>
         </div>
       </div>
       
-      <div class="print-semester">${title}</div>
-      
-      ${tableClone.outerHTML}
-      
-      <div class="print-footer">
-        <div><strong>Generated:</strong> ${new Date().toLocaleString()}</div>
-        <div><strong>Instructor:</strong> <?php echo htmlspecialchars($user_name); ?></div>
+      <!-- Student Info Strip -->
+      <div style="display:flex;flex-wrap:wrap;gap:6mm;padding:6mm 8mm;background:linear-gradient(135deg,#fff,#fafaf8);border:1px solid rgba(184,134,11,.2);border-radius:8px;margin-bottom:8mm;font-size:9px;">
+        <div><span style="font-weight:700;color:#8B6914;">Student:</span> <span style="color:#333;">${studentName}</span></div>
+        <div><span style="font-weight:700;color:#8B6914;">Student ID:</span> <span style="color:#333;">${document.getElementById('gmInfoStudentID').textContent}</span></div>
+        <div><span style="font-weight:700;color:#8B6914;">Year:</span> <span style="color:#333;">${document.getElementById('gmInfoYearLevel').textContent}</span></div>
+        <div><span style="font-weight:700;color:#8B6914;">Semester:</span> <span style="color:#333;">${document.getElementById('gmInfoSemester').textContent}</span></div>
       </div>
-    </body>
-    </html>
+      
+      <!-- Period Row -->
+      <div style="text-align:center;font-size:10px;font-weight:700;color:#8B6914;padding:5mm;background:linear-gradient(135deg,#fef9ed,#fdf6e8);border-radius:6px;margin-bottom:6mm;">
+        ${document.getElementById('gmInfoPeriod').textContent || title}
+      </div>
+      
+      <!-- Table -->
+      <div style="border:1px solid rgba(184,134,11,.2);border-radius:8px;overflow:hidden;margin-bottom:8mm;">
+        ${tableClone.outerHTML}
+      </div>
+      
+      <!-- Summary -->
+      <div style="display:flex;justify-content:space-between;padding:6mm 8mm;background:linear-gradient(145deg,#B8860B,#8B6914);border-radius:8px;font-size:10px;font-weight:700;color:#fff;">
+        <div>${document.getElementById('gmSummaryLeft').textContent}</div>
+        <div>${document.getElementById('gmSummaryGWA').textContent}</div>
+      </div>
+      
+      <!-- Signatures -->
+      <div style="display:flex;justify-content:space-between;margin-top:20mm;padding-top:8mm;border-top:1px solid #ccc;">
+        <div style="text-align:center;width:45%;">
+          <div style="font-size:10px;font-weight:700;color:#333;margin-bottom:3mm;">${advisorName}</div>
+          <div style="border-bottom:1px solid #333;height:15mm;margin-bottom:3mm;"></div>
+          <div style="font-size:9px;font-weight:700;color:#8B6914;margin-bottom:2mm;">Adviser's Signature</div>
+          <div style="font-size:8px;color:#666;">Date: ___________________</div>
+        </div>
+        <div style="text-align:center;width:45%;">
+          <div style="font-size:10px;font-weight:700;color:#333;margin-bottom:3mm;">${programHeadName}</div>
+          <div style="border-bottom:1px solid #333;height:15mm;margin-bottom:3mm;"></div>
+          <div style="font-size:9px;font-weight:700;color:#8B6914;margin-bottom:2mm;">Program Head's Signature</div>
+          <div style="font-size:8px;color:#666;">Date: ___________________</div>
+        </div>
+      </div>
+    </div>
   `;
   
-  printWindow.document.write(html);
-  printWindow.document.close();
-  printWindow.focus();
-  setTimeout(() => {
-    printWindow.print();
-  }, 300);
+  // Remove old print container
+  const existingPrint = document.getElementById('printContainer');
+  if(existingPrint) existingPrint.remove();
+  
+  // Create print container
+  const printContainer = document.createElement('div');
+  printContainer.id = 'printContainer';
+  printContainer.innerHTML = printHTML;
+  printContainer.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99999;overflow:auto;';
+  
+  // Add table styles
+  const tableStyle = document.createElement('style');
+  tableStyle.textContent = `
+    #printContainer table { width:100%;border-collapse:collapse;font-size:9px; }
+    #printContainer th { background:#B8860B;color:#fff;padding:5px 6px;text-align:left;font-weight:700;border-bottom:2px solid #8B6914; }
+    #printContainer th:nth-child(3), #printContainer th:nth-child(4) { text-align:center; }
+    #printContainer td { padding:4px 6px;border-bottom:1px solid #ddd; }
+    #printContainer td:nth-child(3), #printContainer td:nth-child(4) { text-align:center; }
+    #printContainer .code { font-weight:700;color:#1a1a1a; }
+    #printContainer .subject { color:#4b4b4b; }
+    #printContainer .units { font-weight:600;text-align:center; }
+    #printContainer .grade { font-weight:800;text-align:center; }
+    #printContainer .grade.pass { color:#16a34a; }
+    #printContainer .grade.fail { color:#dc2626; }
+    #printContainer .grade.cond { color:#d97706; }
+  `;
+  printContainer.appendChild(tableStyle);
+  document.body.appendChild(printContainer);
+  
+  // Print directly - shows content in print dialog
+  window.print();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2404,19 +2485,82 @@ function renderAdvisement(d) {
 /* ═══════════════════════════════════════════════════════════
    PRINT
 ═══════════════════════════════════════════════════════════ */
-function printProspectus() {
-  const el = document.getElementById('liveProspectus');
-  if(!el) { toast('No prospectus loaded.','error'); return; }
-  const pt = document.getElementById('printTarget');
-  pt.innerHTML = el.outerHTML;
-  pt.querySelectorAll('.grade-inp').forEach(inp => {
-    const span = inp.nextElementSibling;
-    if(span && span.classList.contains('grade-print')) span.style.display = 'inline-block';
-  });
-  pt.querySelectorAll('.save-btn,.grade-hint,.lock-badge,.prereq-chain-info,.gwa-strip,.session-bar,.eval-focus-bar,.sem-finalized-badge').forEach(el2 => el2?.remove && el2.remove());
-  window.print();
-  window.addEventListener('afterprint', () => { pt.innerHTML = ''; }, {once:true});
-}
+ function printProspectus() {
+   const el = document.getElementById('liveProspectus');
+   if(!el) { toast('No prospectus loaded.','error'); return; }
+   const pt = document.getElementById('printTarget');
+   pt.innerHTML = el.outerHTML;
+   pt.querySelectorAll('.grade-inp').forEach(inp => {
+     const span = inp.nextElementSibling;
+     if(span && span.classList.contains('grade-print')) span.style.display = 'inline-block';
+   });
+   pt.querySelectorAll('.save-btn,.grade-hint,.lock-badge,.prereq-chain-info,.gwa-strip,.session-bar,.eval-focus-bar,.sem-finalized-badge').forEach(el2 => el2?.remove && el2.remove());
+   window.print();
+   window.addEventListener('afterprint', () => { pt.innerHTML = ''; }, {once:true});
+ }
+ 
+ function printGradesModal() {
+   const modal = document.querySelector('.grades-modal');
+   if(!modal) { toast('No grades to print.','error'); return; }
+   
+   // Create print target for grades modal
+   let printTarget = document.getElementById('gradesPrintTarget');
+   if(!printTarget) {
+     printTarget = document.createElement('div');
+     printTarget.id = 'gradesPrintTarget';
+     document.body.appendChild(printTarget);
+   }
+   
+   // Clone modal content
+   printTarget.innerHTML = modal.outerHTML;
+   
+   // Force display all elements
+   const elements = printTarget.querySelectorAll('*');
+   elements.forEach(el => {
+     el.style.display = el.tagName === 'STYLE' || el.tagName === 'SCRIPT' ? 'none' : 'block';
+     el.style.visibility = 'visible';
+     el.style.opacity = '1';
+   });
+   
+   // Show all print-only elements
+   const gmSchoolHeader = printTarget.querySelector('#gmSchoolHeader');
+   const gmStudentInfo = printTarget.querySelector('#gmStudentInfo');
+   const gmSummary = printTarget.querySelector('#gmSummary');
+   const gmSigBlock = printTarget.querySelector('#gmSigBlock');
+   
+   if(gmSchoolHeader) { gmSchoolHeader.style.display = 'block'; gmSchoolHeader.style.visibility = 'visible'; }
+   if(gmStudentInfo) { gmStudentInfo.style.display = 'block'; gmStudentInfo.style.visibility = 'visible'; }
+   if(gmSummary) { gmSummary.style.display = 'block'; gmSummary.style.visibility = 'visible'; }
+   if(gmSigBlock) { gmSigBlock.style.display = 'block'; gmSigBlock.style.visibility = 'visible'; }
+   
+   // Fix gm-body to be visible
+   const gmBody = printTarget.querySelector('.gm-body');
+   if(gmBody) {
+     gmBody.style.maxHeight = 'none';
+     gmBody.style.overflow = 'visible';
+     gmBody.style.display = 'block';
+   }
+   
+   // Remove UI buttons
+   const footer = printTarget.querySelector('.gm-footer');
+   if(footer) footer.remove();
+   
+   // Ensure print target is visible
+   printTarget.style.display = 'block';
+   printTarget.style.position = 'absolute';
+   printTarget.style.top = '0';
+   printTarget.style.left = '0';
+   printTarget.style.width = '100%';
+   
+   setTimeout(() => {
+     window.print();
+     
+     window.addEventListener('afterprint', () => { 
+       printTarget.innerHTML = ''; 
+       printTarget.style.display = 'none';
+     }, {once:true});
+   }, 100);
+ }
 
 /* ═══════════════════════════════════════════════════════════
    FINALIZE FROM NOTES TAB

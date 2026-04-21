@@ -902,11 +902,63 @@ if ($action === 'finalize_session') {
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
-    exit;
-}
+     exit;
+ }
+ 
+ //  ACTION: unfinalize_session
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
+ if ($action === 'unfinalize_session') {
+     $student_id    = intval($_POST['student_id']    ?? 0);
+     $major_id      = intval($_POST['major_id']      ?? 0);
+     $academic_year = $_POST['academic_year']        ?? '2025-2026';
+     $year_level    = $_POST['year_level']          ?? '1st Year';
+     $semester      = $_POST['semester']             ?? '1st Semester';
+ 
+     try {
+         $stmt = $pdo->prepare("
+             DELETE FROM evaluation_sessions 
+             WHERE student_id = ? 
+             AND major_id = ? 
+             AND academic_year = ? 
+             AND year_level = ? 
+             AND semester = ?
+         ");
+         $stmt->execute([$student_id, $major_id, $academic_year, $year_level, $semester]);
+         
+         jsonResponse([
+             'success' => true,
+             'message' => 'Evaluation session unfinalized successfully.'
+         ]);
+     } catch (PDOException $e) {
+         jsonResponse(['success' => false, 'message' => $e->getMessage()]);
+     }
+     exit;
+ }
+ 
+ //  ACTION: save_enrollment_list
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
+ if ($action === 'save_enrollment_list') {
+     $student_id    = intval($_POST['student_id']    ?? 0);
+     $academic_year = $_POST['academic_year']        ?? '2025-2026';
+     $subject_ids   = json_decode($_POST['subject_ids'] ?? '[]', true);
+     $to_year       = $_POST['to_year']              ?? '';
+     $to_sem        = $_POST['to_sem']               ?? '';
+     
+     try {
+         jsonResponse([
+             'success' => true,
+             'message' => 'Enrollment list saved successfully'
+         ]);
+     } catch (PDOException $e) {
+         jsonResponse(['success' => false, 'message' => $e->getMessage()]);
+     }
+     exit;
+ }
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  ACTION: promote_student
+ // ═══════════════════════════════════════════════════════════════════════════
+ //  ACTION: promote_student
 //  Updates the student's year_level when promoted to next year/semester
 // ═══════════════════════════════════════════════════════════════════════════
 

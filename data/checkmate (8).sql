@@ -22,7 +22,41 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
+-- =============================================
+-- Calendar Events Schema
+-- Run this SQL to create the necessary tables
+-- for the calendar event functionality
+-- =============================================
 
+-- Create calendar_events table
+CREATE TABLE IF NOT EXISTS calendar_events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT DEFAULT NULL,
+    event_date DATE NOT NULL,
+    created_by INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create event_instructors junction table
+-- Links events to instructors (many-to-many)
+CREATE TABLE IF NOT EXISTS event_instructors (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    instructor_id INT NOT NULL,
+    UNIQUE KEY unique_event_instructor (event_id, instructor_id),
+    CONSTRAINT fk_event_instructors_event 
+        FOREIGN KEY (event_id) REFERENCES calendar_events(id) ON DELETE CASCADE,
+    CONSTRAINT fk_event_instructors_instructor 
+        FOREIGN KEY (instructor_id) REFERENCES instructors(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create indexes for performance
+CREATE INDEX idx_calendar_events_date ON calendar_events(event_date);
+CREATE INDEX idx_calendar_events_created_by ON calendar_events(created_by);
+CREATE INDEX idx_event_instructors_event ON event_instructors(event_id);
+CREATE INDEX idx_event_instructors_instructor ON event_instructors(instructor_id);
 --
 -- Table structure for table `admins`
 --

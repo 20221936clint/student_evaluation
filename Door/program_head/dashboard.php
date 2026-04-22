@@ -1403,6 +1403,111 @@ try {
         font-weight: 600;
         margin: 0 0 16px 0;
     }
+
+    .current-month-events-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .current-month-event-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        background: var(--cream);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .current-month-event-row:hover {
+        background: var(--white);
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(184, 134, 11, 0.12);
+    }
+
+    .current-month-event-row.past-event {
+        opacity: 0.6;
+    }
+
+    .current-month-event-date-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 40px;
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: white;
+        border-radius: 8px;
+        padding: 6px 10px;
+    }
+
+    .current-month-event-row.past-event .current-month-event-date-col {
+        background: linear-gradient(135deg, #9ca3af, #d1d5db);
+    }
+
+    .current-month-event-day-num {
+        font-size: 18px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .current-month-event-day-suffix {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .current-month-event-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .current-month-event-name {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--dark-text);
+        margin-bottom: 2px;
+    }
+
+    .current-month-event-inst {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--medium-text);
+    }
+
+    .current-month-event-inst i {
+        color: #059669;
+        font-size: 10px;
+    }
+
+    .current-month-event-chevron {
+        color: var(--light-text);
+        font-size: 11px;
+    }
+
+    .current-month-event-row:hover .current-month-event-chevron {
+        color: #059669;
+        transform: translateX(3px);
+    }
+
+    .no-month-events-compact {
+        text-align: center;
+        padding: 20px;
+        color: var(--light-text);
+        font-size: 13px;
+    }
+
+    .no-month-events-compact i {
+        font-size: 24px;
+        margin-bottom: 6px;
+        opacity: 0.3;
+        color: #059669;
+        display: block;
+    }
     </style>
 </head>
 
@@ -1781,11 +1886,47 @@ try {
                                               </div>
                                           </a>
 <?php endforeach; ?>
-                                      </div>
-                                  </div>
-                                  <?php endif; ?>
-                                  
-                                  <!-- Upcoming Events Section -->
+                                       </div>
+                                   </div>
+
+<!-- Current Month Events -->
+                                    <div class="dept-majors-section">
+                                        <div class="section-header-modern">
+                                            <h4 class="section-title" id="events-section-title">
+                                                <i class="fas fa-calendar-check"></i> Events for <?php echo $current_month_name; ?>
+                                            </h4>
+                                            <span class="month-event-count" id="events-section-count"><?php echo count($current_month_events); ?></span>
+                                        </div>
+                                        <?php if (!empty($current_month_events)): ?>
+                                        <div class="current-month-events-list" id="current-month-events-list">
+                                           <?php foreach ($current_month_events as $event): 
+                                               $event_date = new DateTime($event['event_date']);
+                                               $is_past = $event_date < new DateTime('today');
+                                           ?>
+                                           <div class="current-month-event-row <?php echo $is_past ? 'past-event' : ''; ?>" onclick="viewEvent(<?php echo $event['id']; ?>)">
+                                               <div class="current-month-event-date-col">
+                                                   <span class="current-month-event-day-num"><?php echo $event_date->format('j'); ?></span>
+                                                   <span class="current-month-event-day-suffix"><?php echo $event_date->format('M'); ?></span>
+                                               </div>
+                                               <div class="current-month-event-details">
+                                                   <span class="current-month-event-name"><?php echo htmlspecialchars($event['title']); ?></span>
+                                                   <?php if (!empty($event['instructor_names'])): ?>
+                                                   <span class="current-month-event-inst"><i class="fas fa-user"></i> <?php echo htmlspecialchars(implode(', ', array_slice($event['instructor_names'], 0, 2))); ?></span>
+                                                   <?php endif; ?>
+                                               </div>
+                                               <div class="current-month-event-chevron"><i class="fas fa-chevron-right"></i></div>
+                                           </div>
+                                           <?php endforeach; ?>
+                                       </div>
+<?php else: ?>
+                                        <div class="no-month-events-compact" id="no-month-events">
+                                            <i class="fas fa-calendar-xmark"></i> No events this month
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                   <?php endif; ?>
+                                   
+                                   <!-- Upcoming Events Section -->
                                   <?php if (!empty($upcoming_events_by_month)): ?>
                                   <div class="dept-majors-section">
                                       <div class="section-header-modern">
@@ -1975,58 +2116,6 @@ try {
                 </div>
             </section>
 
-            <!-- Current Month Events Section -->
-            <section class="current-month-events-section">
-                <div class="section-header-modern">
-                    <h3 class="section-title">
-                        <i class="fas fa-calendar-check"></i> Events for <?php echo $current_month_name; ?>
-                    </h3>
-                    <span class="month-event-count"><?php echo count($current_month_events); ?> event<?php echo count($current_month_events) != 1 ? 's' : ''; ?></span>
-                </div>
-                
-                <?php if (!empty($current_month_events)): ?>
-                <div class="current-month-events-grid">
-                    <?php foreach ($current_month_events as $event): 
-                        $event_date = new DateTime($event['event_date']);
-                        $day_suffix = date('S', strtotime($event['event_date']));
-                        $is_past = $event_date < new DateTime('today');
-                    ?>
-                    <div class="current-month-event-card <?php echo $is_past ? 'past-event' : ''; ?>" onclick="viewEvent(<?php echo $event['id']; ?>)">
-                        <div class="current-month-event-date">
-                            <div class="current-month-event-day"><?php echo $event_date->format('j'); ?></div>
-                            <div class="current-month-event-month"><?php echo $event_date->format('M'); ?></div>
-                        </div>
-                        <div class="current-month-event-info">
-                            <h4 class="current-month-event-title"><?php echo htmlspecialchars($event['title']); ?></h4>
-                            <div class="current-month-event-meta">
-                                <?php if (!empty($event['instructor_names'])): ?>
-                                <span class="current-month-event-instructors">
-                                    <i class="fas fa-user"></i>
-                                    <?php echo htmlspecialchars(implode(', ', array_slice($event['instructor_names'], 0, 2))); ?>
-                                    <?php if (count($event['instructor_names']) > 2): ?>
-                                    +<?php echo count($event['instructor_names']) - 2; ?>
-                                    <?php endif; ?>
-                                </span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="current-month-event-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php else: ?>
-                <div class="no-current-month-events">
-                    <i class="fas fa-calendar-xmark"></i>
-                    <p>No events scheduled for this month</p>
-                    <button class="btn-primary" onclick="openEventModal()">
-                        <i class="fas fa-plus"></i> Add Event
-                    </button>
-                </div>
-                <?php endif; ?>
-            </section>
-
             <!-- Upcoming Events by Month Section -->
             <?php if (!empty($upcoming_events_by_month)): ?>
             <section class="upcoming-events-section">
@@ -2211,10 +2300,12 @@ try {
     }
 
     function loadCalendarEvents() {
+        console.log('loadCalendarEvents called for month', currentMonth + 1, 'year', currentYear);
         fetch('calendar_events_handler.php?action=get_events&month=' + (currentMonth + 1) + '&year=' + currentYear)
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (data.success) {
+                    console.log('Events loaded:', data.events.length);
                     calendarEvents = {};
                     data.events.forEach(function(ev) {
                         if (!calendarEvents[ev.event_date]) {
@@ -2223,11 +2314,65 @@ try {
                         calendarEvents[ev.event_date].push(ev);
                     });
                     renderCalendar();
+                    updateEventsContainer(data.events);
+                } else {
+                    console.log('Failed to load events:', data.message);
                 }
             })
             .catch(function(err) {
                 console.error('Error loading events:', err);
             });
+    }
+
+    function updateEventsContainer(events) {
+        const titleEl = document.getElementById('events-section-title');
+        const countEl = document.getElementById('events-section-count');
+        const listEl = document.getElementById('current-month-events-list');
+        const noEventsEl = document.getElementById('no-month-events');
+        
+        if (!titleEl || !countEl || !listEl) {
+            console.log('updateEventsContainer: elements not found', {titleEl, countEl, listEl});
+            return;
+        }
+        
+        titleEl.innerHTML = '<i class="fas fa-calendar-check"></i> Events for April 2026';
+        countEl.textContent = events.length;
+        console.log('updateEventsContainer called with', events.length, 'events for April 2026');
+        
+        if (events.length === 0) {
+            listEl.innerHTML = '';
+            if (noEventsEl) noEventsEl.style.display = 'block';
+            return;
+        }
+        
+        if (noEventsEl) noEventsEl.style.display = 'none';
+        
+        let html = '';
+        events.forEach(function(ev) {
+            const eventDate = new Date(ev.event_date);
+            const day = eventDate.getDate();
+            const month = monthShortNames[eventDate.getMonth()];
+            const isPast = eventDate < new Date(new Date().toDateString());
+            
+            let instructorHtml = '';
+            if (ev.instructor_ids && ev.instructor_ids.length > 0) {
+                instructorHtml = '<span class="current-month-event-inst"><i class="fas fa-user"></i> Assigned</span>';
+            }
+            
+            html += '<div class="current-month-event-row' + (isPast ? ' past-event' : '') + '" onclick="viewEvent(' + ev.id + ')">';
+            html += '<div class="current-month-event-date-col">';
+            html += '<span class="current-month-event-day-num">' + day + '</span>';
+            html += '<span class="current-month-event-day-suffix">' + month + '</span>';
+            html += '</div>';
+            html += '<div class="current-month-event-details">';
+            html += '<span class="current-month-event-name">' + ev.title + '</span>';
+            html += instructorHtml;
+            html += '</div>';
+            html += '<div class="current-month-event-chevron"><i class="fas fa-chevron-right"></i></div>';
+            html += '</div>';
+        });
+        
+        listEl.innerHTML = html;
     }
 
     function renderCalendar() {
@@ -2643,7 +2788,17 @@ try {
             if (data.success) {
                 showToast(data.message, 'success');
                 closeEventModal();
-                loadCalendarEvents();
+                console.log('Event saved, loading April 2026 events');
+                currentMonth = 3;
+                currentYear = 2026;
+                
+                fetch('calendar_events_handler.php?action=get_events&month=4&year=2026')
+                    .then(function(res) { return res.json(); })
+                    .then(function(evData) {
+                        console.log('April events fetched:', evData.events.length);
+                        renderCalendar();
+                        updateEventsContainer(evData.events);
+                    });
             } else {
                 showToast(data.message, 'error');
             }
@@ -2773,7 +2928,15 @@ try {
             if (data.success) {
                 showToast('Event deleted successfully', 'success');
                 closeEventViewModal();
-                loadCalendarEvents();
+                currentMonth = 3;
+                currentYear = 2026;
+                
+                fetch('calendar_events_handler.php?action=get_events&month=4&year=2026')
+                    .then(function(res) { return res.json(); })
+                    .then(function(evData) {
+                        renderCalendar();
+                        updateEventsContainer(evData.events);
+                    });
             } else {
                 showToast(data.message, 'error');
             }
@@ -2806,6 +2969,8 @@ try {
 
     // Initialize calendar on page load
     document.addEventListener('DOMContentLoaded', function() {
+        currentMonth = 3;
+        currentYear = 2026;
         loadCalendarEvents();
     });
 

@@ -1429,6 +1429,41 @@ try {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
+        max-height: 420px;
+        overflow-y: auto;
+        padding-right: 6px;
+        scroll-behavior: smooth;
+    }
+
+    /* ==========================================
+       CUSTOM SCROLLBAR FOR EVENTS
+       ========================================== */
+    .current-month-events-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .current-month-events-list::-webkit-scrollbar-track {
+        background: rgba(59, 130, 246, 0.08);
+        border-radius: 10px;
+        margin: 8px 0;
+    }
+
+    .current-month-events-list::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #3B82F6, #6366F1, #8B5CF6);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+    }
+
+    .current-month-events-list::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #2563EB, #4F46E5, #7C3AED);
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    /* Firefox Scrollbar */
+    .current-month-events-list {
+        scrollbar-color: #3B82F6 rgba(59, 130, 246, 0.08);
+        scrollbar-width: thin;
     }
 
     .current-month-event-row {
@@ -1574,12 +1609,14 @@ try {
     @media (max-width: 1200px) {
         .current-month-events-list {
             grid-template-columns: 1fr;
+            max-height: 480px;
         }
     }
 
     @media (max-width: 768px) {
         .current-month-events-list {
             grid-template-columns: 1fr;
+            max-height: 420px;
         }
         
         .current-month-event-row {

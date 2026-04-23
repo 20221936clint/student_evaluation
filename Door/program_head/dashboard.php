@@ -239,11 +239,13 @@ try {
                 LEFT JOIN event_instructors ei ON ce.id = ei.event_id
                 WHERE DATE_FORMAT(ce.event_date, '%Y-%m') = :month
                 GROUP BY ce.id
-                ORDER BY ce.event_date ASC
+                ORDER BY ce.title ASC, ce.event_date ASC
             ");
             $stmt->execute([':month' => $current_month]);
             $month_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Group events by title and combine dates
+            $grouped_events = [];
             foreach ($month_events as $event) {
                 $event['instructor_ids'] = $event['instructor_ids']
                     ? array_map('intval', explode(',', $event['instructor_ids']))
@@ -259,6 +261,25 @@ try {
                     $event['instructor_names'] = [];
                 }
 
+                // Use title as the key to group events
+                $title_key = strtolower(trim($event['title']));
+                if (!isset($grouped_events[$title_key])) {
+                    $grouped_events[$title_key] = [
+                        'id' => $event['id'],
+                        'title' => $event['title'],
+                        'description' => $event['description'],
+                        'dates' => [],
+                        'instructor_names' => $event['instructor_names']
+                    ];
+                }
+                
+                $grouped_events[$title_key]['dates'][] = $event['event_date'];
+            }
+
+            // Convert to array and remove duplicate dates for each event
+            foreach ($grouped_events as $key => $event) {
+                $event['dates'] = array_unique($event['dates']);
+                sort($event['dates']);
                 $current_month_events[] = $event;
             }
         }
@@ -1405,9 +1426,9 @@ try {
     }
 
     .current-month-events-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
     }
 
     .current-month-event-row {
@@ -1456,6 +1477,44 @@ try {
         font-size: 9px;
         font-weight: 700;
         text-transform: uppercase;
+    }
+
+    .current-month-event-dates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin: 4px 0 6px 0;
+    }
+
+    .event-date-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1));
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: #4F46E5;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .event-date-tag:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.2));
+        border-color: rgba(99, 102, 241, 0.4);
+        transform: scale(1.05);
+    }
+
+    .event-date-more {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.15));
+        color: #7C3AED;
+        border-color: rgba(168, 85, 247, 0.3);
+        font-weight: 700;
+    }
+
+    .event-date-more:hover {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(139, 92, 246, 0.25));
+        border-color: rgba(168, 85, 247, 0.5);
     }
 
     .current-month-event-details {
@@ -1507,6 +1566,25 @@ try {
         opacity: 0.3;
         color: #059669;
         display: block;
+    }
+
+    /* ==========================================
+       RESPONSIVE LAYOUT FOR SMALLER SCREENS
+       ========================================== */
+    @media (max-width: 1200px) {
+        .current-month-events-list {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .current-month-events-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .current-month-event-row {
+            padding: 10px 12px;
+        }
     }
     </style>
 </head>
@@ -1900,16 +1978,26 @@ try {
                                         <?php if (!empty($current_month_events)): ?>
                                         <div class="current-month-events-list" id="current-month-events-list">
                                            <?php foreach ($current_month_events as $event): 
-                                               $event_date = new DateTime($event['event_date']);
-                                               $is_past = $event_date < new DateTime('today');
+                                               $first_date = new DateTime($event['dates'][0]);
+                                               $is_past = $first_date < new DateTime('today');
                                            ?>
                                            <div class="current-month-event-row <?php echo $is_past ? 'past-event' : ''; ?>" onclick="viewEvent(<?php echo $event['id']; ?>)">
                                                <div class="current-month-event-date-col">
-                                                   <span class="current-month-event-day-num"><?php echo $event_date->format('j'); ?></span>
-                                                   <span class="current-month-event-day-suffix"><?php echo $event_date->format('M'); ?></span>
+                                                   <span class="current-month-event-day-num"><?php echo count($event['dates']) > 1 ? count($event['dates']) : $first_date->format('j'); ?></span>
+                                                   <span class="current-month-event-day-suffix"><?php echo count($event['dates']) > 1 ? 'dates' : $first_date->format('M'); ?></span>
                                                </div>
                                                <div class="current-month-event-details">
                                                    <span class="current-month-event-name"><?php echo htmlspecialchars($event['title']); ?></span>
+                                                   <div class="current-month-event-dates">
+                                                       <?php foreach (array_slice($event['dates'], 0, 3) as $date): 
+                                                           $d = new DateTime($date);
+                                                       ?>
+                                                           <span class="event-date-tag"><?php echo $d->format('j'); ?> <?php echo $d->format('M'); ?></span>
+                                                       <?php endforeach; ?>
+                                                       <?php if (count($event['dates']) > 3): ?>
+                                                           <span class="event-date-tag event-date-more">+<?php echo count($event['dates']) - 3; ?></span>
+                                                       <?php endif; ?>
+                                                   </div>
                                                    <?php if (!empty($event['instructor_names'])): ?>
                                                    <span class="current-month-event-inst"><i class="fas fa-user"></i> <?php echo htmlspecialchars(implode(', ', array_slice($event['instructor_names'], 0, 2))); ?></span>
                                                    <?php endif; ?>
@@ -2336,23 +2424,68 @@ try {
         }
         
         titleEl.innerHTML = '<i class="fas fa-calendar-check"></i> Events for April 2026';
-        countEl.textContent = events.length;
-        console.log('updateEventsContainer called with', events.length, 'events for April 2026');
         
         if (events.length === 0) {
             listEl.innerHTML = '';
+            countEl.textContent = '0';
             if (noEventsEl) noEventsEl.style.display = 'block';
             return;
         }
         
         if (noEventsEl) noEventsEl.style.display = 'none';
         
-        let html = '';
+        // Group events by title to combine multiple dates
+        const groupedEvents = {};
         events.forEach(function(ev) {
-            const eventDate = new Date(ev.event_date);
-            const day = eventDate.getDate();
-            const month = monthShortNames[eventDate.getMonth()];
-            const isPast = eventDate < new Date(new Date().toDateString());
+            const titleKey = (ev.title || '').toLowerCase().trim();
+            if (!groupedEvents[titleKey]) {
+                groupedEvents[titleKey] = {
+                    id: ev.id,
+                    title: ev.title,
+                    description: ev.description,
+                    dates: [],
+                    instructor_ids: ev.instructor_ids || []
+                };
+            }
+            // Add date if not already in the list
+            if (groupedEvents[titleKey].dates.indexOf(ev.event_date) === -1) {
+                groupedEvents[titleKey].dates.push(ev.event_date);
+            }
+        });
+        
+        // Sort dates for each event
+        Object.values(groupedEvents).forEach(function(ev) {
+            ev.dates.sort();
+        });
+        
+        const uniqueEvents = Object.values(groupedEvents);
+        countEl.textContent = uniqueEvents.length;
+        console.log('updateEventsContainer: grouped', uniqueEvents.length, 'unique events from', events.length, 'date entries');
+        
+        let html = '';
+        uniqueEvents.forEach(function(ev) {
+            const firstDate = new Date(ev.dates[0]);
+            const day = firstDate.getDate();
+            const month = monthShortNames[firstDate.getMonth()];
+            const isPast = firstDate < new Date(new Date().toDateString());
+            
+            // Format dates display
+            let dateCountDisplay = ev.dates.length > 1 ? ev.dates.length : day;
+            let dateSuffixDisplay = ev.dates.length > 1 ? 'dates' : month;
+            
+            // Build date tags HTML
+            let dateTagsHtml = '';
+            const datesToShow = ev.dates.slice(0, 3);
+            datesToShow.forEach(function(dateStr) {
+                const d = new Date(dateStr);
+                const dayNum = d.getDate();
+                const monthShort = monthShortNames[d.getMonth()];
+                dateTagsHtml += '<span class="event-date-tag">' + dayNum + ' ' + monthShort + '</span>';
+            });
+            
+            if (ev.dates.length > 3) {
+                dateTagsHtml += '<span class="event-date-tag event-date-more">+' + (ev.dates.length - 3) + '</span>';
+            }
             
             let instructorHtml = '';
             if (ev.instructor_ids && ev.instructor_ids.length > 0) {
@@ -2361,11 +2494,14 @@ try {
             
             html += '<div class="current-month-event-row' + (isPast ? ' past-event' : '') + '" onclick="viewEvent(' + ev.id + ')">';
             html += '<div class="current-month-event-date-col">';
-            html += '<span class="current-month-event-day-num">' + day + '</span>';
-            html += '<span class="current-month-event-day-suffix">' + month + '</span>';
+            html += '<span class="current-month-event-day-num">' + dateCountDisplay + '</span>';
+            html += '<span class="current-month-event-day-suffix">' + dateSuffixDisplay + '</span>';
             html += '</div>';
             html += '<div class="current-month-event-details">';
             html += '<span class="current-month-event-name">' + ev.title + '</span>';
+            if (dateTagsHtml) {
+                html += '<div class="current-month-event-dates">' + dateTagsHtml + '</div>';
+            }
             html += instructorHtml;
             html += '</div>';
             html += '<div class="current-month-event-chevron"><i class="fas fa-chevron-right"></i></div>';
@@ -2796,6 +2932,19 @@ try {
                     .then(function(res) { return res.json(); })
                     .then(function(evData) {
                         console.log('April events fetched:', evData.events.length);
+                        // Update calendarEvents object for the calendar grid
+                        calendarEvents = {};
+                        evData.events.forEach(function(ev) {
+                            const dateKey = ev.event_date;
+                            if (!calendarEvents[dateKey]) {
+                                calendarEvents[dateKey] = [];
+                            }
+                            // Avoid duplicates
+                            const exists = calendarEvents[dateKey].some(function(e) { return e.id === ev.id; });
+                            if (!exists) {
+                                calendarEvents[dateKey].push(ev);
+                            }
+                        });
                         renderCalendar();
                         updateEventsContainer(evData.events);
                     });
@@ -2934,6 +3083,18 @@ try {
                 fetch('calendar_events_handler.php?action=get_events&month=4&year=2026')
                     .then(function(res) { return res.json(); })
                     .then(function(evData) {
+                        // Update calendarEvents object for the calendar grid
+                        calendarEvents = {};
+                        evData.events.forEach(function(ev) {
+                            const dateKey = ev.event_date;
+                            if (!calendarEvents[dateKey]) {
+                                calendarEvents[dateKey] = [];
+                            }
+                            const exists = calendarEvents[dateKey].some(function(e) { return e.id === ev.id; });
+                            if (!exists) {
+                                calendarEvents[dateKey].push(ev);
+                            }
+                        });
                         renderCalendar();
                         updateEventsContainer(evData.events);
                     });

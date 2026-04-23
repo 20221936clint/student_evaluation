@@ -5,6 +5,9 @@ require_once '../../data/config.php';
 
 header('Content-Type: application/json');
 
+// Ensure event_dates table exists for multi-date support
+ensureEventDatesTable($pdo);
+
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
 switch ($action) {
@@ -28,6 +31,31 @@ switch ($action) {
         break;
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
+}
+
+/**
+ * Ensure event_dates table exists for storing multiple dates per event
+ */
+function ensureEventDatesTable($pdo) {
+    try {
+        $stmt = $pdo->query("SHOW TABLES LIKE 'event_dates'");
+        if ($stmt->rowCount() === 0) {
+            // Create event_dates table
+            $sql = "CREATE TABLE IF NOT EXISTS event_dates (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                event_id INT NOT NULL,
+                event_date DATE NOT NULL,
+                CONSTRAINT fk_event_dates_event 
+                    FOREIGN KEY (event_id) REFERENCES calendar_events(id) ON DELETE CASCADE,
+                INDEX idx_event_dates_event (event_id),
+                INDEX idx_event_dates_date (event_date)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+            $pdo->exec($sql);
+        }
+    } catch (PDOException $e) {
+        // Table creation might fail silently
+        error_log('Error ensuring event_dates table: ' . $e->getMessage());
+    }
 }
 
 function getEvents($pdo) {

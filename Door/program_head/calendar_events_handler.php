@@ -153,6 +153,7 @@ function createEvent($pdo) {
         $description = trim($_POST['description'] ?? '');
         $eventDates = $_POST['event_dates'] ?? [];
         $instructorIds = $_POST['instructor_ids'] ?? [];
+        $createdBy = $_SESSION['user_id'] ?? null;
 
         // Support legacy single date field
         if (empty($eventDates)) {
@@ -183,11 +184,12 @@ function createEvent($pdo) {
 
         $pdo->beginTransaction();
 
-        $stmt = $pdo->prepare("INSERT INTO calendar_events (title, description, event_date) VALUES (:title, :description, :event_date)");
+        $stmt = $pdo->prepare("INSERT INTO calendar_events (title, description, event_date, created_by) VALUES (:title, :description, :event_date, :created_by)");
         $stmt->execute([
             ':title' => $title,
             ':description' => $description,
-            ':event_date' => $primaryDate
+            ':event_date' => $primaryDate,
+            ':created_by' => $createdBy
         ]);
 
         $eventId = $pdo->lastInsertId();

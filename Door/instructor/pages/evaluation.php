@@ -166,7 +166,6 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 .pro-units{text-align:center;font-weight:600;white-space:nowrap;}
 .pro-prereq-col{color:#888;font-size:9.5px;white-space:nowrap;}
 .pro-total-row td{background:#f0ece0;font-weight:700;color:var(--gold-d);border-top:2px solid var(--gold);font-size:10px;}
-.pro-total-row td:last-child { text-align: center; }
 .pro-empty{text-align:center;color:#aaa;font-style:italic;padding:10px;font-size:10px;}
 .pro-grand-total{text-align:right;font-size:12px;font-weight:700;padding:7px 14px;background:#f7f5ef;border:1px solid var(--border);border-radius:7px;margin:0 0 12px;}
 .pro-sig-block{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:20px 0 0;border-top:2px solid var(--border);margin-top:20px;}
@@ -519,14 +518,14 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
   .pro-total-row td { background: #f0ece0 !important; font-weight: 700 !important; color: #8B6914 !important; border-top: 0.5pt solid #B8860B !important; font-size: 6pt !important; }
   .pro-empty { font-size: 5pt !important; }
   .pro-bridging-block { margin-bottom: 1mm !important; page-break-inside: avoid !important; }
+  .pro-bridging-block .pro-sem-col { grid-column: 1 / -1 !important; }
   .pro-grand-total { font-size: 7pt !important; font-weight: 700 !important; text-align: right !important; padding: 1mm 2mm !important; margin: 1mm 0 !important; background: #f0ece0 !important; border-top: 0.5pt solid #B8860B !important; color: #8B6914 !important; }
   
   /* Fix GWA display size in prospectus print */
   .gwa-strip .gwa-val { font-size: 18pt !important; }
   
-   /* Align total units value directly under units column for all tables including bridging */
-   .pro-table .pro-total-row td:nth-child(3) { text-align: center !important; }
-   .pro-total-row td:last-child { text-align: center !important; }
+  /* Align total units value directly under units column for graded tables */
+  .pro-total-row td:last-child { text-align: center !important; }
   .pro-sig-block { display: grid !important; grid-template-columns: repeat(3,1fr) !important; gap: 5mm !important; padding: 3mm 2mm !important; border-top: 0.5pt solid #aaa !important; margin-top: 2mm !important; page-break-inside: avoid !important; }
   .pro-sig-col { text-align: center !important; }
   .pro-sig-line { border-bottom: 0.5pt solid #333 !important; height: 5mm !important; margin-bottom: 1mm !important; }
@@ -2449,46 +2448,55 @@ const sigHtml = `<div class="pro-sig-block">
             <span><i class="fas fa-exchange-alt" style="margin-right:6px;font-size:11px;"></i>Bridging Subjects</span>
             <span class="pro-year-total">${fmt((bridging||[]).reduce((a,s2)=>a+(parseFloat(s2.units)||0),0))} units</span>
           </div>
-          <div style="padding:10px 12px 12px;">
-            <table class="pro-table">
-              <thead><tr>
-                <th class="pro-th" style="width:54px;">Grade</th>
-                <th class="pro-th pro-th-status" style="width:36px;">Status</th>
-                <th class="pro-th">Code</th>
-                <th class="pro-th">Subject Title</th>
-                <th class="pro-th" style="width:32px;">Units</th>
-                <th class="pro-th">Bridging For</th>
-              </tr></thead>
-              <tbody>
-                ${(bridging||[]).map(sub => {
-                  const raw    = gradeMap[sub.id] != null ? gradeMap[sub.id] : null;
-                  const status = raw != null ? gradeStatus(roundGrade(raw)) : (sub.grade_status||'not_taken');
-                  return `<tr>
-                    <td>
-                      <div class="grade-cell-wrap">
-                        <div class="grade-row">
-                          <input type="number" class="grade-inp ${raw!=null?gClass(status):''}" id="g-${sub.id}"
-                            value="${raw!=null?parseFloat(raw).toFixed(2):''}"
-                            min="1" max="5" step="0.01" placeholder="—"
-                            title="1.00 to 5.00 · Enter to save"
-                            onchange="onGradeChange(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}')"
-                            onkeydown="if(event.key==='Enter'){event.preventDefault();saveGrade(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}');}">
-                          <span class="grade-print" style="display:none;">${raw!=null?parseFloat(raw).toFixed(2):'—'}</span>
-                          <button class="save-btn" id="sbtn-${sub.id}" onclick="saveGrade(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}')" title="Save grade"><i class="fas fa-save"></i></button>
+          <div class="pro-sem-row">
+            <div class="pro-sem-col" data-sem="1st Semester" style="grid-column:1/-1;">
+              <div class="pro-sem-label">BRIDGING — Subjects</div>
+              <table class="pro-table">
+                <thead><tr>
+                  <th class="pro-th" style="width:54px;text-align:center;">Final Grade</th>
+                  <th class="pro-th pro-th-status" style="width:36px;text-align:center;">Status</th>
+                  <th class="pro-th" style="width:62px;">Course No.</th>
+                  <th class="pro-th">Description</th>
+                  <th class="pro-th" style="width:32px;text-align:center;">Units</th>
+                  <th class="pro-th" style="width:46px;">Bridging For</th>
+                </tr></thead>
+                <tbody>
+                  ${(bridging||[]).map(sub => {
+                    const raw    = gradeMap[sub.id] != null ? gradeMap[sub.id] : null;
+                    const status = raw != null ? gradeStatus(roundGrade(raw)) : (sub.grade_status||'not_taken');
+                    return `<tr id="row-${sub.id}">
+                      <td>
+                        <div class="grade-cell-wrap">
+                          <div class="grade-row">
+                            <input type="number" class="grade-inp ${raw!=null?gClass(status):''}" id="g-${sub.id}"
+                              value="${raw!=null?parseFloat(raw).toFixed(2):''}"
+                              min="1" max="5" step="0.01" placeholder="—"
+                              title="1.00 to 5.00 · Enter to save"
+                              onchange="onGradeChange(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}')"
+                              onkeydown="if(event.key==='Enter'){event.preventDefault();saveGrade(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}');}">
+                            <span class="grade-print" style="display:none;">${raw!=null?parseFloat(raw).toFixed(2):'—'}</span>
+                            <button class="save-btn" id="sbtn-${sub.id}" onclick="saveGrade(${sub.id},${s.id},${s.major_id},'1st Semester','Bridging','${esc(ay)}')" title="Save grade"><i class="fas fa-save"></i></button>
+                          </div>
+                          <div class="grade-hint" id="gl-${sub.id}">${sub.grade_label||''}</div>
                         </div>
-                        <div class="grade-hint" id="gl-${sub.id}">${sub.grade_label||''}</div>
-                      </div>
-                    </td>
-                    <td class="pro-td-status"><span class="${pillClass(status)}" id="pill-${sub.id}">${statusText(status)}</span></td>
-                    <td class="pro-code">${esc(sub.subject_code)}</td>
-                    <td>${esc(sub.subject_name)}</td>
-                    <td class="pro-units">${parseFloat(sub.units)||0}</td>
-                    <td>${esc(sub.bridging_for||'—')}</td>
-                  </tr>`;
-                }).join('')}
-                <tr class="pro-total-row"><td colspan="2" style="text-align:right;padding-right:8px;">Total</td><td class="pro-units">${fmt((bridging||[]).reduce((a,s2)=>a+(parseFloat(s2.units)||0),0))}</td><td colspan="3"></td></tr>
-              </tbody>
-            </table>
+                      </td>
+                      <td class="pro-td-status"><span class="${pillClass(status)}" id="pill-${sub.id}">${statusText(status)}</span></td>
+                      <td class="pro-code">${esc(sub.subject_code)}</td>
+                      <td style="font-size:10px;">${esc(sub.subject_name)}</td>
+                      <td class="pro-units">${parseFloat(sub.units)||0}</td>
+                      <td class="pro-prereq-col">${esc(sub.bridging_for||'—')}</td>
+                    </tr>`;
+                  }).join('')}
+                  <tr class="pro-total-row">
+                    <td></td>
+                    <td class="pro-td-status"></td>
+                    <td colspan="2" style="text-align:right;padding-right:8px;font-weight:700;color:var(--gold-d);">Total Units</td>
+                    <td class="pro-units">${fmt((bridging||[]).reduce((a,s2)=>a+(parseFloat(s2.units)||0),0))}</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -2507,9 +2515,9 @@ const sigHtml = `<div class="pro-sig-block">
 function buildGradeTable(subjects, student, ay, prereqUnlockMap, isFinalized = false) {
   if(!subjects?.length) return `<table class="pro-table">
     <thead><tr>
-      <th class="pro-th" style="width:54px;">Grade</th><th class="pro-th pro-th-status" style="width:36px;">Status</th>
+      <th class="pro-th" style="width:54px;text-align:center;">Grade</th><th class="pro-th pro-th-status" style="width:36px;text-align:center;">Status</th>
       <th class="pro-th" style="width:62px;">Code</th><th class="pro-th">Description</th>
-      <th class="pro-th" style="width:32px;">Units</th><th class="pro-th" style="width:46px;">Pre-Req</th>
+      <th class="pro-th" style="width:32px;text-align:center;">Units</th><th class="pro-th" style="width:46px;">Pre-Req</th>
     </tr></thead>
     <tbody><tr><td colspan="6" class="pro-empty">No subjects</td></tr></tbody>
   </table>`;
@@ -2606,9 +2614,9 @@ function buildGradeTable(subjects, student, ay, prereqUnlockMap, isFinalized = f
   }
   return `<table class="pro-table">
     <thead><tr>
-      <th class="pro-th" style="width:54px;">Final Grade</th><th class="pro-th pro-th-status" style="width:36px;">Status</th>
+      <th class="pro-th" style="width:54px;text-align:center;">Final Grade</th><th class="pro-th pro-th-status" style="width:36px;text-align:center;">Status</th>
       <th class="pro-th" style="width:62px;">Course No.</th><th class="pro-th">Description</th>
-      <th class="pro-th" style="width:32px;">Units</th><th class="pro-th" style="width:46px;">Pre-Req</th>
+      <th class="pro-th" style="width:32px;text-align:center;">Units</th><th class="pro-th" style="width:46px;">Pre-Req</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>`;

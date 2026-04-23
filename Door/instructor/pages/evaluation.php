@@ -465,6 +465,119 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 .rm-enroll-card input[type=checkbox]{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;cursor:pointer;accent-color:var(--green);}
 .rm-blocked-card{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--cream2);opacity:.55;position:relative;}
 
+/* ═══════════════════════════════════════════════════════════
+   STUDENT TYPE MODAL
+═══════════════════════════════════════════════════════════ */
+.stm-overlay{position:fixed;inset:0;background:rgba(5,5,15,.85);z-index:10500;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);}
+.stm-overlay.open{display:flex;}
+.stm-panel{background:var(--white);border-radius:22px;width:100%;max-width:680px;box-shadow:0 32px 80px rgba(0,0,0,.45);animation:modal-in .4s cubic-bezier(.23,1,.32,1);overflow:hidden;}
+.stm-header{background:linear-gradient(145deg,#1a1a2e 0%,#16213e 60%,#1a1a2e 100%);padding:22px 26px;color:#fff;display:flex;align-items:center;gap:16px;position:relative;}
+.stm-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l),var(--gold));}
+.stm-header-icon{width:48px;height:48px;background:rgba(184,134,11,.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--gold-l);}
+.stm-header-title{font-size:18px;font-weight:700;font-family:'Playfair Display',serif;}
+.stm-header-sub{font-size:11px;opacity:.7;margin-top:2px;}
+.stm-close{position:absolute;top:16px;right:16px;width:34px;height:34px;background:rgba(255,255,255,.12);border:none;border-radius:10px;cursor:pointer;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.stm-close:hover{background:rgba(255,255,255,.25);transform:rotate(90deg);}
+.stm-student-bar{display:flex;align-items:center;gap:14px;padding:16px 26px;background:linear-gradient(135deg,#fffdf6,#fef9ed);border-bottom:1px solid rgba(184,134,11,.15);}
+.stm-student-avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-l));border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;}
+.stm-student-name{font-size:14px;font-weight:700;color:var(--dark);}
+.stm-student-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.stm-prev-badge{padding:4px 12px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid var(--blue-b);border-radius:20px;font-size:10px;font-weight:600;color:#1e40af;margin-left:auto;}
+.stm-body{padding:20px 26px;display:flex;flex-direction:column;gap:12px;}
+.stm-type-card{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:2px solid var(--border);border-radius:16px;cursor:pointer;transition:all .3s cubic-bezier(.23,1,.32,1);background:linear-gradient(145deg,#fff,#fafaf8);position:relative;overflow:hidden;}
+.stm-type-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
+.stm-type-card:hover{border-color:var(--gold-l);box-shadow:0 8px 24px rgba(184,134,11,.15);transform:translateY(-2px);}
+.stm-type-card:hover::before{transform:scaleX(1);}
+.stm-type-card[data-type="regular"]::before{background:linear-gradient(90deg,#16a34a,#22c55e);}
+.stm-type-card[data-type="transfer"]::before{background:linear-gradient(90deg,#1d4ed8,#3b82f6);}
+.stm-type-card[data-type="non_ibm"]::before{background:linear-gradient(90deg,#d97706,#f59e0b);}
+.stm-type-card.stm-selected{border-color:var(--gold);box-shadow:0 8px 28px rgba(184,134,11,.25);background:linear-gradient(145deg,#fffdf6,#fef9ed);}
+.stm-type-card.stm-selected::before{transform:scaleX(1);}
+.stm-card-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.stm-card-content{flex:1;}
+.stm-card-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.stm-card-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;}
+.stm-card-features{display:flex;flex-wrap:wrap;gap:6px;}
+.stm-feature{font-size:9px;padding:3px 8px;background:var(--cream2);border-radius:10px;color:var(--mid);font-weight:600;display:inline-flex;align-items:center;gap:4px;}
+.stm-feature i{font-size:8px;color:var(--green);}
+.stm-card-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .25s;flex-shrink:0;margin-top:4px;}
+.stm-type-card.stm-selected .stm-card-check{border-color:var(--gold);color:var(--gold);background:rgba(184,134,11,.1);}
+.stm-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 26px;background:var(--cream);border-top:1px solid var(--border);}
+.stm-btn-cancel{padding:10px 18px;border:1.5px solid var(--border);border-radius:10px;background:var(--white);color:var(--mid);font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:all .2s;}
+.stm-btn-cancel:hover{background:var(--cream);border-color:var(--border2);}
+.stm-btn-confirm{padding:10px 22px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold-l),var(--gold-d));color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:all .25s;box-shadow:0 4px 12px rgba(184,134,11,.3);}
+.stm-btn-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(184,134,11,.4);}
+.stm-btn-confirm:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+
+/* ═══════════════════════════════════════════════════════════
+   TRANSFER EVALUATION MODAL
+═══════════════════════════════════════════════════════════ */
+.te-overlay{position:fixed;inset:0;background:rgba(5,5,15,.85);z-index:10600;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);}
+.te-panel{background:var(--white);border-radius:22px;width:100%;max-width:800px;max-height:92vh;box-shadow:0 32px 80px rgba(0,0,0,.45);animation:modal-in .4s cubic-bezier(.23,1,.32,1);overflow:hidden;display:flex;flex-direction:column;}
+.te-header{background:linear-gradient(145deg,#1d4ed8,#1e40af);padding:20px 24px;color:#fff;display:flex;align-items:center;gap:14px;position:relative;flex-shrink:0;}
+.te-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3b82f6,#93c5fd,#3b82f6);}
+.te-header-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.te-header-title{font-size:17px;font-weight:700;font-family:'Playfair Display',serif;}
+.te-header-sub{font-size:11px;opacity:.8;margin-top:2px;}
+.te-close{position:absolute;top:14px;right:14px;width:32px;height:32px;background:rgba(255,255,255,.12);border:none;border-radius:8px;cursor:pointer;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.te-close:hover{background:rgba(255,255,255,.25);transform:rotate(90deg);}
+.te-steps{display:flex;align-items:center;justify-content:center;gap:0;padding:16px 24px;background:var(--cream);border-bottom:1px solid var(--border);flex-shrink:0;}
+.te-step{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:20px;transition:all .25s;}
+.te-step-active{background:rgba(29,78,216,.1);}
+.te-step-num{width:26px;height:26px;border-radius:50%;background:var(--border);color:var(--muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .25s;}
+.te-step-active .te-step-num{background:var(--blue);color:#fff;}
+.te-step-label{font-size:11px;font-weight:600;color:var(--muted);transition:color .25s;}
+.te-step-active .te-step-label{color:var(--blue);}
+.te-step-line{width:30px;height:2px;background:var(--border);transition:background .25s;}
+.te-line-active{background:var(--blue);}
+.te-body{padding:20px 24px;flex:1;overflow-y:auto;}
+.te-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;background:var(--cream);border-top:1px solid var(--border);flex-shrink:0;}
+.te-btn-cancel,.te-btn-back{padding:9px 16px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--mid);font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:5px;transition:all .2s;}
+.te-btn-cancel:hover,.te-btn-back:hover{background:var(--cream);border-color:var(--border2);}
+.te-btn-next,.te-btn-skip{padding:9px 18px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--blue),#1e40af);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:5px;transition:all .25s;box-shadow:0 3px 10px rgba(29,78,216,.3);}
+.te-btn-next:hover,.te-btn-skip:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(29,78,216,.4);}
+.te-btn-skip{background:linear-gradient(135deg,#64748b,#475569);box-shadow:0 3px 10px rgba(71,85,105,.3);}
+.te-btn-confirm{padding:10px 22px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--green),#15803d);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:all .25s;box-shadow:0 4px 12px rgba(22,163,74,.3);}
+.te-btn-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(22,163,74,.4);}
+.te-group-header td{font-size:11px !important;}
+
+/* ═══════════════════════════════════════════════════════════
+   NON-IBM EVALUATION MODAL
+═══════════════════════════════════════════════════════════ */
+.nim-overlay{position:fixed;inset:0;background:rgba(5,5,15,.85);z-index:10600;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);}
+.nim-panel{background:var(--white);border-radius:22px;width:100%;max-width:800px;max-height:92vh;box-shadow:0 32px 80px rgba(0,0,0,.45);animation:modal-in .4s cubic-bezier(.23,1,.32,1);overflow:hidden;display:flex;flex-direction:column;}
+.nim-header{background:linear-gradient(145deg,#92400e,#b45309);padding:20px 24px;color:#fff;display:flex;align-items:center;gap:14px;position:relative;flex-shrink:0;}
+.nim-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f59e0b,#fbbf24,#f59e0b);}
+.nim-header-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.nim-header-title{font-size:17px;font-weight:700;font-family:'Playfair Display',serif;}
+.nim-header-sub{font-size:11px;opacity:.8;margin-top:2px;}
+.nim-close{position:absolute;top:14px;right:14px;width:32px;height:32px;background:rgba(255,255,255,.12);border:none;border-radius:8px;cursor:pointer;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.nim-close:hover{background:rgba(255,255,255,.25);transform:rotate(90deg);}
+.nim-steps{display:flex;align-items:center;justify-content:center;gap:0;padding:16px 24px;background:var(--cream);border-bottom:1px solid var(--border);flex-shrink:0;}
+.nim-step{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:20px;transition:all .25s;}
+.nim-step-active{background:rgba(217,119,6,.1);}
+.nim-step-num{width:26px;height:26px;border-radius:50%;background:var(--border);color:var(--muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .25s;}
+.nim-step-active .nim-step-num{background:var(--amber);color:#fff;}
+.nim-step-label{font-size:11px;font-weight:600;color:var(--muted);transition:color .25s;}
+.nim-step-active .nim-step-label{color:var(--amber);}
+.nim-step-line{width:30px;height:2px;background:var(--border);transition:background .25s;}
+.nim-line-active{background:var(--amber);}
+.nim-body{padding:20px 24px;flex:1;overflow-y:auto;}
+.nim-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;background:var(--cream);border-top:1px solid var(--border);flex-shrink:0;}
+.nim-btn-cancel,.nim-btn-back{padding:9px 16px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--mid);font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:5px;transition:all .2s;}
+.nim-btn-cancel:hover,.nim-btn-back:hover{background:var(--cream);border-color:var(--border2);}
+.nim-btn-next{padding:9px 18px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--amber),#b45309);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:5px;transition:all .25s;box-shadow:0 3px 10px rgba(217,119,6,.3);}
+.nim-btn-next:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(217,119,6,.4);}
+.nim-btn-confirm{padding:10px 22px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--green),#15803d);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:all .25s;box-shadow:0 4px 12px rgba(22,163,74,.3);}
+.nim-btn-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(22,163,74,.4);}
+.nim-group-header td{font-size:11px !important;}
+
+/* Student Type Badge in Eval Header */
+.student-type-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;margin-left:10px;}
+.stb-regular{background:rgba(22,163,74,.15);color:#166534;border:1px solid var(--green-b);}
+.stb-transfer{background:rgba(29,78,216,.15);color:#1e40af;border:1px solid var(--blue-b);}
+.stb-non_ibm{background:rgba(217,119,6,.15);color:#92400e;border:1px solid var(--amber-b);}
+
  /* PRINT */
  @media print {
    @page { size: A4 portrait; margin: 8mm; }
@@ -753,6 +866,9 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
 </div>
 
 <script src="../../../function/dashboard.js"></script>
+<script src="js/student_type_handler.js"></script>
+<script src="js/transfer_evaluation.js"></script>
+<script src="js/non_ibm_evaluation.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════
    CONSTANTS
@@ -956,20 +1072,53 @@ function applyFilters() {
  /* ═══════════════════════════════════════════════════════════
     OPEN / CLOSE EVAL
  ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   STUDENT TYPE STATE
+═══════════════════════════════════════════════════════════ */
+let currentStudentType = null; // 'regular' | 'transfer' | 'non_ibm'
+
 function openEval(m) {
   if(typeof m === 'string') m = JSON.parse(m);
+
+  // Check if student type already saved in database (m.student_type)
+  if (m.student_type) {
+    currentStudentType = m.student_type;
+    _proceedWithEval(m, m.student_type);
+    return;
+  }
+
+  // Check sessionStorage as fallback (in case DB save hasn't propagated yet)
+  const sessionType = StudentTypeHandler.getType(m.id);
+  if (sessionType) {
+    currentStudentType = sessionType;
+    _proceedWithEval(m, sessionType);
+    return;
+  }
+
+  // Show student type selection modal
+  StudentTypeHandler.showTypeSelection(m, function(type, student) {
+    currentStudentType = type;
+    _proceedWithEval(student, type);
+  });
+}
+
+function _proceedWithEval(m, studentType) {
   currentStudent = m; gradeMap = {}; loadedSubjects = []; prereqSetsData = [];
   focusYear = ''; focusSem = ''; finalizedMap = {};
+
+  // First, fetch the evaluation data (we need subjects for transfer/non-IBM workflows)
+  const fd1 = new FormData(); fd1.append('action','get_student_evaluation'); fd1.append('student_id',m.id); fd1.append('academic_year',currentAY);
+  const fd2 = new FormData(); fd2.append('action','get_prereq_sets');
+
+  // Show a loading state in the overlay
   document.getElementById('evalOverlay').classList.add('open');
   switchEvalTab('prospectus');
   const full = `${m.first_name}${m.middle_name?' '+m.middle_name:''} ${m.last_name}${m.suffix?' '+m.suffix:''}`.trim();
-  document.getElementById('evalName').textContent = full;
+  document.getElementById('evalName').innerHTML = full + _getTypeBadgeHTML(studentType);
   document.getElementById('evalSub').textContent  = `${m.major_name||'No major'} · ${m.year_level||'—'} · A.Y. ${currentAY}`;
   document.getElementById('tab-prospectus-body').innerHTML = `<div class="empty-state"><div class="spinner"></div><p style="margin-top:12px;">Loading prospectus…</p></div>`;
   document.getElementById('tab-advisement-body').innerHTML = `<div class="empty-state"><div class="spinner"></div></div>`;
 
-  const fd1 = new FormData(); fd1.append('action','get_student_evaluation'); fd1.append('student_id',m.id); fd1.append('academic_year',currentAY);
-  const fd2 = new FormData(); fd2.append('action','get_prereq_sets');
   Promise.all([
     fetch(EVAL_PROC,{method:'POST',body:fd1}).then(r=>r.json()),
     fetch('../../../data/major_process.php',{method:'POST',body:fd2}).then(r=>r.json())
@@ -980,7 +1129,85 @@ function openEval(m) {
     }
     if(evalData.ph_settings) phSettings = {...phSettings,...evalData.ph_settings};
     prereqSetsData = (prereqData.success && prereqData.sets) || [];
-    renderProspectus(evalData);
+
+    // Store subjects temporarily for workflow modals
+    const tempSubjects = evalData.subjects || [];
+
+    if (studentType === 'transfer') {
+      // Init will check saved state; if complete, it calls onComplete immediately without showing modal
+      const skipped = TransferEvaluation.init(m, tempSubjects, function(previousSubjects, currentLoad) {
+        // This runs either after modal completion or immediately if already set up
+        document.getElementById('evalOverlay').classList.add('open');
+        TransferEvaluation.applyCreditsToGradeMap(gradeMap);
+        renderProspectus(evalData);
+        _applyTransferVisuals(previousSubjects);
+      });
+      // Only close overlay if modal was actually shown
+      if (!skipped) {
+        document.getElementById('evalOverlay').classList.remove('open');
+      }
+    } else if (studentType === 'non_ibm') {
+      // Init will check saved state; if complete, skips modal
+      const skipped = NonIBMEvaluation.init(m, tempSubjects, function(subjectLoad, bridgingSubjects) {
+        document.getElementById('evalOverlay').classList.add('open');
+        renderProspectus(evalData);
+        setTimeout(() => NonIBMEvaluation.applyRestrictions(), 200);
+      });
+      if (!skipped) {
+        document.getElementById('evalOverlay').classList.remove('open');
+      }
+    } else {
+      // Regular student — proceed directly
+      renderProspectus(evalData);
+    }
+  });
+}
+
+function _getTypeBadgeHTML(type) {
+  const badges = {
+    regular:  '<span class="student-type-badge stb-regular"><i class="fas fa-user-graduate"></i> Regular</span>',
+    transfer: '<span class="student-type-badge stb-transfer"><i class="fas fa-exchange-alt"></i> Transfer</span>',
+    non_ibm:  '<span class="student-type-badge stb-non_ibm"><i class="fas fa-user-tag"></i> Non-IBM</span>'
+  };
+  return badges[type] || '';
+}
+
+function _applyTransferVisuals(previousSubjects) {
+  if (!previousSubjects) return;
+  Object.keys(previousSubjects).forEach(sid => {
+    const ps = previousSubjects[sid];
+    if (!ps.grade || !ps.validated) return;
+    const grade = parseFloat(ps.grade);
+    if (grade > 3.00) return; // not credited
+
+    const row = document.getElementById('row-' + sid);
+    const inp = document.getElementById('g-' + sid);
+    const sbtn = document.getElementById('sbtn-' + sid);
+
+    if (row) {
+      row.style.background = 'linear-gradient(135deg,#eff6ff,#dbeafe)';
+      row.style.borderLeft = '4px solid var(--blue)';
+
+      // Add a "Credited" badge
+      const gradeCell = row.querySelector('.grade-cell-wrap');
+      if (gradeCell && !gradeCell.querySelector('.te-credited-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'te-credited-badge';
+        badge.innerHTML = '<i class="fas fa-check-circle" style="font-size:7px;margin-right:3px;"></i>Credited';
+        badge.style.cssText = 'display:inline-flex;align-items:center;gap:3px;font-size:8px;padding:2px 6px;background:#dbeafe;color:#1e40af;border-radius:4px;border:1px solid #93c5fd;white-space:nowrap;margin-top:2px;';
+        gradeCell.appendChild(badge);
+      }
+
+      // Set the grade input to the credited grade
+      if (inp) {
+        inp.value = grade.toFixed(2);
+        inp.disabled = true;
+        inp.title = 'Credited from previous school';
+        inp.style.background = '#dbeafe';
+        inp.style.borderColor = '#93c5fd';
+      }
+      if (sbtn) sbtn.disabled = true;
+    }
   });
 }
 function closeEval() {
@@ -2728,7 +2955,23 @@ function refreshLockStates() {
     const subSem = (sub.semester||'');
     const fkey   = `${sub.year_level||''}|${subSem.includes('1st')?'1st Semester':'2nd Semester'}`;
     const isFinalized = finalizedMap[fkey];
-    if(pi.unlocked && !isFinalized) {
+
+    // Check Non-IBM restrictions
+    const isNonIBMRestricted = currentStudentType === 'non_ibm' && typeof NonIBMEvaluation !== 'undefined' && !NonIBMEvaluation.isSubjectAllowed(sub.id);
+
+    // Check Transfer credited subjects
+    const isTransferCredited = currentStudentType === 'transfer' && typeof TransferEvaluation !== 'undefined' && TransferEvaluation.isSubjectCredited(sub.id);
+
+    if(isTransferCredited) {
+      // Transfer credited subjects stay locked with their credited grade
+      if(inp) { inp.disabled = true; inp.title = 'Credited from previous school'; }
+      if(sbtn) sbtn.disabled = true;
+    } else if(isNonIBMRestricted) {
+      // Non-IBM restricted subjects stay locked
+      row.classList.add('row-locked');
+      if(inp) { inp.disabled = true; inp.title = 'Not in subject load — Non-IBM restriction'; }
+      if(sbtn) sbtn.disabled = true;
+    } else if(pi.unlocked && !isFinalized) {
       row.classList.remove('row-locked');
       if(inp) { inp.disabled = false; inp.title = '1.00 to 5.00 · Enter to save'; }
       if(sbtn) sbtn.disabled = false;
@@ -2740,6 +2983,11 @@ function refreshLockStates() {
       if(lockEl) lockEl.style.display = 'inline-flex';
     }
   });
+
+  // Re-apply Non-IBM restrictions after lock state refresh
+  if(currentStudentType === 'non_ibm' && typeof NonIBMEvaluation !== 'undefined') {
+    NonIBMEvaluation.applyRestrictions();
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

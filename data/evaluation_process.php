@@ -364,6 +364,7 @@ if ($action === 'get_mentees') {
             SELECT DISTINCT
                 s.id, s.first_name, s.middle_name, s.last_name, s.suffix,
                 s.email, s.student_id AS student_number, s.year_level,
+                s.student_type,
                 s.avatar_initials, s.avatar_gradient_from, s.avatar_gradient_to,
                 m.display_name AS major_name, m.id AS major_id,
                 (
@@ -386,6 +387,48 @@ if ($action === 'get_mentees') {
         echo json_encode(['success' => true, 'mentees' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ACTION: save_student_type
+//  Saves the student classification selected by the instructor
+// ═══════════════════════════════════════════════════════════════════════════
+
+if ($action === 'save_student_type') {
+    $student_id = intval($_POST['student_id'] ?? 0);
+    $student_type = $_POST['student_type'] ?? '';
+
+    // Validate student_type
+    $allowed_types = ['regular', 'transfer', 'non_ibm'];
+    if (!in_array($student_type, $allowed_types)) {
+        jsonError('Invalid student type');
+    }
+
+    // Verify student exists and instructor has access
+    try {
+        $stmt = $pdo->prepare("
+            SELECT s.id FROM students s
+            JOIN mentees me ON s.id = me.student_id
+            WHERE s.id = ? AND me.mentor_id = ?
+        ");
+        $stmt->execute([$student_id, $instructor_id]);
+        if (!$stmt->fetch()) {
+            jsonError('Student not found or access denied');
+        }
+
+        // Save student_type
+        $stmt = $pdo->prepare("
+            UPDATE students 
+            SET student_type = ?, updated_at = NOW() 
+            WHERE id = ?
+        ");
+        $stmt->execute([$student_type, $student_id]);
+
+        jsonResponse(['success' => true, 'message' => 'Student type saved']);
+    } catch (PDOException $e) {
+        jsonError('Database error: ' . $e->getMessage());
     }
     exit;
 }

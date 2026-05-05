@@ -21,6 +21,9 @@ if (!$show_role_modal) { require_once '../../../data/config.php'; }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="evaluation.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+
+</style>
 </head>
 <body>
 
@@ -257,6 +260,28 @@ let currentAY       = '2025-2026';
 let focusYear       = '';
 let focusSem        = '';
 let finalizedMap    = {};
+/* Set of subject IDs that have been manually unlocked (via password verification)
+   so an instructor can edit a single row that would otherwise be locked. */
+let manuallyUnlockedSubjects = new Set();
+
+/* Holds the full list of subject IDs confirmed via rmConfirmEnrollmentList.
+   promoteStudent reads this to (a) pass it to the server so the enrollment
+   list is persisted, and (b) mark those subjects as in-load locally so
+   grade inputs are immediately editable after promotion without a reload. */
+let confirmedEnrollmentSubjectIds = [];
+
+/* Returns true iff the given subject belongs to the student's CURRENT
+   year+semester (based on currentStudent.year_level). Used to gate which
+   rows are editable during an ongoing evaluation. */
+function isSubjectInCurrentPeriod(sub) {
+  if (!currentStudent || !sub) return false;
+  const {yr, sem} = parseStudentStanding(currentStudent.year_level || '1st Year - 1st Semester');
+  const curYear = YEAR_LABELS[yr - 1] || '1st Year';
+  const curTok  = sem === 1 ? '1st' : '2nd';
+  const subYear = (sub.year_level || '').trim();
+  const subSem  = (sub.semester || '').toLowerCase();
+  return subYear === curYear && subSem.includes(curTok);
+}
 
 /* ═══════════════════════════════════════════════════════════
    GRADE HELPERS
@@ -497,13 +522,26 @@ function _proceedWithEval(m, studentType) {
     const tempSubjects = evalData.subjects || [];
 
      if (studentType === 'transfer') {
-       // Init will check saved state; if complete, it calls onComplete immediately without showing modal
-       const skipped = TransferEvaluation.init(m, tempSubjects, function(previousSubjects, currentLoad) {
-         // This runs either after modal completion or immediately if already set up
-         document.getElementById('evalOverlay').classList.add('open');
-         TransferEvaluation.applyCreditsToGradeMap(gradeMap);
-         
-         // Mark credited subjects (passed previous school subjects) on evalData.subjects
+       // ★ Check if transfer evaluation workflow has already been completed
+       // by looking for credited subjects or saved grades from the server data.
+       // This prevents re-showing the 4-step modal after browser close / logout.
+       const hasCreditedSubjects = tempSubjects.some(s => s.is_credited);
+       const hasSavedGrades = tempSubjects.some(s => s.grade_rounded != null);
+
+       if (hasCreditedSubjects || hasSavedGrades) {
+         // Transfer evaluation already completed — skip the 4-step modal entirely
+         // Build previousSubjects from server data for visual application
+         const previousSubjects = {};
+         tempSubjects.forEach(s => {
+           if (s.is_credited && s.grade_rounded != null) {
+             previousSubjects[s.id] = {
+               grade: parseFloat(s.grade_rounded),
+               validated: true
+             };
+           }
+         });
+
+         // Ensure credited flag is set on evalData.subjects
          Object.keys(previousSubjects).forEach(sid => {
            const ps = previousSubjects[sid];
            if (ps.grade && ps.validated && parseFloat(ps.grade) <= 3.00) {
@@ -511,31 +549,61 @@ function _proceedWithEval(m, studentType) {
              if (sub) sub.is_credited = true;
            }
          });
-         
+
          renderProspectus(evalData);
          _applyTransferVisuals(previousSubjects);
-       });
-      // Only close overlay if modal was actually shown
-      if (!skipped) {
-        document.getElementById('evalOverlay').classList.remove('open');
-      }
-     } else if (studentType === 'non_ibm') {
-       // Init will check saved state; if complete, skips modal
-       const skipped = NonIBMEvaluation.init(m, tempSubjects, function(subjectLoad, bridgingSubjects) {
-         document.getElementById('evalOverlay').classList.add('open');
-         // Mark subjects that are in the student's subject load
-         if (subjectLoad) {
-           evalData.subjects.forEach(sub => {
-             const sidStr = String(sub.id);
-             sub.is_in_load = !!subjectLoad[sidStr] || !!subjectLoad[sub.id];
+       } else {
+         // First time — show the transfer evaluation modal
+         const skipped = TransferEvaluation.init(m, tempSubjects, function(previousSubjects, currentLoad) {
+           document.getElementById('evalOverlay').classList.add('open');
+           TransferEvaluation.applyCreditsToGradeMap(gradeMap);
+
+           Object.keys(previousSubjects).forEach(sid => {
+             const ps = previousSubjects[sid];
+             if (ps.grade && ps.validated && parseFloat(ps.grade) <= 3.00) {
+               const sub = evalData.subjects.find(s => s.id == sid);
+               if (sub) sub.is_credited = true;
+             }
            });
+
+           renderProspectus(evalData);
+           _applyTransferVisuals(previousSubjects);
+         });
+         if (!skipped) {
+           document.getElementById('evalOverlay').classList.remove('open');
          }
+       }
+     } else if (studentType === 'non_ibm') {
+       // ★ Check if non-IBM evaluation workflow has already been completed
+       const hasInLoadSubjects = tempSubjects.some(s => s.is_in_load === true || s.is_in_load === 1 || s.is_in_load === '1');
+       const hasSavedGrades = tempSubjects.some(s => s.grade_rounded != null);
+
+       if (hasInLoadSubjects || hasSavedGrades) {
+         // Non-IBM evaluation already completed — skip modal, render directly
+         evalData.subjects.forEach(sub => {
+           sub.is_in_load = !!(sub.is_in_load === true || sub.is_in_load === 1 || sub.is_in_load === '1');
+         });
          renderProspectus(evalData);
-         setTimeout(() => NonIBMEvaluation.applyRestrictions(), 200);
-       });
-      if (!skipped) {
-        document.getElementById('evalOverlay').classList.remove('open');
-      }
+         setTimeout(() => {
+           if (typeof NonIBMEvaluation !== 'undefined') NonIBMEvaluation.applyRestrictions();
+         }, 200);
+       } else {
+         // First time — show the non-IBM evaluation modal
+         const skipped = NonIBMEvaluation.init(m, tempSubjects, function(subjectLoad, bridgingSubjects) {
+           document.getElementById('evalOverlay').classList.add('open');
+           if (subjectLoad) {
+             evalData.subjects.forEach(sub => {
+               const sidStr = String(sub.id);
+               sub.is_in_load = !!subjectLoad[sidStr] || !!subjectLoad[sub.id];
+             });
+           }
+           renderProspectus(evalData);
+           setTimeout(() => NonIBMEvaluation.applyRestrictions(), 200);
+         });
+         if (!skipped) {
+           document.getElementById('evalOverlay').classList.remove('open');
+         }
+       }
     } else {
       // Regular student — proceed directly
       renderProspectus(evalData);
@@ -661,14 +729,18 @@ function autoDetectAndEvaluate() {
   const semMatches  = (subSem) =>
     (subSem||'').toLowerCase().includes(semWant);
 
-  // Step 1: subjects in student's load for current period
-  let targeted = loadedSubjects.filter(s =>
-    yearMatches(s.year_level) && semMatches(s.semester) && s.is_in_load !== false
-  );
+  // Build the targeted subject list:
+  //   Primary  — current period subjects that are in the confirmed load
+  //   Cross-year — subjects from other year levels that are also in-load
+  //                (selected by the instructor in the enrollment modal)
+  // is_in_load is the authoritative flag set by renderProspectus; we do NOT
+  // fall back to "all subjects in the semester" because that would re-introduce
+  // the original bug of loading unselected subjects after promotion.
+  let targeted = loadedSubjects.filter(s => s.is_in_load === true);
 
-  // Step 2: fallback — if nothing in load, use ALL subjects in the period
-  // (covers edge cases: freshly promoted students, transfer/non-IBM with empty
-  // current load, or data where is_in_load flag wasn't set correctly)
+  // Safety fallback: if no in-load subjects at all (e.g. first-ever open for
+  // a regular student before any enrollment list has been saved), include all
+  // subjects in the current period so grading is still possible.
   if (!targeted.length) {
     targeted = loadedSubjects.filter(s =>
       yearMatches(s.year_level) && semMatches(s.semester)
@@ -1723,6 +1795,9 @@ function printGradesTable() {
    const allSelected = [...selected, ...selectedExtra];
    const units    = allSelected.reduce((a,s)=>a+(parseFloat(s.units)||0),0);
    
+   // Store for promoteStudent to use when unlocking subjects after promotion
+   confirmedEnrollmentSubjectIds = allSelected.map(s => s.id);
+   
    if(currentStudent) {
      const fd = new FormData();
      fd.append('action','save_enrollment_list'); fd.append('student_id',currentStudent.id);
@@ -1951,6 +2026,11 @@ function promoteStudent(fromYear, fromSem, toYear, toSem) {
   fd.append('from_year',fromYear); fd.append('from_sem',fromSem);
   fd.append('to_year',toYear); fd.append('to_sem',toSem);
   fd.append('academic_year',currentAY);
+  // Pass the confirmed enrollment subject IDs so the server can persist them
+  // and so we can mark them as in-load locally for immediate grade editing
+  if (confirmedEnrollmentSubjectIds.length) {
+    fd.append('confirmed_subject_ids', JSON.stringify(confirmedEnrollmentSubjectIds));
+  }
 
   const oldYearLevel = currentStudent.year_level || '';
   const newYearLevel = `${toYear} - ${toSem}`;
@@ -2012,29 +2092,21 @@ function promoteStudent(fromYear, fromSem, toYear, toSem) {
           });
         });
 
-        // ★ UNLOCK the newly promoted semester's subjects (mark them as in-load and
-        //   clear any "not in load" lock so instructors can enter grades)
-        loadedSubjects.forEach(sub => {
-          const sYear = (sub.year_level||'').trim();
-          const sSem  = (sub.semester||'').toLowerCase();
-          const wantSem = toSem.includes('1st') ? '1st' : '2nd';
-          if(sYear === toYear && sSem.includes(wantSem)) {
-            sub.is_in_load = true;
-          }
-        });
-
-        // Update focus to the new semester and refresh lock states + visuals
+        // Update focus to the new semester
         focusYear = toYear;
         focusSem  = toSem;
-        refreshLockStates();
-        applyFocusVisuals();
 
-        toast(`Promoted to ${toSem} — ${toYear}! Previous semester locked, new subjects unlocked.`,'success',4000);
+        toast(`Promoted to ${toSem} — ${toYear}! Loading confirmed subject list…`,'success',4000);
 
         setTimeout(() => {
           closeResultModal();
-          // Reopen evaluation with fresh data so new semester's subject load is
-          // fully loaded and the sticky evaluate bar reflects the new standing
+          // Reopen evaluation with fresh data.
+          // confirmedEnrollmentSubjectIds is intentionally kept alive here —
+          // renderProspectus will consume it to set is_in_load only for the
+          // confirmed subjects, then clear it. This preserves the exact
+          // enrollment selection the instructor made in the result modal
+          // across the close/reopen cycle, preventing auto-load of the full
+          // semester dataset.
           if(currentStudent) {
             const studentCopy = {...currentStudent};
             closeEval();
@@ -2083,27 +2155,45 @@ function promoteStudent(fromYear, fromSem, toYear, toSem) {
       return sy === _curYear && ss.includes(_curSemTok);
     };
 
-    // Mark subject load status based on student type
-    if (currentStudentType === 'transfer' && typeof TransferEvaluation !== 'undefined') {
-      const currentLoad = TransferEvaluation.getCurrentLoad();
+    // ── Apply is_in_load based on the confirmed enrollment list (if present) ──
+    // When the instructor just clicked "Proceed to…", promoteStudent stores
+    // the exact IDs they confirmed. We use those as the EXCLUSIVE gate here
+    // so only the selected subjects are editable — not the full semester dump.
+    // Once consumed we clear the list so normal logic applies on future opens.
+    if (confirmedEnrollmentSubjectIds.length > 0) {
+      const confirmedSet = new Set(confirmedEnrollmentSubjectIds.map(id => parseInt(id)));
       subjects.forEach(sub => {
-        const sid = String(sub.id);
-        const isCredited = !!sub.is_credited;
-        // Include: credited subjects, subjects explicitly added to current
-        // load, AND every subject that belongs to the student's current
-        // standing semester (the period currently being evaluated).
-        sub.is_in_load = isCredited || !!currentLoad[sid] || _isCurrentPeriod(sub);
+        // Always keep credited subjects as-is; for everything else, only mark
+        // in-load if the instructor explicitly selected it in the result modal.
+        sub.is_in_load = !!sub.is_credited || confirmedSet.has(parseInt(sub.id));
       });
-    } else if (currentStudentType === 'non_ibm') {
-      // Non-IBM: preserve any flags set by NonIBMEvaluation, but ALSO force
-      // the current standing semester's subjects to be in-load so they can
-      // be graded during the active evaluation.
-      subjects.forEach(sub => {
-        if (_isCurrentPeriod(sub)) sub.is_in_load = true;
-      });
+      // Consumed — clear so subsequent opens use normal logic
+      confirmedEnrollmentSubjectIds = [];
     } else {
-      // Regular students: all subjects are in load
-      subjects.forEach(sub => { sub.is_in_load = true; });
+      // Normal open (no pending promotion) — apply per-student-type rules
+      // Mark subject load status based on student type
+      if (currentStudentType === 'transfer' && typeof TransferEvaluation !== 'undefined') {
+        const currentLoad = TransferEvaluation.getCurrentLoad();
+        subjects.forEach(sub => {
+          const sid = String(sub.id);
+          const isCredited = !!sub.is_credited;
+          // Include: credited, explicitly in current load, current standing semester,
+          // or server-flagged in-load (from a previously saved enrollment list).
+          const serverInLoad = sub.is_in_load === true || sub.is_in_load === 1 || sub.is_in_load === '1';
+          sub.is_in_load = isCredited || !!currentLoad[sid] || _isCurrentPeriod(sub) || serverInLoad;
+        });
+      } else if (currentStudentType === 'non_ibm') {
+        // Non-IBM: respect server in-load flags plus always include current period.
+        subjects.forEach(sub => {
+          const serverInLoad = sub.is_in_load === true || sub.is_in_load === 1 || sub.is_in_load === '1';
+          if (_isCurrentPeriod(sub) || serverInLoad) sub.is_in_load = true;
+        });
+      } else {
+        // Regular students: all subjects are in load (but only the current period
+        // is editable — that is enforced separately by isSubjectInCurrentPeriod
+        // and refreshLockStates, not by is_in_load alone).
+        subjects.forEach(sub => { sub.is_in_load = true; });
+      }
     }
 
     // Populate finalizedMap from backend data
@@ -2312,13 +2402,28 @@ const sigHtml = `<div class="pro-sig-block">
      const isFinalizedLocked = isFinalized;
      const isInLoad = !!sub.is_in_load;
      const isCredited = !!sub.is_credited;
+     const isInCurrentPeriod = isSubjectInCurrentPeriod(sub);
+     const isManuallyUnlocked = manuallyUnlockedSubjects.has(parseInt(sub.id)) || manuallyUnlockedSubjects.has(sub.id);
 
-     // Determine if input should be disabled:
-     // - Prerequisite not yet passed
-     // - Semester finalized
-     // - Credited from previous school (cannot edit)
-     // - Not in current load (cannot edit, regardless of grade presence)
-     const shouldDisable = isPrereqLocked || isFinalizedLocked || isCredited || !isInLoad;
+     // Determine if input should be disabled.
+     // A subject is editable when ALL of the following hold:
+     //   1. Prerequisites met
+     //   2. Semester not finalized
+     //   3. Not a credited transfer subject
+     //   4. Is in the student's confirmed load (is_in_load = true)
+     //      *** is_in_load is set by renderProspectus from confirmedEnrollmentSubjectIds
+     //          after promotion, so cross-year confirmed subjects are already true here
+     //          and do NOT need a separate isInCurrentPeriod exception.
+     //   5. Belongs to the student's current standing period OR is a confirmed
+     //      cross-year subject (i.e. is_in_load already handles this)
+     //
+     // The old rule "!isInCurrentPeriod => disable" is removed. isInCurrentPeriod
+     // is now only used for lock-badge display, not as an edit gate — the gate is
+     // entirely is_in_load. This prevents confirmed cross-year subjects from being
+     // locked out after promotion.
+     let shouldDisable = isPrereqLocked || isFinalizedLocked || isCredited || !isInLoad;
+     // Manual per-row unlock via password bypasses all locks except credited
+     if (isManuallyUnlocked && !isCredited) shouldDisable = false;
 
       total += parseFloat(sub.units)||0;
 
@@ -2350,6 +2455,14 @@ const sigHtml = `<div class="pro-sig-block">
           badgeStyle = 'background:rgba(128,128,128,.15);border-color:#999;color:#666;';
           badgeIcon = 'fa-info-circle';
         }
+      } else if(!isInCurrentPeriod && !isInLoad) {
+        // Only show "Not in current term" badge for subjects that are neither
+        // in the current period NOR explicitly enrolled (cross-year selected).
+        // If is_in_load is true for a non-current-period subject, it was
+        // confirmed in the enrollment modal — show no lock badge for it.
+        lockDesc = 'Not in current term';
+        badgeStyle = 'background:rgba(100,116,139,.15);border-color:#94a3b8;color:#475569;';
+        badgeIcon = 'fa-calendar-xmark';
       }
 
      const isPrereqSetTarget = Array.isArray(prereqSetsData) && prereqSetsData.some(set =>
@@ -2376,10 +2489,11 @@ const sigHtml = `<div class="pro-sig-block">
             <button class="save-btn" id="sbtn-${sub.id}"
               onclick="saveGrade(${sub.id},${student.id},${student.major_id},'${esc(sub.semester)}','${esc(sub.year_level)}','${esc(ay)}')"
               ${shouldDisable?'disabled':''} title="Save grade"><i class="fas fa-save"></i></button>
+            ${(shouldDisable && !isCredited) ? `<button class="edit-btn" id="ebtn-${sub.id}" onclick="requestEditGrade(${sub.id},${student.id},${student.major_id},'${esc(sub.semester)}','${esc(sub.year_level)}','${esc(ay)}')" title="Edit this grade (requires password)"><i class="fas fa-edit"></i></button>` : ''}
           </div>
           <div class="grade-hint" id="gl-${sub.id}">${sub.grade_label||''}</div>
            ${shouldDisable && !isFinalizedLocked ? `<span class="lock-badge" style="${badgeStyle}"><i class="fas ${badgeIcon}" style="font-size:7px;"></i>${lockDesc||'Locked'}</span>` : ''}
-          ${isInLoad && raw == null ? '<span class="lock-badge" style="background:linear-gradient(135deg,var(--amber-l),var(--amber-b));color:#92400e;border-color:#fbbf24;"><i class="fas fa-exclamation-triangle" style="font-size:7px;"></i> Not graded</span>' : ''}
+          ${isInLoad && raw == null && isInCurrentPeriod ? '<span class="lock-badge" style="background:linear-gradient(135deg,var(--amber-l),var(--amber-b));color:#92400e;border-color:#fbbf24;"><i class="fas fa-exclamation-triangle" style="font-size:7px;"></i> Not graded</span>' : ''}
         </div>
       </td>
       <td class="pro-td-status"><span class="${pillClass(status)}" id="pill-${sub.id}">${statusText(status)}</span></td>
@@ -2490,6 +2604,17 @@ function saveGrade(sid, studentId, majorId, sem, year, ay) {
       let pill = document.getElementById('pill-'+sid) || document.getElementById('bpill-'+sid);
       if(pill) { pill.className = pillClass(status); pill.textContent = statusText(status); }
        gradeMap[sid] = parseFloat(rounded);
+       // If this subject was temporarily unlocked via password, re-lock it now
+       // so the row returns to its normal (finalized / out-of-period) locked state.
+       const wasManuallyUnlocked = manuallyUnlockedSubjects.has(parseInt(sid)) || manuallyUnlockedSubjects.has(sid);
+       if(wasManuallyUnlocked) {
+         manuallyUnlockedSubjects.delete(parseInt(sid));
+         manuallyUnlockedSubjects.delete(sid);
+         // Restore any visual tint applied by submitEditPassword
+         if(inp) { inp.style.background = ''; inp.style.borderColor = ''; }
+         const row = document.getElementById('row-'+sid);
+         if(row) row.classList.remove('row-edit-unlocked');
+       }
        refreshLockStates();
        recalcGWA();
        applyFocusVisuals();
@@ -2562,16 +2687,35 @@ function refreshLockStates() {
     // Check Transfer credited subjects
     const isTransferCredited = currentStudentType === 'transfer' && typeof TransferEvaluation !== 'undefined' && TransferEvaluation.isSubjectCredited(sub.id);
 
+    // Check if this subject has been manually unlocked via password
+    const isManuallyUnlocked = manuallyUnlockedSubjects.has(parseInt(sub.id)) || manuallyUnlockedSubjects.has(sub.id);
+
     if(isTransferCredited) {
       // Transfer credited subjects stay locked with their credited grade
       if(inp) { inp.disabled = true; inp.title = 'Credited from previous school'; }
       if(sbtn) sbtn.disabled = true;
+    } else if(isManuallyUnlocked) {
+      // Per-row password-unlocked: allow editing regardless of period/finalized
+      row.classList.remove('row-locked');
+      if(inp) { inp.disabled = false; inp.title = '1.00 to 5.00 · Enter to save (edit unlocked)'; }
+      if(sbtn) sbtn.disabled = false;
+      if(lockEl) lockEl.style.display = 'none';
     } else if(isNonIBMRestricted) {
       // Non-IBM restricted subjects stay locked
       row.classList.add('row-locked');
       if(inp) { inp.disabled = true; inp.title = 'Not in subject load — Non-IBM restriction'; }
       if(sbtn) sbtn.disabled = true;
-    } else if(pi.unlocked && !isFinalized) {
+    } else if(pi.unlocked && !isFinalized && sub.is_in_load &&
+              (_subInCurrentPeriod || !_subInCurrentPeriod)) {
+      // Unlock any row where:
+      //  - Prerequisites are met (pi.unlocked)
+      //  - The semester is not finalized
+      //  - The subject is in the student's confirmed load (is_in_load = true)
+      // This covers both the current-period subjects and any cross-year subjects
+      // the instructor explicitly selected in the enrollment modal.
+      // is_in_load is the single source of truth; it is set by renderProspectus
+      // using the confirmedEnrollmentSubjectIds list after promotion, or by the
+      // per-student-type rules on a normal open.
       row.classList.remove('row-locked');
       if(inp) { inp.disabled = false; inp.title = '1.00 to 5.00 · Enter to save'; }
       if(sbtn) sbtn.disabled = false;
@@ -2588,6 +2732,103 @@ function refreshLockStates() {
   if(currentStudentType === 'non_ibm' && typeof NonIBMEvaluation !== 'undefined') {
     NonIBMEvaluation.applyRestrictions();
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PER-ROW EDIT (password-gated)
+   Allows an instructor to unlock a single subject row for editing
+   after verifying their account password. The unlock is transient:
+   once saveGrade succeeds, the row re-locks automatically.
+═══════════════════════════════════════════════════════════ */
+function requestEditGrade(sid, studentId, majorId, sem, year, ay) {
+  // Remove any existing edit modal
+  document.getElementById('editGradeModal')?.remove();
+
+  const sub = loadedSubjects.find(s => parseInt(s.id) === parseInt(sid));
+  const subjectLabel = sub ? `${sub.subject_code} — ${sub.subject_name}` : `Subject #${sid}`;
+
+  const modalHtml = `
+    <div id="editGradeModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:15000;display:flex;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:linear-gradient(145deg,#fff,#fafaf8);border-radius:16px;padding:26px 30px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35);border:1px solid rgba(184,134,11,.2);">
+        <div style="width:58px;height:58px;margin:0 auto 14px;background:linear-gradient(135deg,var(--green),#15803d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;"><i class="fas fa-unlock-alt"></i></div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--dark);margin-bottom:6px;text-align:center;font-family:'Playfair Display',serif;">Unlock Grade for Editing</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;text-align:center;line-height:1.5;">
+          You are about to edit:<br>
+          <strong style="color:var(--dark);">${esc(subjectLabel)}</strong><br>
+          Enter your password to continue.
+        </p>
+        <input type="password" id="editGradePassword" placeholder="Your password" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:10px;box-sizing:border-box;font-family:'Poppins',sans-serif;">
+        <p id="editGradePasswordError" style="font-size:11px;color:var(--red);margin-bottom:10px;display:none;"></p>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button onclick="closeEditGradeModal()" style="padding:9px 18px;border:1px solid var(--border);border-radius:8px;background:var(--cream);color:var(--mid);font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Cancel</button>
+          <button id="editGradeConfirmBtn" onclick="submitEditPassword(${sid},${studentId},${majorId},'${esc(sem)}','${esc(year)}','${esc(ay)}')" style="padding:9px 18px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--green),#15803d);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;"><i class="fas fa-check" style="margin-right:5px;"></i>Verify &amp; Unlock</button>
+        </div>
+      </div>
+    </div>`;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = modalHtml;
+  document.body.appendChild(wrap.firstElementChild);
+
+  const pwdInput = document.getElementById('editGradePassword');
+  setTimeout(() => pwdInput?.focus(), 100);
+  pwdInput?.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') { e.preventDefault(); submitEditPassword(sid, studentId, majorId, sem, year, ay); }
+  });
+}
+
+function closeEditGradeModal() {
+  document.getElementById('editGradeModal')?.remove();
+}
+
+function submitEditPassword(sid, studentId, majorId, sem, year, ay) {
+  const pwdInput = document.getElementById('editGradePassword');
+  const errorEl  = document.getElementById('editGradePasswordError');
+  const confirmBtn = document.getElementById('editGradeConfirmBtn');
+  if(!pwdInput) return;
+  const password = pwdInput.value.trim();
+  if(!password) {
+    if(errorEl) { errorEl.textContent = 'Please enter your password'; errorEl.style.display = 'block'; }
+    return;
+  }
+
+  if(confirmBtn) { confirmBtn.disabled = true; confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…'; }
+  if(errorEl) errorEl.style.display = 'none';
+
+  const fd = new FormData();
+  fd.append('action', 'verify_password');
+  fd.append('password', password);
+
+  fetch(EVAL_PROC, {method:'POST', body:fd})
+    .then(r => r.json())
+    .then(data => {
+      if(data.success) {
+        manuallyUnlockedSubjects.add(parseInt(sid));
+        // Enable the row's input + save button directly
+        const inp  = document.getElementById('g-'+sid);
+        const sbtn = document.getElementById('sbtn-'+sid);
+        const row  = document.getElementById('row-'+sid);
+        if(inp)  { inp.disabled = false; inp.title = '1.00 to 5.00 · Enter to save (edit unlocked)'; inp.style.background = '#f0fdf4'; inp.style.borderColor = '#86efac'; }
+        if(sbtn) { sbtn.disabled = false; }
+        if(row)  { row.classList.remove('row-locked'); row.classList.add('row-edit-unlocked'); }
+        // Hide any lingering lock badges for this row
+        row?.querySelectorAll('.lock-badge').forEach(b => { b.style.display = 'none'; });
+        // Hide the edit button itself while the row is unlocked
+        const ebtn = document.getElementById('ebtn-'+sid);
+        if(ebtn) ebtn.style.display = 'none';
+        closeEditGradeModal();
+        toast('Edit unlocked. Press Enter or click Save to commit the new grade.', 'success', 3200);
+        setTimeout(() => { inp?.focus(); inp?.select(); }, 150);
+      } else {
+        if(errorEl) { errorEl.textContent = data.message || 'Invalid password'; errorEl.style.display = 'block'; }
+        if(confirmBtn) { confirmBtn.disabled = false; confirmBtn.innerHTML = '<i class="fas fa-check" style="margin-right:5px;"></i>Verify &amp; Unlock'; }
+        pwdInput.focus();
+        pwdInput.select();
+      }
+    })
+    .catch(() => {
+      if(errorEl) { errorEl.textContent = 'Error verifying password. Please try again.'; errorEl.style.display = 'block'; }
+      if(confirmBtn) { confirmBtn.disabled = false; confirmBtn.innerHTML = '<i class="fas fa-check" style="margin-right:5px;"></i>Verify &amp; Unlock'; }
+    });
 }
 
 /* ═══════════════════════════════════════════════════════════

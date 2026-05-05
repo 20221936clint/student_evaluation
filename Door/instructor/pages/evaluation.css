@@ -1008,3 +1008,42 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
     display: none !important;
   }
 }
+/* Per-row Edit button (password-gated) */
+.edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  padding: 0;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+  font-size: 11px;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.edit-btn:hover {
+  background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+  color: #1e3a8a;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(30, 64, 175, .25);
+}
+.edit-btn:active { transform: translateY(0); }
+.edit-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+/* Visual cue while a row is temporarily unlocked via password */
+.row-edit-unlocked {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important;
+  border-left: 3px solid #16a34a !important;
+}
+.row-edit-unlocked .grade-inp {
+  background: #f0fdf4 !important;
+  border-color: #86efac !important;
+}

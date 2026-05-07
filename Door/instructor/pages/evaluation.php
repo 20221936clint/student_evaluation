@@ -90,11 +90,6 @@ if (!$show_role_modal) { require_once '../../../data/config.php'; }
             <button class="year-btn" data-year="3" onclick="filterMenteeYear('3')">3rd Year</button>
             <button class="year-btn" data-year="4" onclick="filterMenteeYear('4')">4th Year</button>
           </div>
-          <div class="sem-filter-btns" style="display:flex;gap:6px;margin-top:4px;">
-            <button class="sem-btn active" data-sem="all" onclick="filterMenteeSem('all')" style="padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.2);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;">All Sem</button>
-            <button class="sem-btn" data-sem="1st Semester" onclick="filterMenteeSem('1st Semester')" style="padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);background:transparent;color:rgba(255,255,255,0.85);font-size:11px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;">1st Sem</button>
-            <button class="sem-btn" data-sem="2nd Semester" onclick="filterMenteeSem('2nd Semester')" style="padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);background:transparent;color:rgba(255,255,255,0.85);font-size:11px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;">2nd Sem</button>
-          </div>
         </div>
       </div>
 
@@ -398,7 +393,7 @@ function loadMentees() {
       const pct  = m.total_subjects>0 ? Math.round(m.graded_count/m.total_subjects*100) : 0;
       const yrNum = (m.year_level||'0').replace(/[^0-9]/g,'');
       const semester = (m.year_level||'').includes('2nd Semester') ? '2nd Semester' : '1st Semester';
-      html += `<div class="mentee-card" onclick='openEval(${JSON.stringify(m).replace(/'/g,"&#39;")})' data-name="${esc(full.toLowerCase())}" data-year="${yrNum||'0'}" data-semester="${semester}">
+      html += `<div class="mentee-card" onclick='openEval(${JSON.stringify(m).replace(/'/g,"&#39;")})' data-name="${esc(full.toLowerCase())}" data-id="${esc((m.student_number||'').toLowerCase())}" data-major="${esc((m.major_name||'').toLowerCase())}" data-year="${yrNum||'0'}" data-semester="${semester}">
         <div class="mc-top">
           <div class="mc-avatar" style="background:linear-gradient(135deg,${esc(m.avatar_gradient_from||'#3b82f6')},${esc(m.avatar_gradient_to||'#60a5fa')});">${esc(init)}</div>
           <div><div class="mc-name">${esc(full)}</div><div class="mc-sub">${esc(m.student_number||'—')} &nbsp;·&nbsp; ${esc(m.major_name||'No major')}</div></div>
@@ -443,7 +438,7 @@ function filterMenteeSem(s) {
 function applyFilters() {
   const q = document.getElementById('menteeSearch').value.toLowerCase();
   document.querySelectorAll('.mentee-card').forEach(c => {
-    const matchSearch   = (c.dataset.name||'').includes(q);
+    const matchSearch   = q === '' || (c.dataset.name||'').includes(q) || (c.dataset.id||'').includes(q) || (c.dataset.major||'').includes(q);
     const matchYear     = currentYearFilter === 'all' || (c.dataset.year||'0') === currentYearFilter;
     const matchSemester = currentSemFilter  === 'all' || (c.dataset.semester||'') === currentSemFilter;
     c.style.display = (matchSearch && matchYear && matchSemester) ? '' : 'none';

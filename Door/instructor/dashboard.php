@@ -312,26 +312,36 @@ if ($pdo) {
             padding: 24px;
             border: 1px solid #e5e7eb;
             margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: nowrap;
         }
 
         .quick-actions h3 {
             font-size: 16px;
             font-weight: 700;
             color: #1f2937;
-            margin-bottom: 16px;
+            margin: 0;
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: flex;
+            align-items: center;
             gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            width: auto;
         }
 
         .action-btn {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 12px;
             padding: 16px;
@@ -341,6 +351,8 @@ if ($pdo) {
             font-size: 14px;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .action-btn.primary {

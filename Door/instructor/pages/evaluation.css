@@ -772,7 +772,7 @@ body{font-family:'Poppins',sans-serif;background:var(--cream);overflow-x:hidden;
   .pro-code { font-size: 6pt !important; font-weight: 700 !important; white-space: nowrap !important; }
   .pro-units { font-size: 6pt !important; text-align: center !important; white-space: nowrap; }
   .pro-prereq-col { font-size: 5.5pt !important; white-space: nowrap; }
-  .grade-inp, .save-btn, .grade-hint, .lock-badge, .prereq-chain-info, .sem-finalized-badge, .sem-finalized-badge-inline, .finalized-lock-overlay, .btn-finalize { display: none !important; }
+  .grade-inp, .save-btn, .grade-hint, .lock-badge, .prereq-chain-info, .sem-finalized-badge, .sem-finalized-badge-inline, .finalized-lock-overlay, .btn-finalize, .edit-btn { display: none !important; }
   .grade-print { display: inline-block !important; font-size: 6pt !important; font-weight: 700 !important; }
   .pro-td-status, .pro-th-status { display: none !important; }
   .gpill { font-size: 5pt !important; padding: 0.3pt 1pt !important; }

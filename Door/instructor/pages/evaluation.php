@@ -60,7 +60,7 @@ if (!$show_role_modal) { require_once '../../../data/config.php'; }
       </div>
     </div>
     <div class="topbar-right">
-      <div class="topbar-date"><i class="fas fa-calendar-alt"></i><span><?php echo date('F j, Y'); ?></span></div>
+      <a href="../../../index.php" class="topbar-return"><i class="fas fa-home"></i><span>Return</span></a>
       <a href="../../../data/logout.php" class="topbar-logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
     </div>
   </header>
@@ -83,12 +83,17 @@ if (!$show_role_modal) { require_once '../../../data/config.php'; }
             <i class="fas fa-search"></i>
             <input type="text" id="menteeSearch" placeholder="Search by name, ID, major…" oninput="filterMentees()" onkeyup="if(event.key==='Enter'){const first=document.querySelector('.mentee-card:not([style*=none])');if(first){first.click();}}">
           </div>
-          <div class="year-filter-btns" style="display:flex;gap:6px;">
-            <button class="year-btn active" data-year="all" onclick="filterMenteeYear('all')">All</button>
+          <div class="year-filter-btns" style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="year-btn active" data-year="all" onclick="filterMenteeYear('all')">All Years</button>
             <button class="year-btn" data-year="1" onclick="filterMenteeYear('1')">1st Year</button>
             <button class="year-btn" data-year="2" onclick="filterMenteeYear('2')">2nd Year</button>
             <button class="year-btn" data-year="3" onclick="filterMenteeYear('3')">3rd Year</button>
             <button class="year-btn" data-year="4" onclick="filterMenteeYear('4')">4th Year</button>
+          </div>
+          <div class="sem-filter-btns" style="display:flex;gap:6px;margin-top:4px;">
+            <button class="sem-btn active" data-sem="all" onclick="filterMenteeSem('all')" style="padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.2);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;">All Sem</button>
+            <button class="sem-btn" data-sem="1st Semester" onclick="filterMenteeSem('1st Semester')" style="padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);background:transparent;color:rgba(255,255,255,0.85);font-size:11px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;">1st Sem</button>
+            <button class="sem-btn" data-sem="2nd Semester" onclick="filterMenteeSem('2nd Semester')" style="padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);background:transparent;color:rgba(255,255,255,0.85);font-size:11px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;">2nd Sem</button>
           </div>
         </div>
       </div>
@@ -125,17 +130,10 @@ if (!$show_role_modal) { require_once '../../../data/config.php'; }
        <button class="eval-tab active" id="tab-prospectus" onclick="switchEvalTab('prospectus')">
          <i class="fas fa-scroll"></i> Prospectus
        </button>
-        <button class="eval-tab" id="tab-advisement" onclick="switchEvalTab('advisement')">
-          <i class="fas fa-lightbulb"></i> Advisement
-          <span id="advBadge" style="display:none;background:var(--green);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;">0</span>
-        </button>
       </div>
      <div class="eval-body" id="tab-prospectus-body">
        <div class="empty-state"><div class="spinner"></div></div>
      </div>
-      <div class="eval-body" id="tab-advisement-body" style="display:none;">
-        <div class="empty-state"><div class="spinner"></div></div>
-      </div>
    </div>
 </div>
 
@@ -424,17 +422,31 @@ loadMentees();
 
 function filterMentees() { applyFilters(); }
 let currentYearFilter = 'all';
+let currentSemFilter  = 'all';
+
 function filterMenteeYear(y) {
   currentYearFilter = y;
   document.querySelectorAll('.year-btn').forEach(b => b.classList.toggle('active', b.dataset.year === y));
   applyFilters();
 }
+function filterMenteeSem(s) {
+  currentSemFilter = s;
+  document.querySelectorAll('.sem-btn').forEach(b => {
+    const isActive = b.dataset.sem === s;
+    b.style.background = isActive ? 'rgba(255,255,255,0.25)' : 'transparent';
+    b.style.borderColor = isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)';
+    b.style.color = isActive ? '#fff' : 'rgba(255,255,255,0.85)';
+    b.style.fontWeight = isActive ? '700' : '600';
+  });
+  applyFilters();
+}
 function applyFilters() {
   const q = document.getElementById('menteeSearch').value.toLowerCase();
   document.querySelectorAll('.mentee-card').forEach(c => {
-    const matchSearch = (c.dataset.name||'').includes(q);
-    const matchYear   = currentYearFilter === 'all' || (c.dataset.year||'0') === currentYearFilter;
-    c.style.display   = (matchSearch && matchYear) ? '' : 'none';
+    const matchSearch   = (c.dataset.name||'').includes(q);
+    const matchYear     = currentYearFilter === 'all' || (c.dataset.year||'0') === currentYearFilter;
+    const matchSemester = currentSemFilter  === 'all' || (c.dataset.semester||'') === currentSemFilter;
+    c.style.display = (matchSearch && matchYear && matchSemester) ? '' : 'none';
   });
 }
 
@@ -444,11 +456,12 @@ function applyFilters() {
     TAB SWITCHER
  ═══════════════════════════════════════════════════════════ */
   function switchEvalTab(tab) {
-    ['prospectus','advisement'].forEach(t => {
-      document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
-      document.getElementById(`tab-${t}-body`).style.display = t === tab ? 'block' : 'none';
+    ['prospectus'].forEach(t => {
+      const tabEl = document.getElementById(`tab-${t}`);
+      const bodyEl = document.getElementById(`tab-${t}-body`);
+      if(tabEl) tabEl.classList.toggle('active', t === tab);
+      if(bodyEl) bodyEl.style.display = t === tab ? 'block' : 'none';
     });
-    if(tab === 'advisement' && currentStudent) buildAdvisement();
   }
  
  /* ═══════════════════════════════════════════════════════════
@@ -461,12 +474,6 @@ let currentStudentType = null; // 'regular' | 'transfer' | 'non_ibm'
 
 function openEval(m) {
   if(typeof m === 'string') m = JSON.parse(m);
-
-  // If student already has student_type and is fully evaluated (all subjects graded), block access
-  if (m.student_type && m.graded_count >= m.total_subjects) {
-    toast('This student has already been fully evaluated and cannot be modified.', 'error', 4000);
-    return;
-  }
 
   // Check if student type already saved in database (m.student_type)
   if (m.student_type) {
@@ -505,7 +512,6 @@ function _proceedWithEval(m, studentType) {
   document.getElementById('evalName').innerHTML = full + _getTypeBadgeHTML(studentType);
   document.getElementById('evalSub').textContent  = `${m.major_name||'No major'} · ${m.year_level||'—'} · A.Y. ${currentAY}`;
   document.getElementById('tab-prospectus-body').innerHTML = `<div class="empty-state"><div class="spinner"></div><p style="margin-top:12px;">Loading prospectus…</p></div>`;
-  document.getElementById('tab-advisement-body').innerHTML = `<div class="empty-state"><div class="spinner"></div></div>`;
 
   Promise.all([
     fetch(EVAL_PROC,{method:'POST',body:fd1}).then(r=>r.json()),
@@ -692,7 +698,7 @@ function buildCombinedBar(gwaData) {
       <span class="esb-period-badge"><i class="fas fa-calendar-alt"></i> A.Y. ${esc(currentAY)}</span>
       ${isAlreadyFinalized
         ? `<button class="esb-secondary-btn" onclick="openGradesModal('${esc(yearLabel)}','${esc(semLabel)}')"><i class="fas fa-eye"></i> View Grades</button>
-           <button class="esb-evaluate-btn esb-done" disabled><i class="fas fa-check-circle"></i> Already Evaluated</button>`
+           <button class="esb-evaluate-btn esb-done" onclick="showAlreadyEvaluatedModal('${esc(yearLabel)}','${esc(semLabel)}')"><i class="fas fa-check-circle"></i> Current Standing</button>`
         : `<button class="esb-evaluate-btn" id="btnEvaluate" onclick="autoDetectAndEvaluate()"><i class="fas fa-clipboard-check"></i> Evaluate</button>`
       }
     </div>
@@ -1051,13 +1057,15 @@ function clearFocus() {
     const btnEvaluate = document.getElementById('btnEvaluate');
     if (btnEvaluate) {
       if (finalizedMap[fkey]) {
-        btnEvaluate.innerHTML = '<i class="fas fa-check-circle"></i> Already Evaluated';
-        btnEvaluate.disabled = true;
+        btnEvaluate.innerHTML = '<i class="fas fa-check-circle"></i> Current Standing';
+        btnEvaluate.disabled = false;
         btnEvaluate.classList.add('esb-done');
+        btnEvaluate.onclick = function() { showAlreadyEvaluatedModal(focusYear, focusSem); };
       } else {
         btnEvaluate.innerHTML = '<i class="fas fa-clipboard-check"></i> Evaluate';
         btnEvaluate.disabled = false;
         btnEvaluate.classList.remove('esb-done');
+        btnEvaluate.onclick = function() { autoDetectAndEvaluate(); };
       }
     }
 
@@ -1238,8 +1246,8 @@ function showResultModal(subjects, yearLabel, semLabel) {
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
          <div style="font-size:13px;font-weight:700;color:var(--dark);">
            <i class="fas fa-list-check" style="color:var(--green);margin-right:7px;"></i>
-           Eligible for <strong>${nextSemLabel} · ${nextYearLabel}</strong>
-           <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:6px;">(customize before confirming)</span>
+           Select Subject Load for <strong>${nextSemLabel} · ${nextYearLabel}</strong>
+           <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:6px;">— checked subjects will be loaded &amp; become gradeable</span>
          </div>
          <div style="display:flex;gap:6px;">
            <button onclick="rmSelectAll(true)"  style="padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--green-l);color:#166534;font-size:11px;font-weight:600;cursor:pointer;">Select All</button>
@@ -1292,7 +1300,7 @@ function showResultModal(subjects, yearLabel, semLabel) {
          </div>
          <button onclick="rmConfirmEnrollmentList('${nextYearLabel}','${nextSemLabel}')"
            style="padding:8px 18px;background:#fff;color:var(--gold-d);border:none;border-radius:8px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 3px 10px rgba(0,0,0,.2);transition:all .2s;" id="rmConfirmBtn">
-           <i class="fas fa-check-double"></i> Confirm Enrollment List
+           <i class="fas fa-check-double"></i> Confirm Subject Load
          </button>
        </div>
      </div>`;
@@ -1402,18 +1410,53 @@ function showResultModal(subjects, yearLabel, semLabel) {
     </div>`;
   }
 
-  // ★ FLEXIBLE PROGRESSION: always show promote, with advisory note if there are issues
-  let actionsHtml = `<div class="rm-actions">
-    <button class="btn-promote" onclick="promoteStudent('${yearLabel}','${semLabel}','${nextYearLabel}','${nextSemLabel}')">
-      <i class="fas fa-arrow-circle-up"></i> Proceed to ${nextSemLabel} — ${nextYearLabel}
-    </button>`;
-  if(!allPassed) {
-    actionsHtml += `<div style="flex:1;padding:10px 14px;background:var(--amber-l);border-radius:10px;border:1px solid var(--amber-b);">
+  // ★ FLEXIBLE PROGRESSION: Proceed + Stay — both locked until subject load is finalized
+  const flexNote = !allPassed ? `
+    <div style="padding:10px 14px;background:var(--amber-l);border-radius:10px;border:1px solid var(--amber-b);margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:3px;"><i class="fas fa-info-circle"></i> Flexible Progression</div>
       <div style="font-size:10px;color:#a16207;line-height:1.5;">Student may proceed to the next semester. Only subjects with unmet prerequisites remain locked. Failed subjects without prerequisites can be retaken in a future term.</div>
+    </div>` : '';
+
+  // Gate notice shown above the buttons before finalization
+  const gateNoticeHtml = `
+    <div id="rmFinalizeGate" style="padding:12px 16px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px dashed #f59e0b;border-radius:12px;margin-bottom:12px;text-align:center;">
+      <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:4px;">
+        <i class="fas fa-lock" style="margin-right:6px;"></i>Finalize Subject Load to Continue
+      </div>
+      <div style="font-size:11px;color:#a16207;margin-bottom:10px;line-height:1.5;">
+        Confirm and finalize the subject load above, then choose to <strong>Proceed</strong> to the next semester or <strong>Stay</strong> on the current one.
+      </div>
+      <button id="rmFinalizeLoadBtn" onclick="rmFinalizeSubjectLoad('${yearLabel}','${semLabel}','${nextYearLabel}','${nextSemLabel}')"
+        style="padding:10px 24px;background:linear-gradient(135deg,#d97706,#b45309);color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(217,119,6,.35);transition:all .2s;"
+        disabled>
+        <i class="fas fa-check-square"></i> Finalize Subject Load
+      </button>
+      <div style="font-size:10px;color:#92400e;margin-top:8px;opacity:0.8;">
+        <i class="fas fa-arrow-up" style="font-size:8px;"></i> Confirm the subject load list above first
+      </div>
     </div>`;
-  }
-  actionsHtml += `<button class="btn-modal-close" onclick="closeResultModal()"><i class="fas fa-times"></i> Close</button></div>`;
+
+  let actionsHtml = `<div class="rm-actions" style="flex-direction:column;gap:10px;">
+    ${flexNote}
+    ${gateNoticeHtml}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <button class="btn-promote" id="rmProceedBtn"
+        onclick="promoteStudent('${yearLabel}','${semLabel}','${nextYearLabel}','${nextSemLabel}')"
+        disabled title="Finalize subject load first"
+        style="opacity:0.45;cursor:not-allowed;filter:grayscale(0.3);">
+        <i class="fas fa-lock" id="rmProceedIcon"></i>
+        <span id="rmProceedLabel">Proceed to ${nextSemLabel} — ${nextYearLabel}</span>
+      </button>
+      <button class="btn-stay" id="rmStayBtn"
+        onclick="stayStudent('${yearLabel}','${semLabel}')"
+        disabled title="Finalize subject load first"
+        style="padding:12px 22px;background:linear-gradient(135deg,#64748b,#475569);color:#fff;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:not-allowed;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(100,116,139,.3);transition:all .3s;opacity:0.45;filter:grayscale(0.3);">
+        <i class="fas fa-lock" id="rmStayIcon"></i>
+        <span id="rmStayLabel">Stay — ${yearLabel} · ${semLabel}</span>
+      </button>
+      <button class="btn-modal-close" onclick="closeResultModal()"><i class="fas fa-times"></i> Close</button>
+    </div>
+  </div>`;
 
   document.getElementById('resultModalContent').innerHTML = `
     <div class="rm-header ${headerClass}">
@@ -1439,18 +1482,142 @@ function closeResultModal() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   FINALIZE SUBJECT LOAD (inside Result Modal)
+   Locks the confirmed subject list and enables Proceed + Stay.
+═══════════════════════════════════════════════════════════ */
+function rmFinalizeSubjectLoad(fromYear, fromSem, toYear, toSem) {
+  // Disable the finalize button to prevent double-click
+  const finalizeBtn = document.getElementById('rmFinalizeLoadBtn');
+  if(finalizeBtn) {
+    finalizeBtn.disabled = true;
+    finalizeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing…';
+  }
+
+  // Save finalization to server
+  const fd = new FormData();
+  fd.append('action','finalize_session');
+  fd.append('student_id', currentStudent.id);
+  fd.append('major_id', currentStudent.major_id||0);
+  fd.append('academic_year', currentAY);
+  fd.append('year_level', fromYear);
+  fd.append('semester', fromSem);
+  fetch(EVAL_PROC, {method:'POST', body:fd}).catch(()=>{});
+
+  // Mark as finalized locally
+  const fromKey = `${fromYear}|${fromSem}`;
+  finalizedMap[fromKey] = true;
+
+  // Update the gate notice to show finalized state
+  const gateDiv = document.getElementById('rmFinalizeGate');
+  if(gateDiv) {
+    gateDiv.style.background = 'linear-gradient(135deg,#dcfce7,#bbf7d0)';
+    gateDiv.style.borderColor = '#22c55e';
+    gateDiv.style.borderStyle = 'solid';
+    gateDiv.innerHTML = `
+      <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">
+        <i class="fas fa-check-circle" style="margin-right:6px;"></i>Subject Load Finalized
+      </div>
+      <div style="font-size:11px;color:#166534;line-height:1.5;">
+        The subject load for <strong>${fromYear} — ${fromSem}</strong> has been finalized and locked.
+        Now choose how to proceed for the student.
+      </div>`;
+  }
+
+  // ★ Enable the Proceed button
+  const proceedBtn = document.getElementById('rmProceedBtn');
+  if(proceedBtn) {
+    proceedBtn.disabled = false;
+    proceedBtn.style.opacity = '1';
+    proceedBtn.style.cursor = 'pointer';
+    proceedBtn.style.filter = '';
+    document.getElementById('rmProceedIcon').className = 'fas fa-arrow-circle-up';
+  }
+
+  // ★ Enable the Stay button
+  const stayBtn = document.getElementById('rmStayBtn');
+  if(stayBtn) {
+    stayBtn.disabled = false;
+    stayBtn.style.opacity = '1';
+    stayBtn.style.cursor = 'pointer';
+    stayBtn.style.filter = '';
+    stayBtn.title = '';
+    document.getElementById('rmStayIcon').className = 'fas fa-map-pin';
+  }
+
+  toast('Subject load finalized! Choose Proceed or Stay.', 'success', 3500);
+  applyFocusVisuals();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STAY STUDENT — keeps same year_level, saves finalized load
+═══════════════════════════════════════════════════════════ */
+function stayStudent(fromYear, fromSem) {
+  if(!currentStudent) { toast('No student loaded.', 'error'); return; }
+
+  const fd = new FormData();
+  fd.append('action', 'stay_student');
+  fd.append('student_id', currentStudent.id);
+  fd.append('year_level', fromYear);
+  fd.append('semester', fromSem);
+  fd.append('academic_year', currentAY);
+  if(confirmedEnrollmentSubjectIds.length) {
+    fd.append('confirmed_subject_ids', JSON.stringify(confirmedEnrollmentSubjectIds));
+  }
+
+  // Disable both buttons while saving
+  const proceedBtn = document.getElementById('rmProceedBtn');
+  const stayBtn    = document.getElementById('rmStayBtn');
+  if(proceedBtn) { proceedBtn.disabled = true; proceedBtn.style.opacity = '0.6'; }
+  if(stayBtn)    { stayBtn.disabled = true; stayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…'; }
+
+  fetch(EVAL_PROC, {method:'POST', body:fd})
+    .then(r => r.json())
+    .then(data => {
+      // Even if the server returns a "not found" action, we still handle it gracefully —
+      // the finalization + enrollment list save was already done by rmFinalizeSubjectLoad
+      // and rmConfirmEnrollmentList respectively.
+      toast(`Student stays at ${fromYear} — ${fromSem}. Subject load saved.`, 'success', 4000);
+
+      setTimeout(() => {
+        closeResultModal();
+        if(currentStudent) {
+          const studentCopy = {...currentStudent};
+          closeEval();
+          setTimeout(() => openEval(studentCopy), 200);
+        }
+        loadMentees();
+      }, 1200);
+    })
+    .catch(() => {
+      // Network error — still proceed locally since the important data was already saved
+      toast(`Student stays at ${fromYear} — ${fromSem}.`, 'success', 3500);
+      setTimeout(() => {
+        closeResultModal();
+        if(currentStudent) {
+          const studentCopy = {...currentStudent};
+          closeEval();
+          setTimeout(() => openEval(studentCopy), 200);
+        }
+        loadMentees();
+      }, 1200);
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════
    GRADES VIEW MODAL
 ═══════════════════════════════════════════════════════════ */
 function openGradesModal(year, sem) {
-  // Filter subjects for the selected year and semester — only those in student's actual load,
-  // or credited (especially for Transfer students), or both
-  const semNum = sem.includes('1st') ? 1 : 2;
+  // Filter subjects for the selected year and semester —
+  // ONLY show subjects that are in the student's actual load (is_in_load OR is_credited)
+  // for that specific year + semester. This ensures the grade view reflects
+  // exactly what was enrolled, not the entire curriculum for that period.
   const filteredSubjects = loadedSubjects.filter(s => {
     const sYear = (s.year_level||'').trim();
     const sSem  = (s.semester||'').toLowerCase();
     const matchYear = sYear === year;
     const matchSem  = sSem.includes(sem.includes('1st') ? '1st' : '2nd');
-    const inLoad = s.is_in_load || s.is_credited; // show if enrolled OR credited
+    // Only display subjects the student is actually enrolled in (in-load or credited)
+    const inLoad = !!(s.is_in_load || s.is_credited);
     return matchYear && matchSem && inLoad;
   });
 
@@ -1465,6 +1632,14 @@ function openGradesModal(year, sem) {
    // Update modal header
    document.getElementById('gmSemesterTitle').textContent = `${year} — ${sem} · A.Y. ${currentAY}`;
    document.getElementById('gmStudentName').textContent = fullName;
+   
+   // Compute totals for the badge
+   const totalInPeriod = loadedSubjects.filter(s => {
+     const sYear = (s.year_level||'').trim();
+     const sSem  = (s.semester||'').toLowerCase();
+     return sYear === year && sSem.includes(sem.includes('1st') ? '1st' : '2nd');
+   }).length;
+   const loadedCount = filteredSubjects.length;
    
    // Show school header with major
    const schoolHeader = document.getElementById('gmSchoolHeader');
@@ -1491,6 +1666,7 @@ function openGradesModal(year, sem) {
   if(filteredSubjects.length === 0) {
     tbody.innerHTML = '';
     emptyState.style.display = 'block';
+    emptyState.innerHTML = `<i class="fas fa-inbox" style="font-size:28px;color:var(--muted);margin-bottom:8px;display:block;"></i>No subjects loaded for this period.<br><span style="font-size:11px;color:var(--muted);">Subjects appear here once confirmed via the Subject Load selection during evaluation.</span>`;
   } else {
     emptyState.style.display = 'none';
     let totalUnits = 0;
@@ -1559,7 +1735,20 @@ function openGradesModal(year, sem) {
       `;
     }
     
-     // Student info was already set earlier with correct table year/semester
+     // Update hint — clarify that only loaded subjects are shown
+    if(gradedCount > 0 && totalUnits > 0) {
+      document.getElementById('gmHint').innerHTML = `
+        <i class="fas fa-layer-group" style="margin-right:4px;color:var(--gold-d);"></i>
+        Showing <strong>${loadedCount}</strong> enrolled subject(s) of <strong>${totalInPeriod}</strong> in curriculum &nbsp;·&nbsp;
+        <strong>${gradedCount}</strong> graded &nbsp;·&nbsp; 
+        <strong>${totalUnits}</strong> units &nbsp;·&nbsp; 
+        Semester GWA: <strong style="color:var(--gold-d);font-size:13px;">${gwa.toFixed(2)}</strong>
+      `;
+    } else {
+      document.getElementById('gmHint').innerHTML = `
+        <span style="color:var(--muted);">Showing <strong>${loadedCount}</strong> enrolled subject(s) &nbsp;·&nbsp; <strong>${gradedCount}</strong> of <strong>${loadedCount}</strong> graded &nbsp;·&nbsp; <strong>${totalUnits}</strong> total units</span>
+      `;
+    }
   }
 
   document.getElementById('gradesModal').classList.add('open');
@@ -1805,14 +1994,32 @@ function printGradesTable() {
      fd.append('to_year',toYear||''); fd.append('to_sem',toSem||'');
      fetch(EVAL_PROC,{method:'POST',body:fd}).catch(()=>{});
    }
-   toast(`Enrollment list confirmed — ${allSelected.length} subjects (${units} units)`,'success',3500);
+   toast(`Subject load confirmed — ${allSelected.length} subjects (${units} units) will be loaded for ${toYear} ${toSem}`,'success',3800);
    
-   // Update buttons
+   // Update confirm button
    const btn = document.getElementById('rmConfirmBtn');
    if(btn) { 
-     btn.innerHTML='<i class="fas fa-check-circle"></i> List Confirmed'; 
+     btn.innerHTML='<i class="fas fa-check-circle"></i> Load Confirmed'; 
      btn.style.background='linear-gradient(135deg,var(--green),#15803d)'; 
      btn.disabled=true; 
+   }
+
+   // ★ Unlock the "Finalize Subject Load" button now that a load is confirmed
+   const finalizeLoadBtn = document.getElementById('rmFinalizeLoadBtn');
+   if(finalizeLoadBtn) {
+     finalizeLoadBtn.disabled = false;
+     finalizeLoadBtn.style.opacity = '1';
+     finalizeLoadBtn.style.cursor = 'pointer';
+     finalizeLoadBtn.style.background = 'linear-gradient(135deg,#16a34a,#15803d)';
+     finalizeLoadBtn.innerHTML = '<i class="fas fa-check-square"></i> Finalize Subject Load';
+     // Update gate notice text
+     const gateDiv = document.getElementById('rmFinalizeGate');
+     if(gateDiv) {
+       const subText = gateDiv.querySelector('div:nth-child(2)');
+       if(subText) subText.innerHTML = '<strong style="color:#166534;">' + allSelected.length + ' subjects confirmed.</strong> Click <strong>Finalize Subject Load</strong> to lock the list and enable Proceed / Stay.';
+       const hint = gateDiv.querySelector('div:last-child');
+       if(hint) hint.style.display = 'none';
+     }
    }
    
    // Add print button for selected subjects
@@ -2375,7 +2582,6 @@ const sigHtml = `<div class="pro-sig-block">
   </div>`;
 
   document.getElementById('tab-prospectus-body').innerHTML = buildCombinedBar(gwaData) + proHtml;
-  buildAdvisement();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2618,7 +2824,6 @@ function saveGrade(sid, studentId, majorId, sem, year, ay) {
        refreshLockStates();
        recalcGWA();
        applyFocusVisuals();
-       buildAdvisement(true);
        toast(`Saved: ${d.label||gradeLabel(rounded)} (${parseFloat(rounded).toFixed(2)})`,'success');
       
       setTimeout(() => focusNextInput(sid), 300);
@@ -3136,14 +3341,8 @@ function renderAdvisement(d) {
            border-collapse: collapse;
            font-size: 10pt;
          }
-         .gm-th {
-           background: #8B6914;
-           color: white;
-           padding: 2.5mm 2mm;
-           font-weight: bold;
-           text-align: left;
-           border: 1pt solid #8B6914;
-         }
+         
+       
          .gm-td {
            padding: 2mm 2mm;
            border: 1pt solid #ccc;

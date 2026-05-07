@@ -414,7 +414,7 @@ if ($action === 'save_student_type') {
     $student_type = $_POST['student_type'] ?? '';
 
     // Validate student_type
-    $allowed_types = ['regular', 'transfer', 'non_ibm'];
+    $allowed_types = ['regular', 'transfer', 'non_ibm', 'prospect'];
     if (!in_array($student_type, $allowed_types)) {
         jsonError('Invalid student type');
     }
@@ -1131,6 +1131,51 @@ if ($action === 'verify_password') {
             echo json_encode(['success' => false, 'message' => 'Invalid password']);
         }
     } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ACTION: reset_student
+//  Deletes all grades and resets student to fresh state
+// ═══════════════════════════════════════════════════════════════════
+
+if ($action === 'reset_student') {
+    $student_id = intval($_POST['student_id'] ?? 0);
+    
+    if (!$student_id) {
+        echo json_encode(['success' => false, 'message' => 'Student ID required']);
+        exit;
+    }
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Delete all grades for this student
+        $stmt = $pdo->prepare("DELETE FROM student_grades WHERE student_id = ?");
+        $stmt->execute([$student_id]);
+        
+        // Delete all evaluation sessions for this student
+        $stmt = $pdo->prepare("DELETE FROM evaluation_sessions WHERE student_id = ?");
+        $stmt->execute([$student_id]);
+        
+        // Delete student subject load
+        $stmt = $pdo->prepare("DELETE FROM student_subject_load WHERE student_id = ?");
+        $stmt->execute([$student_id]);
+        
+        // Reset student type to null (optional - makes them new again)
+        $stmt = $pdo->prepare("UPDATE students SET student_type = NULL, updated_at = NOW() WHERE id = ?");
+        $stmt->execute([$student_id]);
+        
+        $pdo->commit();
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Student has been reset successfully. All grades and evaluation data have been cleared.'
+        ]);
+    } catch (PDOException $e) {
+        $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;

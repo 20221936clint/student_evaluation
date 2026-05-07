@@ -17,7 +17,8 @@ const NonIBMEvaluation = (() => {
   let _bridgingSubjects = [];     // auto-loaded bridging subjects for 1st Year 1st Sem
   let _bridgingComplete = false;
   let _onComplete = null;
-  let _step = 1;                  // 1=load subjects, 2=review bridging, 3=done
+  let _step = 1;                  // 1=load bridging subjects, 2=load regular subjects, 3=done
+  let _setupComplete = false;     // flag to track if the Non-IBM setup is fully completed
 
   const STORAGE_KEY = 'non_ibm_eval_data';
 
@@ -31,48 +32,50 @@ const NonIBMEvaluation = (() => {
     _bridgingComplete = false;
     _step = 1;
 
-    _loadSaved();
+     _loadSaved();
 
-    // If subject load already exists, skip modal and call onComplete immediately
-    if (Object.keys(_subjectLoad).length > 0) {
-      // Ensure bridging subjects list is populated for applyRestrictions
-      if (_bridgingSubjects.length === 0) {
-        _bridgingSubjects = _subjects.filter(s => (s.year_level || '').toLowerCase() === 'bridging');
-      }
-      if (typeof onComplete === 'function') {
-        // Use setTimeout to avoid re-entrancy issues
-        setTimeout(() => onComplete(_subjectLoad, _bridgingSubjects), 0);
-      }
-      return true; // skipped
-    }
+     // If subject load already exists AND setup is complete, skip modal and call onComplete immediately
+     if (Object.keys(_subjectLoad).length > 0 && _setupComplete) {
+       // Ensure bridging subjects list is populated for applyRestrictions
+       if (_bridgingSubjects.length === 0) {
+         _bridgingSubjects = _subjects.filter(s => (s.year_level || '').toLowerCase() === 'bridging');
+       }
+       if (typeof onComplete === 'function') {
+         // Use setTimeout to avoid re-entrancy issues
+         setTimeout(() => onComplete(_subjectLoad, _bridgingSubjects), 0);
+       }
+       return true; // skipped
+     }
 
-    _showWorkflow();
-    return false; // modal shown
+     _showWorkflow();
+     return false; // modal shown
   }
 
   /* ── Session Persistence ── */
-  function _loadSaved() {
-    try {
-      const raw = sessionStorage.getItem(`${STORAGE_KEY}_${_student.id}`);
-      if (raw) {
-        const data = JSON.parse(raw);
-        _subjectLoad = data.subjectLoad || {};
-        _bridgingComplete = data.bridgingComplete || false;
-        if (Object.keys(_subjectLoad).length > 0) {
-          _step = 3;
-        }
-      }
-    } catch (e) {}
-  }
+   function _loadSaved() {
+     try {
+       const raw = sessionStorage.getItem(`${STORAGE_KEY}_${_student.id}`);
+       if (raw) {
+         const data = JSON.parse(raw);
+         _subjectLoad = data.subjectLoad || {};
+         _bridgingComplete = data.bridgingComplete || false;
+         _setupComplete = data.setupComplete || false;
+         if (Object.keys(_subjectLoad).length > 0) {
+           _step = 3;
+         }
+       }
+     } catch (e) {}
+   }
 
-  function _save() {
-    try {
-      sessionStorage.setItem(`${STORAGE_KEY}_${_student.id}`, JSON.stringify({
-        subjectLoad: _subjectLoad,
-        bridgingComplete: _bridgingComplete
-      }));
-    } catch (e) {}
-  }
+   function _save() {
+     try {
+       sessionStorage.setItem(`${STORAGE_KEY}_${_student.id}`, JSON.stringify({
+         subjectLoad: _subjectLoad,
+         bridgingComplete: _bridgingComplete,
+         setupComplete: _setupComplete
+       }));
+     } catch (e) {}
+   }
 
   /* ── Getters ── */
   function getSubjectLoad() { return _subjectLoad; }
@@ -148,15 +151,15 @@ const NonIBMEvaluation = (() => {
         </div>
 
         <div class="nim-steps">
-          <div class="nim-step ${_step >= 1 ? 'nim-step-active' : ''}" id="nimStep1">
-            <div class="nim-step-num">1</div>
-            <div class="nim-step-label">Subject Load</div>
-          </div>
+           <div class="nim-step ${_step >= 1 ? 'nim-step-active' : ''}" id="nimStep1">
+             <div class="nim-step-num">1</div>
+             <div class="nim-step-label">Bridging</div>
+           </div>
           <div class="nim-step-line ${_step >= 2 ? 'nim-line-active' : ''}"></div>
-          <div class="nim-step ${_step >= 2 ? 'nim-step-active' : ''}" id="nimStep2">
-            <div class="nim-step-num">2</div>
-            <div class="nim-step-label">${isFirstYearFirstSem ? 'Bridging' : 'Review'}</div>
-          </div>
+           <div class="nim-step ${_step >= 2 ? 'nim-step-active' : ''}" id="nimStep2">
+             <div class="nim-step-num">2</div>
+             <div class="nim-step-label">Regular</div>
+           </div>
           <div class="nim-step-line ${_step >= 3 ? 'nim-line-active' : ''}"></div>
           <div class="nim-step ${_step >= 3 ? 'nim-step-active' : ''}" id="nimStep3">
             <div class="nim-step-num">3</div>
@@ -195,38 +198,23 @@ const NonIBMEvaluation = (() => {
     const footer = document.getElementById('nimFooter');
     if (!body || !footer) return;
 
-    switch (_step) {
-      case 1: _renderSubjectLoad(body, footer); break;
-      case 2: _renderBridgingReview(body, footer); break;
-      case 3: _renderComplete(body, footer); break;
-    }
+      switch (_step) {
+        case 1: _renderBridgingLoad(body, footer); break;
+        case 2: _renderRegularLoad(body, footer); break;
+        case 3: _renderComplete(body, footer); break;
+      }
   }
 
-  /* ── Step 1: Subject Load ── */
-  function _renderSubjectLoad(body, footer) {
+   /* ── Step 1: Bridging Subject Load ── */
+   function _renderBridgingLoad(body, footer) {
     const isFirstYearFirstSem = _isFirstYearFirstSem();
-
-    // Group non-bridging subjects by year/semester
-    const nonBridging = _subjects.filter(s => (s.year_level || '').toLowerCase() !== 'bridging');
-    const grouped = {};
-    nonBridging.forEach(s => {
-      const key = `${s.year_level || '1st Year'}|${s.semester || '1st Semester'}`;
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(s);
-    });
+    const bridging = _subjects.filter(s => (s.year_level || '').toLowerCase() === 'bridging');
 
     let tableRows = '';
-    const sortedKeys = Object.keys(grouped).sort((a, b) => {
-      const [yA] = a.split('|');
-      const [yB] = b.split('|');
-      const yearOrder = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4 };
-      return (yearOrder[yA] || 99) - (yearOrder[yB] || 99);
-    });
-
-    sortedKeys.forEach(key => {
-      const [year, sem] = key.split('|');
-      tableRows += `<tr class="nim-group-header"><td colspan="4" style="background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#fff;font-weight:700;padding:8px 12px;font-size:11px;">${_escHtml(year)} — ${_escHtml(sem)}</td></tr>`;
-      grouped[key].forEach(s => {
+    if (bridging.length === 0) {
+      tableRows = `<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted);font-size:11px;">No bridging subjects configured</td></tr>`;
+    } else {
+      bridging.forEach(s => {
         const inLoad = _subjectLoad[s.id] || false;
         tableRows += `
         <tr class="nim-subject-row" id="nim-row-${s.id}">
@@ -240,17 +228,106 @@ const NonIBMEvaluation = (() => {
           <td style="text-align:center;font-weight:600;padding:6px;">${parseFloat(s.units) || 0}</td>
         </tr>`;
       });
-    });
+    }
 
     body.innerHTML = `
     <div style="margin-bottom:14px;">
       <div style="padding:14px 18px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid var(--amber-b);border-radius:10px;">
         <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:4px;">
-          <i class="fas fa-clipboard-list" style="margin-right:6px;"></i>Step 1: Define Subject Load
+          <i class="fas fa-exchange-alt" style="margin-right:6px;"></i>Step 1: Bridging Subjects
         </div>
         <div style="font-size:11px;color:#a16207;line-height:1.6;">
-          Select only the subjects the Non-IBM student is allowed to take. The evaluation will be restricted strictly to these subjects.
-          ${isFirstYearFirstSem ? '<br><strong>Note:</strong> Since this is a 1st Year 1st Semester student, bridging subjects will be auto-loaded in the next step.' : ''}
+          ${isFirstYearFirstSem ? 'For 1st Year 1st Semester Non-IBM students, select the required bridging subjects that must be completed before proceeding to regular subjects.' : 'Select any bridging subjects the student needs to take.'}
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;">
+      <input type="text" id="nimLoadSearch" placeholder="Search bridging subjects..." oninput="NonIBMEvaluation.filterSubjects()"
+        style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'Poppins',sans-serif;">
+      <span style="font-size:11px;color:var(--muted);" id="nimLoadCount">${Object.keys(_subjectLoad).filter(k => _subjectLoad[k]).length} selected</span>
+    </div>
+    <div style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:var(--cream2);">
+            <th style="width:36px;padding:8px;text-align:center;font-size:10px;font-weight:700;color:var(--gold-d);">✓</th>
+            <th style="padding:8px;text-align:left;font-size:10px;font-weight:700;color:var(--gold-d);">Code</th>
+            <th style="padding:8px;text-align:left;font-size:10px;font-weight:700;color:var(--gold-d);">Subject</th>
+            <th style="width:50px;padding:8px;text-align:center;font-size:10px;font-weight:700;color:var(--gold-d);">Units</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px;padding:8px 12px;background:var(--cream2);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:10px;color:var(--muted);">
+        <i class="fas fa-info-circle" style="color:var(--amber);margin-right:4px;"></i>
+        Select bridging subjects that must be completed first
+      </span>
+      <span style="font-size:11px;font-weight:700;color:var(--gold-d);" id="nimLoadUnits">0 units</span>
+    </div>`;
+
+    footer.innerHTML = `
+    <button class="nim-btn-back" onclick="NonIBMEvaluation.goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="nim-btn-next" onclick="NonIBMEvaluation.goToStep(2)"><i class="fas fa-arrow-right"></i> Next: Regular Subjects</button>`;
+
+    _updateLoadCount();
+   }
+
+    /* ── Step 2: All Subjects (Regular + Bridging) ── */
+    function _renderRegularLoad(body, footer) {
+     const isFirstYearFirstSem = _isFirstYearFirstSem();
+
+     // Group ALL subjects by year/semester (including bridging)
+     const grouped = {};
+     _subjects.forEach(s => {
+       const key = `${s.year_level || '1st Year'}|${s.semester || '1st Semester'}`;
+       if (!grouped[key]) grouped[key] = [];
+       grouped[key].push(s);
+     });
+
+      let tableRows = '';
+     const sortedKeys = Object.keys(grouped).sort((a, b) => {
+       const [yA, sA] = a.split('|');
+       const [yB, sB] = b.split('|');
+       const yearOrder = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4, 'Bridging': 5 };
+       const semOrder = { '1st Semester': 1, '2nd Semester': 2, 'Summer': 3 };
+       const yearDiff = (yearOrder[yA] || 99) - (yearOrder[yB] || 99);
+       if (yearDiff !== 0) return yearDiff;
+       return (semOrder[sA] || 99) - (semOrder[sB] || 99);
+     });
+
+     sortedKeys.forEach(key => {
+       const [year, sem] = key.split('|');
+       tableRows += `<tr class="nim-group-header"><td colspan="4" style="background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#fff;font-weight:700;padding:8px 12px;font-size:11px;">${_escHtml(year)} — ${_escHtml(sem)}</td></tr>`;
+       grouped[key].forEach(s => {
+         const isBridging = (s.year_level || '').toLowerCase() === 'bridging';
+         const inLoad = _subjectLoad[s.id] || false;
+         const isDisabled = isBridging; // Bridging subjects are auto-selected from step 1 and can't be unchecked
+         tableRows += `
+         <tr class="nim-subject-row" id="nim-row-${s.id}" style="${isDisabled ? 'opacity:0.7' : ''}">
+           <td style="text-align:center;padding:6px;">
+             <input type="checkbox" class="nim-load-check" data-sid="${s.id}" ${inLoad ? 'checked' : ''}
+               ${isDisabled ? 'disabled' : ''}
+               onchange="NonIBMEvaluation.toggleSubject(${s.id}, this.checked)"
+               style="width:16px;height:16px;accent-color:var(--amber);cursor:${isDisabled ? 'not-allowed' : 'pointer'};">
+           </td>
+           <td style="font-weight:700;font-size:11px;padding:6px 8px;">${_escHtml(s.subject_code)}${isBridging ? ' <span style="color:var(--amber);font-size:9px;">(bridging)</span>' : ''}</td>
+           <td style="font-size:10px;padding:6px 8px;">${_escHtml(s.subject_name)}</td>
+           <td style="text-align:center;font-weight:600;padding:6px;">${parseFloat(s.units) || 0}</td>
+         </tr>`;
+       });
+     });
+
+     body.innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="padding:14px 18px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid var(--amber-b);border-radius:10px;">
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:4px;">
+          <i class="fas fa-clipboard-list" style="margin-right:6px;"></i>Step 2: All Subjects
+        </div>
+        <div style="font-size:11px;color:#a16207;line-height:1.6;">
+          Review and select all subjects the Non-IBM student is allowed to take. Bridging subjects (marked) are already loaded and must be completed first.
+          ${isFirstYearFirstSem ? '<br><strong>Note:</strong> Regular subjects can only be taken after completing required bridging subjects.' : ''}
         </div>
       </div>
     </div>
@@ -280,101 +357,15 @@ const NonIBMEvaluation = (() => {
       <span style="font-size:11px;font-weight:700;color:var(--gold-d);" id="nimLoadUnits">0 units</span>
     </div>`;
 
-    footer.innerHTML = `
-    <button class="nim-btn-cancel" onclick="NonIBMEvaluation.close()"><i class="fas fa-times"></i> Cancel</button>
-    <button class="nim-btn-next" onclick="NonIBMEvaluation.goToStep(2)"><i class="fas fa-arrow-right"></i> Next: ${isFirstYearFirstSem ? 'Bridging Subjects' : 'Review'}</button>`;
+     footer.innerHTML = `
+    <button class="nim-btn-back" onclick="NonIBMEvaluation.goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="nim-btn-next" onclick="NonIBMEvaluation.goToStep(3)"><i class="fas fa-arrow-right"></i> Next: Proceed</button>`;
 
     _updateLoadCount();
   }
 
-  /* ── Step 2: Bridging Review ── */
-  function _renderBridgingReview(body, footer) {
-    const isFirstYearFirstSem = _isFirstYearFirstSem();
-    const bridgingAll = _subjects.filter(s => (s.year_level || '').toLowerCase() === 'bridging');
-
-    if (isFirstYearFirstSem && bridgingAll.length > 0) {
-      _bridgingSubjects = bridgingAll;
-
-      // Auto-add bridging subjects to load
-      bridgingAll.forEach(bs => {
-        _subjectLoad[bs.id] = true;
-      });
-      _save();
-
-      let bridgingRows = '';
-      bridgingAll.forEach(bs => {
-        bridgingRows += `
-        <div style="padding:12px 16px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid var(--amber-b);border-radius:10px;display:flex;align-items:center;gap:12px;">
-          <div style="width:36px;height:36px;background:var(--amber);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0;">
-            <i class="fas fa-exchange-alt"></i>
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:12px;font-weight:700;color:#92400e;">${_escHtml(bs.subject_code)}</div>
-            <div style="font-size:10px;color:#a16207;">${_escHtml(bs.subject_name)}</div>
-            ${bs.bridging_for ? `<div style="font-size:9px;color:#92400e;margin-top:3px;"><i class="fas fa-arrow-right" style="margin-right:3px;"></i>Bridging for: ${_escHtml(bs.bridging_for)}</div>` : ''}
-          </div>
-          <div style="font-size:11px;font-weight:700;color:#92400e;">${parseFloat(bs.units) || 0} units</div>
-          <span style="padding:3px 8px;background:var(--amber);color:#fff;border-radius:10px;font-size:9px;font-weight:700;">AUTO-LOADED</span>
-        </div>`;
-      });
-
-      body.innerHTML = `
-      <div style="margin-bottom:14px;">
-        <div style="padding:14px 18px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid var(--amber-b);border-radius:10px;">
-          <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:4px;">
-            <i class="fas fa-exchange-alt" style="margin-right:6px;"></i>Step 2: Bridging Subjects (Auto-Loaded)
-          </div>
-          <div style="font-size:11px;color:#a16207;line-height:1.6;">
-            Since this is a <strong>1st Year, 1st Semester</strong> Non-IBM student, the following bridging subjects have been automatically added to the subject load.
-            These must be completed before proceeding to other regular subjects.
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
-        ${bridgingRows}
-      </div>
-      <div style="padding:12px 16px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid var(--blue-b);border-radius:10px;">
-        <div style="font-size:11px;color:#1d4ed8;line-height:1.6;">
-          <i class="fas fa-info-circle" style="margin-right:4px;"></i>
-          <strong>Important:</strong> Bridging subjects replace regular subjects whose prerequisites are not yet satisfied.
-          The student must complete these bridging subjects first before proceeding with the standard subject flow.
-        </div>
-      </div>`;
-    } else {
-      // No bridging needed — just show review
-      const loadCount = Object.keys(_subjectLoad).filter(k => _subjectLoad[k]).length;
-      const loadUnits = Object.keys(_subjectLoad).filter(k => _subjectLoad[k]).reduce((acc, sid) => {
-        const sub = _subjects.find(s => s.id == sid);
-        return acc + (sub ? (parseFloat(sub.units) || 0) : 0);
-      }, 0);
-
-      body.innerHTML = `
-      <div style="margin-bottom:14px;">
-        <div style="padding:14px 18px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid var(--blue-b);border-radius:10px;">
-          <div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:4px;">
-            <i class="fas fa-clipboard-check" style="margin-right:6px;"></i>Step 2: Review Subject Load
-          </div>
-          <div style="font-size:11px;color:#1d4ed8;line-height:1.6;">
-            Review the selected subject load. Only these subjects will be available for evaluation.
-          </div>
-        </div>
-      </div>
-      <div style="text-align:center;padding:20px;background:var(--cream2);border-radius:12px;margin-bottom:16px;">
-        <div style="font-size:28px;font-weight:800;color:var(--amber);font-family:'Playfair Display',serif;">${loadCount}</div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600;">${loadUnits} units in subject load</div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);text-align:center;">
-        ${!_isFirstYearFirstSem() ? 'No bridging subjects needed for this year/semester.' : 'No bridging subjects configured in the prospectus.'}
-      </div>`;
-    }
-
-    footer.innerHTML = `
-    <button class="nim-btn-back" onclick="NonIBMEvaluation.goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
-    <button class="nim-btn-next" onclick="NonIBMEvaluation.goToStep(3)"><i class="fas fa-arrow-right"></i> Next: Finish</button>`;
-  }
-
-  /* ── Step 3: Complete ── */
-  function _renderComplete(body, footer) {
+   /* ── Step 3: Complete ── */
+   function _renderComplete(body, footer) {
     const loadCount = Object.keys(_subjectLoad).filter(k => _subjectLoad[k]).length;
     const loadUnits = Object.keys(_subjectLoad).filter(k => _subjectLoad[k]).reduce((acc, sid) => {
       const sub = _subjects.find(s => s.id == sid);
@@ -453,13 +444,14 @@ const NonIBMEvaluation = (() => {
   }
 
   /* ── Complete ── */
-  function complete() {
-    _save();
-    _removeModal();
-    if (typeof _onComplete === 'function') {
-      _onComplete(_subjectLoad, _bridgingSubjects);
-    }
-  }
+   function complete() {
+     _setupComplete = true;
+     _save();
+     _removeModal();
+     if (typeof _onComplete === 'function') {
+       _onComplete(_subjectLoad, _bridgingSubjects);
+     }
+   }
 
   /* ── Close ── */
   function close() {

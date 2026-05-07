@@ -2693,9 +2693,8 @@ const sigHtml = `<div class="pro-sig-block">
             ${(shouldDisable && !isCredited) ? `<button class="edit-btn" id="ebtn-${sub.id}" onclick="requestEditGrade(${sub.id},${student.id},${student.major_id},'${esc(sub.semester)}','${esc(sub.year_level)}','${esc(ay)}')" title="Edit this grade (requires password)"><i class="fas fa-edit"></i></button>` : ''}
           </div>
           <div class="grade-hint" id="gl-${sub.id}">${sub.grade_label||''}</div>
-           ${shouldDisable && !isFinalizedLocked ? `<span class="lock-badge" style="${badgeStyle}"><i class="fas ${badgeIcon}" style="font-size:7px;"></i>${lockDesc||'Locked'}</span>` : ''}
-          ${isInLoad && raw == null && isInCurrentPeriod ? '<span class="lock-badge" style="background:linear-gradient(135deg,var(--amber-l),var(--amber-b));color:#92400e;border-color:#fbbf24;"><i class="fas fa-exclamation-triangle" style="font-size:7px;"></i> Not graded</span>' : ''}
-        </div>
+             ${shouldDisable && !isFinalizedLocked ? `<span class="lock-badge" style="${badgeStyle}"><i class="fas ${badgeIcon}" style="font-size:7px;"></i>${lockDesc||'Locked'}</span>` : ''}
+          </div>
       </td>
       <td class="pro-td-status"><span class="${pillClass(status)}" id="pill-${sub.id}">${statusText(status)}</span></td>
       <td class="pro-code">${esc(sub.subject_code)}</td>

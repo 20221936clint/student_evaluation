@@ -812,6 +812,23 @@ CREATE TABLE `subject_advisements` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Table structure for table `student_subject_load`
+--
+
+CREATE TABLE `student_subject_load` (
+  `id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `major_id` int(11) DEFAULT NULL,
+  `year_level` varchar(20) DEFAULT '1st Year',
+  `semester` varchar(20) DEFAULT '1st Semester',
+  `academic_year` varchar(20) DEFAULT '2025-2026',
+  `status` enum('enrolled','dropped','completed') DEFAULT 'enrolled',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- --------------------------------------------------------
 
 --

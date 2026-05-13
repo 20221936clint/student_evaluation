@@ -752,7 +752,7 @@ body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--i
         <a href="../dashboard.php" class="sidebar-nav-item"><i class="fas fa-chart-pie"></i><span>Overview</span></a>
         <a href="students.php" class="sidebar-nav-item active"><i class="fas fa-user-graduate"></i><span>Student Mentees</span></a>
         <a href="evaluation.php" class="sidebar-nav-item"><i class="fas fa-comment-dots"></i><span>Evaluation</span></a>
-        <a href="reports.php" class="sidebar-nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
+
         <a href="profile.php" class="sidebar-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
     </nav>
 </aside>

@@ -13,7 +13,6 @@ $avg_rating = 0;
 $new_feedback = 0;
 $pending_evaluations = 0;
 $new_mentees = 0;
-$reports_generated = 0;
 $active_tasks = 0;
 $recent_evaluations = [];
 $recent_feedback = [];
@@ -87,14 +86,7 @@ if ($pdo) {
         $new_mentees = 0;
     }
 
-    try {
-        // Get reports generated count
-        $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM reports");
-        $result = $stmt->fetch();
-        $reports_generated = $result['cnt'] ?? 0;
-    } catch (PDOException $e) {
-        $reports_generated = 0;
-    }
+
 
     try {
         // Get active tasks count
@@ -728,10 +720,7 @@ if ($pdo) {
                  <i class="fas fa-comment-dots"></i>
                  <span>Evaluation</span>
              </a>
-             <a href="pages/reports.php" class="sidebar-nav-item">
-                 <i class="fas fa-file-alt"></i>
-                 <span>Reports</span>
-             </a>
+
              <a href="pages/profile.php" class="sidebar-nav-item">
                  <i class="fas fa-user"></i>
                  <span>Profile</span>
@@ -784,10 +773,7 @@ if ($pdo) {
                         <i class="fas fa-users"></i>
                         <span>Manage Students</span>
                     </a>
-                    <a href="pages/reports.php" class="banner-action-btn tertiary">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>View Reports</span>
-                    </a>
+
                 </div>
             </div>
 
@@ -863,18 +849,7 @@ if ($pdo) {
                     <?php endif; ?>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-card-icon indigo">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                    </div>
-                    <div class="stat-card-value"><?php echo $reports_generated; ?></div>
-                    <div class="stat-card-label">Reports Generated</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-chart-line"></i> Analytics Ready
-                    </div>
-                </div>
+
             </div>
 
             <!-- Quick Actions -->
@@ -889,10 +864,7 @@ if ($pdo) {
                         <i class="fas fa-user-plus"></i>
                         <span>Assign Task</span>
                     </a>
-                    <a href="pages/reports.php" class="action-btn tertiary">
-                        <i class="fas fa-file-download"></i>
-                        <span>Generate Report</span>
-                    </a>
+
                     <a href="pages/profile.php" class="action-btn quaternary">
                         <i class="fas fa-user-cog"></i>
                         <span>Update Profile</span>

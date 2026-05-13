@@ -2346,7 +2346,7 @@ if (!$show_role_modal) {
             <a href="student_enrollment.php" class="sidebar-nav-item active"><i class="fas fa-user-graduate"></i><span>Enrollment</span></a>
             <a href="mentee_flow.php" class="sidebar-nav-item"><i class="fas fa-users"></i><span>MenteeFlow</span></a>
             <a href="departments.php" class="sidebar-nav-item"><i class="fas fa-building"></i><span>Departments</span></a>
-            <a href="reports.php" class="sidebar-nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
+
             <a href="settings.php" class="sidebar-nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
         </nav>
     </div>

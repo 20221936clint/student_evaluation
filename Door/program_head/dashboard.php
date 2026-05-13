@@ -1668,10 +1668,7 @@ try {
                 <i class="fas fa-building"></i>
                 <span>Departments</span>
             </a>
-            <a href="pages/reports.php" class="sidebar-nav-item">
-                <i class="fas fa-file-alt"></i>
-                <span>Reports</span>
-            </a>
+
             <a href="pages/settings.php" class="sidebar-nav-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
@@ -1732,9 +1729,7 @@ try {
                             <a href="pages/instructors.php" class="welcome-btn">
                                 <i class="fas fa-chalkboard-teacher"></i> Manage Instructors
                             </a>
-                            <a href="pages/reports.php" class="welcome-btn outline">
-                                <i class="fas fa-chart-bar"></i> View Reports
-                            </a>
+
                         </div>
                     </div>
                     <div class="welcome-banner-right">
@@ -1776,7 +1771,7 @@ try {
                         </div>
                     </a>
                     
-                    <a href="pages/reports.php" class="stats-highlight clickable-stat">
+                    <div class="stats-highlight">
                         <div class="stat-card-inner">
                             <div class="stat-card-icon-wrap green">
                                 <i class="fas fa-check-circle"></i>
@@ -1788,9 +1783,8 @@ try {
                                     <span class="sub-rate"><i class="fas fa-chart-line"></i> <?php echo $eval_completion_rate; ?>% Completion Rate</span>
                                 </div>
                             </div>
-                            <div class="stat-card-arrow"><i class="fas fa-arrow-right"></i></div>
                         </div>
-                    </a>
+                    </div>
                     
                     <a href="pages/student_enrollment.php" class="stats-highlight clickable-stat">
                         <div class="stat-card-inner">
@@ -2058,9 +2052,7 @@ try {
                                           <h4 class="section-title">
                                               <i class="fas fa-calendar-check"></i> Upcoming Events
                                           </h4>
-                                          <a href="pages/reports.php" class="section-action">
-                                              View All <i class="fas fa-arrow-right"></i>
-                                          </a>
+
                                       </div>
                                       
                                       <div class="events-compact-list">
@@ -2174,9 +2166,7 @@ try {
                         <div class="content-card">
                             <div class="content-card-header gold-header">
                                 <h3><i class="fas fa-chart-line"></i> Performance Overview</h3>
-                                <a href="pages/reports.php" class="view-all">
-                                    Full Report <i class="fas fa-arrow-right"></i>
-                                </a>
+
                             </div>
                             <div class="content-card-body">
                                 <div class="performance-summary">
@@ -2226,15 +2216,11 @@ try {
                                     <div class="empty-state-small">
                                         <i class="fas fa-chart-pie"></i>
                                         <p>No performance data yet</p>
-                                        <a href="pages/reports.php" class="btn-primary" style="margin-top: 12px; font-size: 12px; padding: 10px 18px;">
-                                            <i class="fas fa-plus"></i> Start Evaluation
-                                        </a>
+
                                     </div>
                                 <?php endif; ?>
                                 
-                                <a href="pages/reports.php" class="view-all centered-link">
-                                    <i class="fas fa-chart-bar"></i> Full Reports
-                                </a>
+
                             </div>
                         </div>
                     </div>

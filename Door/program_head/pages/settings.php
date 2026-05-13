@@ -153,7 +153,7 @@ if (!$show_role_modal) {
             <a href="student_enrollment.php" class="sidebar-nav-item"><i class="fas fa-user-graduate"></i><span>Enrollment</span></a>
             <a href="mentee_flow.php" class="sidebar-nav-item"><i class="fas fa-users"></i><span>MenteeFlow</span></a>
             <a href="departments.php" class="sidebar-nav-item"><i class="fas fa-graduation-cap"></i><span>Majors</span></a>
-            <a href="reports.php" class="sidebar-nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
+
             <a href="settings.php" class="sidebar-nav-item active"><i class="fas fa-cog"></i><span>Settings</span></a>
         </nav>
     </aside>
@@ -385,28 +385,7 @@ if (!$show_role_modal) {
                         </div>
                     </div>
                     
-                    <div class="card" style="margin-top: 24px;">
-                        <div class="section-header">
-                            <div class="section-icon" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);"><i class="fas fa-file-alt"></i></div>
-                            <h3 class="section-title">Report Settings</h3>
-                        </div>
-                        <div class="toggle-group">
-                            <div class="toggle-label"><span>Include Comments</span><span>Show instructor comments in reports</span></div>
-                            <label class="toggle-switch"><input type="checkbox" id="includeComments" checked><span class="toggle-slider"></span></label>
-                        </div>
-                        <div class="toggle-group">
-                            <div class="toggle-label"><span>Show Rankings</span><span>Display instructor rankings</span></div>
-                            <label class="toggle-switch"><input type="checkbox" id="showRankings"><span class="toggle-slider"></span></label>
-                        </div>
-                        <div class="toggle-group">
-                            <div class="toggle-label"><span>Export PDF</span><span>Allow PDF export of reports</span></div>
-                            <label class="toggle-switch"><input type="checkbox" id="exportPdf" checked><span class="toggle-slider"></span></label>
-                        </div>
-                        <div class="toggle-group">
-                            <div class="toggle-label"><span>Export Excel</span><span>Allow Excel export of reports</span></div>
-                            <label class="toggle-switch"><input type="checkbox" id="exportExcel" checked><span class="toggle-slider"></span></label>
-                        </div>
-                    </div>
+
                 </div>
 
                 <!-- Notifications Tab -->
